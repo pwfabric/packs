@@ -1,5 +1,5 @@
 /**
- * Conventional Commits — workspace standard (loosened).
+ * Conventional Commits (loosened).
  *
  * Load-bearing rule = commit TYPE: feat→MINOR, fix→PATCH, BREAKING CHANGE→MAJOR.
  * Cosmetic rules (case, trailing period, line lengths) are relaxed so valid
@@ -8,7 +8,7 @@
  * No header length limit: length has no effect on the semver bump; the
  * load-bearing rule is the type.
  *
- * CI: .github/workflows/commitlint.yml  ·  Local: npx commitlint --from=origin/main
+ * CI: the commitlint job in .github/workflows/ci.yml  ·  Local: npx commitlint --from=origin/main
  */
 module.exports = {
   extends: ['@commitlint/config-conventional'],

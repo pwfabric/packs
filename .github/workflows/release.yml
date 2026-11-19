@@ -19,6 +19,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
@@ -28,8 +30,14 @@ jobs:
       - name: Resolve the pack and version from the tag
         id: tag
         run: |
-          pack="${GITHUB_REF_NAME%@*}"
-          version="${GITHUB_REF_NAME##*@}"
+          # <pack>@<major.minor.patch> and nothing else: the name reaches a path and a shell.
+          if [[ ! "$GITHUB_REF_NAME" =~ ^([a-z0-9][a-z0-9-]*)@([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "tag '$GITHUB_REF_NAME' is not <pack>@<major.minor.patch>"; exit 1
+          fi
+          pack="${BASH_REMATCH[1]}"
+          version="${BASH_REMATCH[2]}"
+          # A release is cut from what main carries, never from an unmerged commit.
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main || { echo "$GITHUB_SHA is not on main"; exit 1; }
           file="packs/$pack/pwpack.json"
           test -f "$file" || { echo "no pack '$pack' (no $file)"; exit 1; }
           declared=$(node -p "require('./$file').version")
