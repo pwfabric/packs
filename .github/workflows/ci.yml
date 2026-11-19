@@ -29,9 +29,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
       - run: pnpm validate
+      # The .pwpack archives a release attaches, written here too, so a pack
+      # that cannot be packed fails on its pull request, not on its tag.
+      - run: pnpm build
 
-  # The packs declare engines.pwfabric ">=3.0.0 <4"; the engine they are
-  # typechecked and tested on is the one package.json pins.
+  # The packs declare their engine range in pack-map.json (defaults.engines);
+  # the engine they are typechecked and tested on is the one package.json pins.
   engine:
     name: typecheck + test
     runs-on: ubuntu-latest
