@@ -1,0 +1,395 @@
+{
+  "id": "form.form",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "form",
+  "name": "form",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Form container that wires its inputs to the platform/entities capability and emits submit. Submitted values are saved as a record in the app's own data, under the entity type the form is bound to.",
+    "useCases": [
+      "Login or sign-up form",
+      "Contact or feedback submission",
+      "Entity create or edit form",
+      "Multi-step form (wizard): ONE form wraps every step; step buttons (button.action setState step) sit inside it; showSubmit only on the summary step; the confirmation shows on the formBinding success statusKey"
+    ],
+    "composesWith": [
+      "form.input",
+      "form.textarea",
+      "form.select",
+      "control.button",
+      "platform/entities",
+      "platform/persistence"
+    ],
+    "antiPatterns": [
+      "Wizard with explicit step navigation — wrap form inside panel.stepper",
+      "Single-input search — input + button is fine without a form wrapper",
+      "Wrapping only the first step of a multi-step flow in the form — fields of the later steps are never sent, the record is never written"
+    ],
+    "implementation": "Operational constraints (install, permissions, polling, read-only scope):\n- Read-only data display — use data.list\n\nFurther use cases:\n- Filter bar that produces a typed query\n\nValidation: the form validates itself on submit. A missing visible field gets the browser's own message on that field; a required field in a hidden wizard step (visibleWhen) is named in an alert above the submit button, so the visitor can go back to it. Mark only the fields the brief requires as required."
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "action",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "default": ""
+      },
+      {
+        "name": "method",
+        "type": "\"GET\" | \"POST\" | \"PUT\" | \"PATCH\" | \"DELETE\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "GET",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE"
+          ]
+        },
+        "bindable": false,
+        "default": "POST"
+      },
+      {
+        "name": "submitLabel",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "resetLabel",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "showReset",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "gap",
+        "type": "number | string",
+        "jsonSchema": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "bindable": false,
+        "default": 16
+      },
+      {
+        "name": "submittingWhen",
+        "type": "string",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Bind to the formBindings statusKeys.loading state key (e.g. {{state.scLoading}}) — while true the submit button is locked with a spinner. The synchronous ref lock stays active regardless."
+        },
+        "bindable": true
+      },
+      {
+        "name": "showSubmit",
+        "type": "boolean | string",
+        "jsonSchema": {
+          "type": [
+            "boolean",
+            "string"
+          ],
+          "description": "Whether the form renders its own submit button. Bind it for a multi-step flow: wrap EVERY step in this one form and show the submit only on the last step, e.g. {{state.step == 3}}. Unset = shown."
+        },
+        "bindable": true
+      },
+      {
+        "name": "resetWhen",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": [
+            "boolean",
+            "string"
+          ],
+          "description": "Clears every field when this turns true. Bind it to the formBindings statusKeys.success state key (e.g. {{state.scSuccess}}) so the form empties after a successful save. Only the false → true change resets."
+        },
+        "bindable": true
+      },
+      {
+        "name": "secondaryLabel",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "The text of a second, quieter control beside the submit button — Back on a step of a wizard, Cancel. Unset or empty: none is drawn. It never submits the form."
+        },
+        "bindable": true
+      },
+      {
+        "name": "secondaryHref",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Where the secondary control goes (an app route or an address): it renders a link in the secondary look. Wins over secondaryAction."
+        },
+        "bindable": true
+      },
+      {
+        "name": "secondaryAction",
+        "type": "SurfaceAction",
+        "jsonSchema": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "setState"
+                },
+                "key": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {}
+              },
+              "required": [
+                "type",
+                "key"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "refresh"
+                },
+                "sourceId": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "type",
+                "sourceId"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "refreshAll"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "showBlock"
+                },
+                "blockId": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "type",
+                "blockId"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "hideBlock"
+                },
+                "blockId": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "type",
+                "blockId"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "navigate"
+                },
+                "url": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "type",
+                "url"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "write"
+                },
+                "sourceId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "op": {
+                  "type": "string",
+                  "enum": [
+                    "create",
+                    "update",
+                    "delete"
+                  ]
+                },
+                "id": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                },
+                "values": {
+                  "type": "object",
+                  "additionalProperties": {}
+                },
+                "statusKeys": {
+                  "type": "object",
+                  "properties": {
+                    "loading": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "success": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "error": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "reason": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "fields": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "detail": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
+              },
+              "required": [
+                "type",
+                "sourceId",
+                "op"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "auth:signIn"
+                },
+                "method": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "auth:register"
+                },
+                "method": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "auth:signOut"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            }
+          ],
+          "description": "What pressing the secondary control does: one surface action, the shapes control.button takes (setState step back, navigate, write, auth:*). The press emits block:click from the id <form id>-secondary, so a page can also wire a behavior on it."
+        },
+        "bindable": true
+      },
+      {
+        "name": "onSubmitAction",
+        "type": "{ type: \"setState\" | \"navigate\" | \"refresh\" | \"refreshAll\" | \"showBlock\" | \"hideBlock\" | \"write\" | \"auth:signIn\" | \"auth:register\" | \"auth:signOut\"; [member: string]: unknown }",
+        "jsonSchema": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": {},
+          "description": "One declarative surface action dispatched on submit, carried in the form:submit payload — e.g. {\"type\":\"setState\",\"key\":\"submitted\",\"value\":true} so a success block with visibleWhen \"{{state.submitted}}\" shows."
+        },
+        "bindable": false
+      }
+    ],
+    "defaultProps": {
+      "action": "",
+      "method": "POST",
+      "showReset": false,
+      "gap": 16
+    },
+    "canHaveChildren": true,
+    "icon": "☐",
+    "traits": [
+      "modal-content"
+    ],
+    "allowedChildTraits": [
+      "form-field",
+      "form-content"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

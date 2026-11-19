@@ -1,0 +1,137 @@
+{
+  "id": "container.tabs",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "container",
+  "name": "tabs",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Tab strip that switches between independent panels of content",
+    "useCases": [
+      "Settings page sections (Profile / Billing / Security)",
+      "Detail page sub-views (Overview / Activity / Logs)",
+      "Mobile section switcher"
+    ],
+    "composesWith": [
+      "layout.container",
+      "form.form",
+      "container.card",
+      "control.badge",
+      "form.segmented-control"
+    ],
+    "antiPatterns": [
+      "Sequential wizard — one form per step, with a progress line or badges for the steps",
+      "Top-level site navigation — use layout.navbar",
+      "Collapsible FAQ — use container.accordion"
+    ],
+    "implementation": "Further use cases:\n- Code example with multiple language variants"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "tabs",
+        "type": "[{id, label, disabled}]",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "disabled": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "label"
+            ]
+          }
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "defaultTab",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "variant",
+        "type": "\"default\" | \"pills\" | \"underline\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "default",
+            "pills",
+            "underline"
+          ]
+        },
+        "bindable": false,
+        "default": "default"
+      },
+      {
+        "name": "fullWidth",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "orientation",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "horizontal",
+            "vertical"
+          ],
+          "description": "Tab-list orientation — 'vertical' draws a left-hand tab column."
+        },
+        "bindable": false,
+        "default": "horizontal"
+      },
+      {
+        "name": "stateKey",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "value",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "The active tab id page state holds — bind it to the key the tabs write (\"{{state.<stateKey>}}\"). When the key changes from outside (a second tab strip with the same key, a link that sets it) this strip follows, so tabs that share a key stay in sync. An unresolved binding or an unknown id is ignored."
+        },
+        "bindable": true
+      }
+    ],
+    "defaultProps": {
+      "tabs": [],
+      "variant": "default",
+      "fullWidth": false,
+      "orientation": "horizontal"
+    },
+    "canHaveChildren": true,
+    "icon": "⊟",
+    "traits": [],
+    "allowedChildTraits": [
+      "tab-panel"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "id": "media.carousel",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "media",
+  "name": "carousel",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Horizontally scrollable / paginated set of slides with optional autoplay and arrows. Two modes: pass `items` for an image carousel, or nest CHILD BLOCKS to turn any row (cards, stats, testimonials, logos) into a paginated strip — children take precedence over items. Set slidesPerView > 1 for a multi-up strip.",
+    "useCases": [
+      "Image gallery with autoplay and dots",
+      "Three-up card strip of services or team members (children + slidesPerView 3)",
+      "Testimonial strip that paginates one quote at a time (children + slidesPerView 1)"
+    ],
+    "composesWith": [
+      "layout.section",
+      "container.card",
+      "media.image"
+    ],
+    "antiPatterns": [
+      "Critical sequential content (likely to be missed by scroll-past)",
+      "Long browsing list — use layout.grid + panel.card",
+      "Single image — use media.image"
+    ],
+    "implementation": "Further anti-patterns:\n- Setting BOTH items and children — children win and items are ignored silently\n\nFurther use cases:\n- Logo row that scrolls on narrow screens"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "items",
+        "type": "[{src, alt, caption}]",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "src": {
+                "type": "string"
+              },
+              "alt": {
+                "type": "string"
+              },
+              "caption": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "src"
+            ]
+          }
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "autoplay",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "autoplayInterval",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "minimum": 1000,
+          "maximum": 10000
+        },
+        "bindable": false,
+        "default": 3000
+      },
+      {
+        "name": "showDots",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "showArrows",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "aspectRatio",
+        "type": "\"16:9\" | \"4:3\" | \"1:1\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "16:9",
+            "4:3",
+            "1:1"
+          ]
+        },
+        "bindable": false,
+        "default": "16:9"
+      },
+      {
+        "name": "slidesPerView",
+        "type": "number",
+        "jsonSchema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6
+        },
+        "bindable": false,
+        "default": 1
+      }
+    ],
+    "defaultProps": {
+      "items": [],
+      "autoplay": false,
+      "autoplayInterval": 3000,
+      "showDots": true,
+      "showArrows": true,
+      "aspectRatio": "16:9",
+      "slidesPerView": 1
+    },
+    "canHaveChildren": true,
+    "icon": "◫",
+    "traits": []
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

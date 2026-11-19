@@ -1,0 +1,81 @@
+{
+  "id": "feedback.spinner",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "feedback",
+  "name": "spinner",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Indeterminate loading indicator shown while content or an action is in progress",
+    "useCases": [
+      "Inline loading state on a button or panel",
+      "Placeholder while data is being fetched",
+      "Pending state for an async operation"
+    ],
+    "composesWith": [
+      "control.button",
+      "container.card",
+      "empty-state",
+      "feedback.toast"
+    ],
+    "antiPatterns": [
+      "Known progress percentage — a spinner cannot say how far along the work is",
+      "Skeleton placeholder for layout — use data.skeleton",
+      "Blocking full-page overlay — a spinner marks one region, it does not block the page"
+    ],
+    "implementation": "Further use cases:\n- Small activity indicator next to a label"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "size",
+        "type": "\"sm\" | \"md\" | \"lg\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "bindable": false,
+        "default": "md"
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "default": ""
+      },
+      {
+        "name": "variant",
+        "type": "\"primary\" | \"muted\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "primary",
+            "muted"
+          ]
+        },
+        "bindable": false,
+        "default": "primary"
+      }
+    ],
+    "defaultProps": {
+      "size": "md",
+      "label": "",
+      "variant": "primary"
+    },
+    "canHaveChildren": false,
+    "icon": "◠",
+    "traits": [
+      "inline"
+    ]
+  },
+  "tags": [
+    "tier:content"
+  ]
+}

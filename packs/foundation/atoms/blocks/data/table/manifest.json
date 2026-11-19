@@ -1,0 +1,401 @@
+{
+  "id": "data.table",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "data",
+  "name": "table",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Data-grid for tabular data: configurable columns with per-cell renderers (text/number/date/badge/link/avatar/image/button/icon — so cells can host an owner avatar chip, a picture drawn as itself (image), a row action button, or a status icon, not just text), a styleable (teal/dark) header, optional per-row left-edge accent/status stripes, and an optional selection checkbox column. Renders from a data source.",
+    "useCases": [
+      "Admin record list with status badges and a selection column (bulk actions)",
+      "Enterprise data-grid with branded (teal/dark) header and per-row status stripes",
+      "CRUD index page for an entity with linked cells (open/edit)",
+      "List with a link to each row detail page: link column with hrefTemplate \"/product?id={id}\""
+    ],
+    "composesWith": [
+      "layout.section",
+      "control.pagination",
+      "platform/persistence",
+      "platform/entities",
+      "control.badge",
+      "data.skeleton"
+    ],
+    "antiPatterns": [
+      "Simple bulleted list — use data.list",
+      "Visual card grid — use layout.grid + panel.card",
+      "Long single-column item feed — use data.list"
+    ],
+    "implementation": "Further use cases:\n- Sortable comparison or reporting table"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "columns",
+        "type": "[{key, header, width, align, type, decimals, dateFormat, dateLocale, badgeColorKey, badgeColor, badgeColorMap, badgeLabelMap, hrefKey, hrefTemplate, newTab, avatarKey, altKey, alt, imageSize, nameKey, showName, buttonLabel, buttonVariant, icon, iconColor}]",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "header": {
+                "type": "string"
+              },
+              "width": {
+                "type": [
+                  "number",
+                  "string"
+                ]
+              },
+              "align": {
+                "default": "left",
+                "type": "string",
+                "enum": [
+                  "left",
+                  "center",
+                  "right"
+                ]
+              },
+              "type": {
+                "default": "text",
+                "type": "string",
+                "enum": [
+                  "text",
+                  "number",
+                  "badge",
+                  "link",
+                  "avatar",
+                  "image",
+                  "button",
+                  "icon",
+                  "date"
+                ]
+              },
+              "decimals": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "dateFormat": {
+                "type": "string",
+                "enum": [
+                  "short",
+                  "long",
+                  "datetime",
+                  "time"
+                ]
+              },
+              "dateLocale": {
+                "type": "string"
+              },
+              "badgeColorKey": {
+                "type": "string"
+              },
+              "badgeColor": {
+                "type": "string"
+              },
+              "badgeColorMap": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "badgeLabelMap": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "hrefKey": {
+                "type": "string"
+              },
+              "hrefTemplate": {
+                "type": "string"
+              },
+              "newTab": {
+                "type": "boolean",
+                "description": "type link: open the link in a new tab. The cell is marked as such (an external-link glyph and \"opens in a new tab\" for a screen reader)."
+              },
+              "avatarKey": {
+                "type": "string"
+              },
+              "altKey": {
+                "type": "string",
+                "description": "type image: the row field holding the picture's text alternative (e.g. the sky in words). Without it (and without alt) the picture is decorative."
+              },
+              "alt": {
+                "type": "string",
+                "description": "type image: one text alternative for every row's picture."
+              },
+              "imageSize": {
+                "type": "number",
+                "minimum": 1,
+                "description": "type image: the square box the picture is drawn in, px (default 32). The whole picture shows (contain), with no circle or fill."
+              },
+              "nameKey": {
+                "type": "string"
+              },
+              "showName": {
+                "type": "boolean"
+              },
+              "buttonLabel": {
+                "type": "string"
+              },
+              "buttonVariant": {
+                "type": "string",
+                "enum": [
+                  "primary",
+                  "secondary",
+                  "outline",
+                  "ghost",
+                  "destructive"
+                ]
+              },
+              "icon": {
+                "type": "string"
+              },
+              "iconColor": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "key"
+            ]
+          }
+        },
+        "bindable": false,
+        "default": []
+      },
+      {
+        "name": "data",
+        "type": "Record<string, unknown>[]",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "columnsFrom",
+        "type": "'data'",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "data"
+          ],
+          "description": "Derive the columns from the first row's keys when `columns` is empty — for sources whose header row IS the schema (a workbook range). Private `__` keys are skipped."
+        },
+        "bindable": false
+      },
+      {
+        "name": "striped",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "bordered",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "hoverable",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "compact",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "headerColor",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Header row background colour. Defaults to the card token (var(--pw-color-card))."
+        },
+        "bindable": false
+      },
+      {
+        "name": "headerTextColor",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Header row text colour. Use with a dark/teal headerColor for light header text."
+        },
+        "bindable": false
+      },
+      {
+        "name": "rowAccentKey",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Name of a data field whose value is a colour string. When set, that colour renders as a left-edge stripe on the row; the field is consumed for the stripe and NOT shown as a column."
+        },
+        "bindable": false
+      },
+      {
+        "name": "selectable",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Render a leading checkbox column with a header select-all checkbox and per-row checkboxes. Selection is local component state; checkboxes are disabled in inert (editor/preview) renders."
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "sortable",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Click a header to sort asc/desc/none (Intl.Collator in the environment locale, numeric-aware)."
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "filterable",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Adds a global text-filter box above the table."
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "filterPlaceholder",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Placeholder (and accessible name) of the filter box, in the app's language."
+        },
+        "bindable": true
+      },
+      {
+        "name": "loadingWhen",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Bind {{__loading.<sourceId>}} — while true the table draws shimmer skeleton rows."
+        },
+        "bindable": true
+      },
+      {
+        "name": "loadingRows",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 50,
+          "description": "How many skeleton rows the loading state draws (default 3). Give the number of rows the source usually holds (24 hours, 10 deploys) so the table does not grow when the rows land."
+        },
+        "bindable": true,
+        "default": 3
+      },
+      {
+        "name": "errorWhen",
+        "type": "string",
+        "jsonSchema": {
+          "type": [
+            "string",
+            "boolean"
+          ],
+          "description": "Bind {{__errors.<sourceId>}} — a non-empty message is shown in the table body as a visible alert."
+        },
+        "bindable": true
+      },
+      {
+        "name": "emptyText",
+        "type": "string",
+        "description": "Shown in the table body when there are no rows (and nothing is loading or failing). Write it in the app's language; empty = no message.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "errorText",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "The human message shown when errorWhen is truthy (\"The readings could not be loaded.\"). Without it the bound error message itself is shown."
+        },
+        "bindable": true
+      },
+      {
+        "name": "loadingText",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Announced to assistive technology while loadingWhen shows the skeleton rows (\"Loading readings…\")."
+        },
+        "bindable": true
+      },
+      {
+        "name": "phoneLayout",
+        "type": "\"cards\" | \"rows\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "cards",
+            "rows"
+          ],
+          "description": "Below 480px of the table width: cards (default) turns each row into a label/value card; rows keeps one compact row per record and scrolls sideways if the columns do not fit — for few, short columns (an hourly forecast)."
+        },
+        "bindable": false,
+        "default": "cards"
+      },
+      {
+        "name": "fixedLayout",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "table-layout fixed: columns take their width values (the rest share what is left), not their content width, so several tables with the same columns (one per group) line up column for column."
+        },
+        "bindable": false,
+        "default": false
+      }
+    ],
+    "defaultProps": {
+      "columns": [],
+      "data": [],
+      "striped": false,
+      "bordered": true,
+      "hoverable": true,
+      "compact": false,
+      "selectable": false
+    },
+    "canHaveChildren": false,
+    "icon": "⊞",
+    "traits": [
+      "modal-content"
+    ]
+  },
+  "tags": [
+    "tier:data"
+  ]
+}

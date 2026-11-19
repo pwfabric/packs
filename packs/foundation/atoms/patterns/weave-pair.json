@@ -1,0 +1,70 @@
+{
+  "name": "weave-pair",
+  "role": "weave",
+  "layoutOnly": true,
+  "bodies": [
+    "flow",
+    "dense"
+  ],
+  "description": "Two panes side by side: comparison, code and explanation, or editor + preview.",
+  "provenPattern": "From the compatibility matrix: the looms this arrangement is legal on were determined from measured page spines.",
+  "knowledge": {
+    "purpose": "The spine where two things must be seen at once",
+    "useCases": [
+      "Code and explanation",
+      "Version comparison"
+    ],
+    "composesWith": [
+      "shell-topbar-split-doc"
+    ],
+    "antiPatterns": [
+      "Leaving one pane much narrower than the other — both panes share the row equally",
+      "Not saying which pane comes first on a narrow screen — the first pane is the one read first",
+      "Filling only one pane — with one thing to show this is a single column, not a pair"
+    ]
+  },
+  "mobileCollapse": "Vertical stack — the first pane comes first, the second under it; the order is the order the panes are filled.",
+  "placeholders": {
+    "{{BANDS}}": "the panes: the first empty region takes the first pane bands (read first on a phone), the second region the second pane bands"
+  },
+  "usesBlocks": [
+    "container"
+  ],
+  "snippet": {
+    "id": "{{ID}}",
+    "type": "container",
+    "props": {
+      "direction": "row",
+      "gap": 24,
+      "align": "start"
+    },
+    "children": [
+      {
+        "id": "{{ID}}-a",
+        "type": "container",
+        "props": {
+          "direction": "column",
+          "gap": 16
+        },
+        "style": {
+          "flex": "1 1 0",
+          "minWidth": "0"
+        },
+        "children": []
+      },
+      {
+        "id": "{{ID}}-b",
+        "type": "container",
+        "props": {
+          "direction": "column",
+          "gap": 16
+        },
+        "style": {
+          "flex": "1 1 0",
+          "minWidth": "0"
+        },
+        "children": []
+      }
+    ]
+  }
+}

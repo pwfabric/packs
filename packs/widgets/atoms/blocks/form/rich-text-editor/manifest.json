@@ -1,0 +1,77 @@
+{
+  "id": "form.rich-text-editor",
+  "kind": "block",
+  "version": "0.1.0",
+  "category": "form",
+  "name": "rich-text-editor",
+  "state": "experimental",
+  "knowledge": {
+    "purpose": "A lightweight rich-text (bold/italic/bullet-list) editor built on a contentEditable surface — basic-formatting authoring, not a full WYSIWYG document suite.",
+    "useCases": [
+      "Long-form author fields such as an announcement body, a blog post or an idea description"
+    ],
+    "composesWith": [
+      "form.form",
+      "control.button"
+    ],
+    "antiPatterns": [
+      "Not a replacement for a full document editor (tables, images, embeds) — keep it to short-to-medium prose",
+      "Do not use for plain single-line input — use form.input instead"
+    ]
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Field label, announced as the editor name."
+        },
+        "bindable": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "FormData key: the sanitized HTML is submitted under it."
+        },
+        "bindable": false
+      },
+      {
+        "name": "placeholder",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Hint text shown while empty."
+        },
+        "bindable": true
+      },
+      {
+        "name": "value",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Initial HTML content. Sanitized before it is shown or submitted: only basic formatting tags survive, and links keep a safe href only."
+        },
+        "bindable": true,
+        "default": ""
+      }
+    ],
+    "defaultProps": {
+      "value": ""
+    },
+    "canHaveChildren": false,
+    "allowedParents": [
+      "form",
+      "container"
+    ],
+    "traits": [
+      "form-field"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

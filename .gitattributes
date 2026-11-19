@@ -1,0 +1,3 @@
+# Line endings: keep the repo LF and check out LF on every platform, so
+# generated files (pwpack.json, LICENSE, vendored helpers) never differ by CRLF.
+* text=auto eol=lf

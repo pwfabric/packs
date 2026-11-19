@@ -1,0 +1,296 @@
+{
+  "name": "contact-form",
+  "role": "band",
+  "body": "flow",
+  "description": "Two-column contact band: heading/text on the left, form on the right. Sits near the page's close.",
+  "provenPattern": "A survey of 54 sector demo homepages: this band appears in 23 of them, mean vertical position 0.68 (0 = top of page, 1 = bottom). Third most common band; almost always right before a map",
+  "knowledge": {
+    "purpose": "Two-column contact band with heading and text on the left, a form on the right (name, email, one required choice, a free note) that writes each message as a record of the app and says whether it arrived; sits near the page close",
+    "useCases": [
+      "Contact/quote form at the end of a marketing page",
+      "Event registration band",
+      "Collecting demo requests"
+    ],
+    "composesWith": [
+      "form.form",
+      "form.input"
+    ],
+    "antiPatterns": [
+      "Putting the form at the top of the page — this band was built for the visitor who has decided at the end of the reading path",
+      "More than four required fields — completion drops",
+      "Leaving fields without labels, placeholder only",
+      "Using it back to back with a call-to-action band on one page — two conversion calls eat each other's emphasis",
+      "A form with no confirmation — the visitor cannot tell whether the message arrived and sends it again",
+      "Pointing the form at an outside address — the form block posts nothing by itself; the message is written as a record through the form binding",
+      "Binding the server’s error detail into the failure alert — the visitor gets fixed, human copy",
+      "One failure line for every refusal — a 409 on a unique e-mail is \"you are already on the list\", not \"check your connection\"; fill FAILED_CONFLICT (and the other reasons the app can meet)",
+      "One failure line for every refusal — the failure copy follows the write's reason (statusKeys.reason → {{state.contactReason}}: validation, unauthenticated, forbidden, conflict, network, server or error): the page's words for that reason, held in {{state.contactCopy}}, else the generic failure copy; the refused field names are in {{state.contactFields}}. The server's own words are never shown",
+      "A result nobody notices — the result (sent or failed) takes focus when it appears, so a screen reader hears it and the eye lands on it"
+    ]
+  },
+  "mobileCollapse": "Text on top, form below; the form and its fields take the full width (the row stretches its children, so the stacked form is not left at its content width). The confirmation (with its optional Send another) or the failure shows under the form.",
+  "placeholders": {
+    "{{ID}}": "block id prefix",
+    "{{HEADING}}": "band heading",
+    "{{SUBHEADING}}": "contact invitation text",
+    "{{ENTITY}}": "the app’s entity type a message is written to (e.g. ContactMessage) — its fields take the form’s names: name, email, the choice field, message",
+    "{{SUBMIT_LABEL}}": "form.submitLabel",
+    "{{LABEL_NAME}}": "input.label",
+    "{{LABEL_EMAIL}}": "input.label",
+    "{{LABEL_MESSAGE}}": "textarea.label",
+    "{{SENT_TEXT}}": "alert.message after the message was written, e.g. Thanks — we will get back to you within a day.",
+    "{{FAILED_TEXT}}": "alert.title when the write failed and no copy for its reason is given, in the visitor’s words, e.g. Your message did not arrive — send it again; plain text. The server’s own reason is never shown",
+    "{{FAILED_VALIDATION}}": {
+      "description": "the failure copy when the server refused one or more fields (400) — the refused field names are in {{state.contactFields}}, in the visitor's words; plain text. Left out, {{FAILED_TEXT}} is shown",
+      "optional": true
+    },
+    "{{FAILED_UNAUTHENTICATED}}": {
+      "description": "the failure copy when the visitor is not signed in (401), in the visitor's words; plain text. Left out, {{FAILED_TEXT}} is shown",
+      "optional": true
+    },
+    "{{FAILED_FORBIDDEN}}": {
+      "description": "the failure copy when the visitor may not write this (403), in the visitor's words; plain text. Left out, {{FAILED_TEXT}} is shown",
+      "optional": true
+    },
+    "{{FAILED_CONFLICT}}": {
+      "description": "the failure copy when the record already exists (409, a unique field) — e.g. \"You are already on the list\", in the visitor's words; plain text. Left out, {{FAILED_TEXT}} is shown",
+      "optional": true
+    },
+    "{{FAILED_NETWORK}}": {
+      "description": "the failure copy when nothing reached the server (no connection), in the visitor's words; plain text. Left out, {{FAILED_TEXT}} is shown",
+      "optional": true
+    },
+    "{{FAILED_SERVER}}": {
+      "description": "the failure copy when the server failed (5xx), in the visitor's words; plain text. Left out, {{FAILED_TEXT}} is shown",
+      "optional": true
+    },
+    "{{ANOTHER_LABEL}}": {
+      "description": "button.label under the confirmation that clears it and the chosen {{CHOICE_FIELD}} for a new message, e.g. Send another message; plain text. Left out, there is no such button (the form is still emptied after a send)",
+      "optional": true
+    },
+    "{{CHOICE_FIELD}}": "the entity field the required choice writes (an enum field, e.g. kit or topic). The choice lives in page state under `choice`, so a link like ?choice=home preselects it when the page lists `choice` in urlState",
+    "{{LABEL_CHOICE}}": "select.label, e.g. Which kit?",
+    "{{CHOICE_PLACEHOLDER}}": "select.placeholder, e.g. Choose a kit",
+    "{{CHOICE_OPTIONS}}": "array of {label, value} — the enum values of the choice field"
+  },
+  "initialState": {
+    "contactSending": false,
+    "contactSent": false,
+    "contactFailed": false,
+    "contactReason": "",
+    "contactFields": [],
+    "contactCopy": {
+      "error": "{{FAILED_TEXT}}",
+      "validation": "{{FAILED_VALIDATION}}",
+      "unauthenticated": "{{FAILED_UNAUTHENTICATED}}",
+      "forbidden": "{{FAILED_FORBIDDEN}}",
+      "conflict": "{{FAILED_CONFLICT}}",
+      "network": "{{FAILED_NETWORK}}",
+      "server": "{{FAILED_SERVER}}",
+      "another": "{{ANOTHER_LABEL}}"
+    },
+    "choice": ""
+  },
+  "usesBlocks": [
+    "alert",
+    "button",
+    "container",
+    "form",
+    "heading",
+    "input",
+    "section",
+    "select",
+    "text",
+    "textarea"
+  ],
+  "snippet": {
+    "id": "{{ID}}",
+    "type": "section",
+    "props": {
+      "paddingY": 64,
+      "gap": 32
+    },
+    "children": [
+      {
+        "id": "{{ID}}-row",
+        "type": "container",
+        "props": {
+          "direction": "row",
+          "gap": 48,
+          "align": "stretch",
+          "padding": 0
+        },
+        "children": [
+          {
+            "id": "{{ID}}-copy",
+            "type": "container",
+            "props": {
+              "direction": "column",
+              "gap": 12,
+              "padding": 0
+            },
+            "children": [
+              {
+                "id": "{{ID}}-h",
+                "type": "heading",
+                "props": {
+                  "text": "{{HEADING}}",
+                  "level": "h2"
+                }
+              },
+              {
+                "id": "{{ID}}-t",
+                "type": "text",
+                "props": {
+                  "content": "{{SUBHEADING}}",
+                  "color": "var(--pw-color-text-muted)"
+                }
+              }
+            ],
+            "style": {
+              "flex": "1 1 0",
+              "minWidth": "0",
+              "maxWidth": "420px"
+            }
+          },
+          {
+            "id": "{{ID}}-side",
+            "type": "container",
+            "props": {
+              "direction": "column",
+              "gap": 12,
+              "align": "stretch",
+              "padding": 0
+            },
+            "children": [
+              {
+                "id": "{{ID}}-form",
+                "type": "form",
+                "props": {
+                  "submitLabel": "{{SUBMIT_LABEL}}",
+                  "gap": 12,
+                  "submittingWhen": "{{state.contactSending}}",
+                  "resetWhen": "{{state.contactSent}}"
+                },
+                "children": [
+                  {
+                    "id": "{{ID}}-name",
+                    "type": "input",
+                    "props": {
+                      "name": "name",
+                      "label": "{{LABEL_NAME}}",
+                      "required": true,
+                      "type": "text"
+                    }
+                  },
+                  {
+                    "id": "{{ID}}-email",
+                    "type": "input",
+                    "props": {
+                      "name": "email",
+                      "type": "email",
+                      "label": "{{LABEL_EMAIL}}",
+                      "required": true
+                    }
+                  },
+                  {
+                    "id": "{{ID}}-choice",
+                    "type": "select",
+                    "props": {
+                      "name": "{{CHOICE_FIELD}}",
+                      "label": "{{LABEL_CHOICE}}",
+                      "placeholder": "{{CHOICE_PLACEHOLDER}}",
+                      "options": "{{CHOICE_OPTIONS}}",
+                      "required": true,
+                      "defaultValue": "{{state.choice}}",
+                      "stateKey": "choice"
+                    }
+                  },
+                  {
+                    "id": "{{ID}}-msg",
+                    "type": "textarea",
+                    "props": {
+                      "name": "message",
+                      "label": "{{LABEL_MESSAGE}}",
+                      "rows": 4
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "{{ID}}-ok",
+                "type": "alert",
+                "visibleWhen": "{{state.contactSent}}",
+                "props": {
+                  "message": "{{SENT_TEXT}}",
+                  "variant": "success",
+                  "focusOnShow": true
+                }
+              },
+              {
+                "id": "{{ID}}-another",
+                "type": "button",
+                "visibleWhen": "{{state.contactSent && state.contactCopy.another != ''}}",
+                "props": {
+                  "label": "{{state.contactCopy.another}}",
+                  "variant": "outline",
+                  "action": [
+                    {
+                      "type": "setState",
+                      "key": "contactSent",
+                      "value": false
+                    },
+                    {
+                      "type": "setState",
+                      "key": "choice",
+                      "value": ""
+                    }
+                  ]
+                },
+                "style": {
+                  "alignSelf": "flex-start"
+                }
+              },
+              {
+                "id": "{{ID}}-err",
+                "type": "alert",
+                "visibleWhen": "{{state.contactFailed}}",
+                "props": {
+                  "title": "{{state.contactCopy[state.contactReason] || state.contactCopy.error}}",
+                  "variant": "error",
+                  "focusOnShow": true
+                }
+              }
+            ],
+            "style": {
+              "flex": "1 1 0",
+              "minWidth": "0"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "dataSources": [
+    {
+      "id": "contactMessages",
+      "kind": "entity",
+      "entityType": "{{ENTITY}}",
+      "fallback": []
+    }
+  ],
+  "formBindings": [
+    {
+      "formId": "{{ID}}-form",
+      "sourceId": "contactMessages",
+      "method": "POST",
+      "statusKeys": {
+        "loading": "contactSending",
+        "success": "contactSent",
+        "error": "contactFailed",
+        "reason": "contactReason",
+        "fields": "contactFields"
+      }
+    }
+  ]
+}

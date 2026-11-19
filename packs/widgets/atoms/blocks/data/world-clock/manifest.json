@@ -1,0 +1,89 @@
+{
+  "id": "data.world-clock",
+  "kind": "block",
+  "version": "0.1.0",
+  "category": "data",
+  "name": "world-clock",
+  "state": "experimental",
+  "knowledge": {
+    "purpose": "Shows the current local time for a list of named IANA timezones, ticking live client-side.",
+    "useCases": [
+      "Global office / distributed-team clocks widget (Clocks module)"
+    ],
+    "composesWith": [],
+    "antiPatterns": [
+      "Not for scheduling/booking across timezones — pair with a form/calendar block for that",
+      "Timezone identifiers must be valid IANA names (e.g. 'Europe/Istanbul') — invalid ids silently fall back to the browser's local time"
+    ]
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "title",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Clock card heading."
+        },
+        "bindable": true
+      },
+      {
+        "name": "clocks",
+        "type": "array",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "timezone": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "label",
+              "timezone"
+            ]
+          },
+          "description": "Time-zone list: [{label, timezone}] with an IANA zone, e.g. {label:'Istanbul', timezone:'Europe/Istanbul'} — live tick via Intl.DateTimeFormat."
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "hour12",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "12-hour (true) or 24-hour (false) clock. Unset: the app's locale decides: en-GB and most of Europe read 24-hour, en-US 12-hour."
+        },
+        "bindable": false
+      },
+      {
+        "name": "showSeconds",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Show the seconds ticking (default false — a wall of clocks reads hours and minutes)."
+        },
+        "bindable": false
+      },
+      {
+        "name": "at",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "The moment the clocks show, as an ISO date-time with its offset (\"2026-11-17T09:05:00Z\"), instead of now. For an app whose day is fixed in its content: the clocks agree with the date the page states, and stand still. Unset: live."
+        },
+        "bindable": true
+      }
+    ],
+    "defaultProps": {},
+    "canHaveChildren": false
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "id": "layout.announcement-bar",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "layout",
+  "name": "announcement-bar",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Full-width strip at the top of a page for a short announcement with an optional action and dismiss",
+    "useCases": [
+      "Product launch or feature announcement banner",
+      "Promotional or sale notice with a CTA link",
+      "System / maintenance notice at the top of a page"
+    ],
+    "composesWith": [
+      "control.button",
+      "text.text",
+      "layout.navbar"
+    ],
+    "antiPatterns": [
+      "Transient status feedback — use feedback.toast",
+      "In-context inline message — use control.badge",
+      "Blocking confirmation — the bar is dismissible and never waits for an answer"
+    ],
+    "implementation": "Further use cases:\n- Cookie or policy acknowledgement strip"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "message",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "default": ""
+      },
+      {
+        "name": "variant",
+        "type": "\"primary\" | \"accent\" | \"neutral\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "primary",
+            "accent",
+            "neutral"
+          ]
+        },
+        "bindable": false,
+        "default": "primary"
+      },
+      {
+        "name": "dismissible",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "actionLabel",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "actionHref",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      }
+    ],
+    "defaultProps": {
+      "message": "",
+      "variant": "primary",
+      "dismissible": true
+    },
+    "canHaveChildren": false,
+    "icon": "▔",
+    "traits": []
+  },
+  "tags": [
+    "tier:structure"
+  ]
+}

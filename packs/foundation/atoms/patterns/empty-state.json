@@ -1,0 +1,101 @@
+{
+  "name": "empty-state",
+  "role": "part",
+  "layoutOnly": true,
+  "description": "Empty-state region: icon + heading + description + optional CTA. List-level empty states are done by repeater/table with their own emptyText; this is for page-level empty regions.",
+  "provenPattern": "A pure arrangement with no state or behaviour of its own, so it is a composition rather than a block (arrangement-only → template).",
+  "knowledge": {
+    "purpose": "Meets a page-level empty region with icon, heading, description and an optional action",
+    "useCases": [
+      "A page with no content produced yet",
+      "No-search-results region",
+      "A new user's first screen"
+    ],
+    "composesWith": [
+      "callout",
+      "control.button"
+    ],
+    "antiPatterns": [
+      "Using it for an empty list or table — that is repeater/table emptyText's job",
+      "Writing only \"No data\" — an empty state must say what to do",
+      "Promising an action without placing a button",
+      "An h2 not-found title on a page whose own h1 is hidden — the page then has no h1; give TITLE_LEVEL \"h1\"",
+      "A CTA whose href is \"\" or \"#\" expecting it to do something by itself — with no href the button navigates nowhere; give it a route, or wire a behavior on {{ID}}-cta (trigger block:click)"
+    ]
+  },
+  "placeholders": {
+    "{{ICON}}": "icon name",
+    "{{TITLE_LEVEL}}": "heading level of the title: \"h2\" inside a page that has its own h1; \"h1\" when the empty state IS the page (a not-found view whose page heading is hidden)",
+    "{{TITLE}}": "title",
+    "{{BODY}}": "description",
+    "{{CTA_LABEL}}": {
+      "description": "button.label — what the reader can do next; \"\" for no button",
+      "type": "text",
+      "optional": true
+    },
+    "{{CTA_HREF}}": {
+      "description": "button.href — where the action goes (an app route such as /catalogue). \"\" for a behaviour-only button: it renders a <button> that navigates nowhere, and the page wires its click with a behavior on {{ID}}-cta (refresh a source, clear a filter, open a modal)",
+      "type": "url",
+      "optional": true
+    }
+  },
+  "usesBlocks": [
+    "container",
+    "icon",
+    "heading",
+    "text",
+    "button"
+  ],
+  "snippet": {
+    "id": "{{ID}}",
+    "type": "container",
+    "props": {
+      "direction": "column",
+      "gap": 10,
+      "align": "center",
+      "padding": 32
+    },
+    "children": [
+      {
+        "id": "{{ID}}-icon",
+        "type": "icon",
+        "props": {
+          "name": "{{ICON}}",
+          "size": 36,
+          "color": "var(--pw-color-text-muted)"
+        }
+      },
+      {
+        "id": "{{ID}}-title",
+        "type": "heading",
+        "props": {
+          "text": "{{TITLE}}",
+          "level": "{{TITLE_LEVEL}}",
+          "textAlign": "center"
+        },
+        "style": {
+          "fontSize": "var(--pw-font-size-xl, 1.25rem)",
+          "margin": "0"
+        }
+      },
+      {
+        "id": "{{ID}}-body",
+        "type": "text",
+        "props": {
+          "content": "{{BODY}}",
+          "color": "var(--pw-color-text-muted)",
+          "textAlign": "center"
+        }
+      },
+      {
+        "id": "{{ID}}-cta",
+        "type": "button",
+        "props": {
+          "label": "{{CTA_LABEL}}",
+          "href": "{{CTA_HREF}}",
+          "variant": "outline"
+        }
+      }
+    ]
+  }
+}

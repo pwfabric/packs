@@ -1,0 +1,97 @@
+{
+  "id": "control.copy-button",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "control",
+  "name": "copy-button",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Button that copies a value to the clipboard and confirms with a transient tick",
+    "useCases": [
+      "Copy an API key, token, or ID",
+      "Copy a share link or referral code",
+      "Copy a code snippet or command"
+    ],
+    "composesWith": [
+      "form.input",
+      "container.card"
+    ],
+    "antiPatterns": [
+      "Primary page action — use control.button",
+      "Navigation to another page — use control.link",
+      "Toggling a boolean — a copy button performs one action and holds no state"
+    ],
+    "implementation": "Further use cases:\n- Copy a wallet address or coupon"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "value",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "default": ""
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "default": "Copy"
+      },
+      {
+        "name": "copiedLabel",
+        "type": "string",
+        "description": "Shown and announced after the value reached the clipboard. Write it in the app language.",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Shown and announced after the value reached the clipboard. Write it in the app language."
+        },
+        "bindable": true,
+        "default": "Copied"
+      },
+      {
+        "name": "failedLabel",
+        "type": "string",
+        "description": "Shown and announced when the browser refused the clipboard write. Write it in the app language.",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Shown and announced when the browser refused the clipboard write. Write it in the app language."
+        },
+        "bindable": true,
+        "default": "Copy failed"
+      },
+      {
+        "name": "size",
+        "type": "\"sm\" | \"md\" | \"lg\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "bindable": false,
+        "default": "md"
+      }
+    ],
+    "defaultProps": {
+      "value": "",
+      "label": "Copy",
+      "size": "md"
+    },
+    "canHaveChildren": false,
+    "icon": "⧉",
+    "traits": [
+      "inline"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "id": "theme-paper",
+  "kind": "ui-appearance",
+  "version": "1.0.0",
+  "category": "ui",
+  "name": "Paper",
+  "state": "stable",
+  "description": "Editorial: warm paper ground, ink-navy primary, Newsreader headings over Source Serif body, square corners, no shadows, an 18px reading size.",
+  "tags": [
+    "theme",
+    "appearance",
+    "light",
+    "editorial"
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#1f3354",
+      "secondary": "#ede6d8",
+      "accent": "#efe3cc",
+      "background": "#f7f3ea",
+      "card": "#fbf8f2",
+      "text": "#1d1a16",
+      "textMuted": "#5a5248",
+      "border": "#ddd3c1",
+      "error": "#a8261b",
+      "success": "#2f6b3a",
+      "warning": "#8a5a00",
+      "info": "#1f4f8a",
+      "textOnPrimary": "#ffffff"
+    },
+    "border": {
+      "radius": "3px",
+      "width": "1px",
+      "style": "solid",
+      "radiusLarge": "4px",
+      "radiusSmall": "2px",
+      "radiusXl": "6px",
+      "radius2xl": "8px",
+      "radiusFull": "9999px"
+    },
+    "typography": {
+      "fontFamily": "\"Source Serif 4\", Georgia, \"Times New Roman\", serif",
+      "headingFontFamily": "Newsreader, Georgia, \"Times New Roman\", serif",
+      "monoFontFamily": "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+      "baseFontSize": "18px",
+      "headingWeight": "600",
+      "headingLineHeight": "1.15",
+      "letterSpacing": "-0.015em",
+      "bodyLineHeight": "1.65",
+      "bodyWeight": "400",
+      "bodyLetterSpacing": "0em",
+      "fontSizeXs": "13px",
+      "fontSizeSm": "15px",
+      "fontSizeLg": "20px",
+      "fontSizeXl": "23px",
+      "fontSize2xl": "28px",
+      "fontSize3xl": "36px",
+      "fontSize4xl": "46px"
+    },
+    "spacing": {
+      "base": "1rem",
+      "xs": "0.25rem",
+      "sm": "0.5rem",
+      "md": "1rem",
+      "lg": "1.75rem",
+      "xl": "2.5rem",
+      "xxl": "4rem"
+    },
+    "shadows": {
+      "card": "none",
+      "button": "none",
+      "sm": "none",
+      "md": "0 6px 18px rgba(29,26,22,.08)",
+      "lg": "0 12px 28px rgba(29,26,22,.1)",
+      "xl": "0 20px 40px rgba(29,26,22,.12)"
+    },
+    "motion": {
+      "durationFast": "150ms",
+      "durationNormal": "200ms",
+      "durationSlow": "300ms",
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "easingBounce": "cubic-bezier(0.68, -0.55, 0.27, 1.55)"
+    },
+    "layout": {
+      "gap": "0px",
+      "padding": "0px",
+      "containerMaxWidth": "1160px",
+      "gridGap": "28px",
+      "sectionPaddingY": "clamp(3rem, 6vw, 5rem)",
+      "sectionPaddingX": "clamp(1rem, 3vw, 2rem)"
+    },
+    "focus": {
+      "ringColor": "#3d6aa8",
+      "ringWidth": "2px",
+      "ringOffset": "2px"
+    },
+    "zIndex": {
+      "sticky": 150,
+      "nav": 200,
+      "dropdown": 300,
+      "drawer": 400,
+      "modal": 500,
+      "toast": 540
+    }
+  },
+  "darkTheme": {
+    "colors": {
+      "primary": "#a9c1e8",
+      "secondary": "#2a2620",
+      "accent": "#2f2a22",
+      "background": "#161411",
+      "card": "#1e1b17",
+      "text": "#efe8dc",
+      "textMuted": "#b4aa9a",
+      "border": "#3a342b",
+      "error": "#f0a093",
+      "success": "#9fd1a5",
+      "warning": "#e8c27a",
+      "info": "#9cc0ee",
+      "textOnPrimary": "#121b2b"
+    },
+    "focus": {
+      "ringColor": "#a9c1e8"
+    }
+  },
+  "knowledge": {
+    "purpose": "A look for pages people read through: serif voice, a generous 18px body with a long line height, near-square corners and no shadows, so type and pictures carry the page.",
+    "useCases": [
+      "A magazine, a journal or a blog",
+      "Documentation or long guides read top to bottom",
+      "A studio or practice whose site is its writing and its pictures",
+      "Pick it as a starting point and edit token values one by one"
+    ],
+    "composesWith": [
+      "platform/persistence",
+      "platform/entities",
+      "platform/navigation"
+    ],
+    "antiPatterns": [
+      "A dense data screen — wear slate or midnight",
+      "A phone-first ordering or booking flow — wear linen or zinc",
+      "Pinning colours in block props — theme tokens already cascade",
+      "Expecting two themes on one surface — a surface carries a single token set"
+    ]
+  }
+}

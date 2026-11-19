@@ -1,0 +1,89 @@
+{
+  "id": "overlay.tooltip",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "overlay",
+  "name": "tooltip",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "On-hover / on-focus floating hint that explains a control or label",
+    "useCases": [
+      "Define a jargon term beside a label",
+      "Show a keyboard shortcut next to a button",
+      "Reveal full text of a truncated label"
+    ],
+    "composesWith": [
+      "control.button",
+      "control.icon",
+      "control.badge",
+      "control.link",
+      "text.text"
+    ],
+    "antiPatterns": [
+      "Critical information that must be seen — promote it inline",
+      "Long-form help — use overlay.popover or overlay.modal",
+      "Touch-only contexts where hover does not work"
+    ],
+    "implementation": "Further use cases:\n- Inline help for an icon-only button"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "content",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "placement",
+        "type": "\"top\" | \"bottom\" | \"left\" | \"right\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "top",
+            "bottom",
+            "left",
+            "right"
+          ]
+        },
+        "bindable": false,
+        "default": "top"
+      },
+      {
+        "name": "delay",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number"
+        },
+        "bindable": false,
+        "default": 200
+      },
+      {
+        "name": "maxWidth",
+        "type": "number | string",
+        "jsonSchema": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "bindable": false
+      }
+    ],
+    "defaultProps": {
+      "placement": "top",
+      "delay": 200
+    },
+    "canHaveChildren": true,
+    "icon": "💬",
+    "traits": [],
+    "allowedChildTraits": [
+      "inline"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

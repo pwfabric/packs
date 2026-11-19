@@ -1,0 +1,184 @@
+{
+  "id": "text.heading",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "text",
+  "name": "heading",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Semantic heading (h1–h6) that sets visual and outline hierarchy on a surface",
+    "useCases": [
+      "Section title in a marketing layout",
+      "Page hero h1",
+      "Card title in a list of cards"
+    ],
+    "composesWith": [
+      "layout.section",
+      "layout.container",
+      "container.card",
+      "text.text",
+      "control.link"
+    ],
+    "antiPatterns": [
+      "Body paragraph — use text.text",
+      "Pure visual emphasis without semantic outline — use text.text with style overrides",
+      "Caption beneath an image — use text.text"
+    ],
+    "implementation": "Further use cases:\n- Form section header"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "default": ""
+      },
+      {
+        "name": "level",
+        "type": "\"h1\" | \"h2\" | \"h3\" | \"h4\" | \"h5\" | \"h6\" | number",
+        "jsonSchema": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "h1",
+                "h2",
+                "h3",
+                "h4",
+                "h5",
+                "h6"
+              ]
+            },
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 6
+            }
+          ]
+        },
+        "bindable": false,
+        "default": "h2"
+      },
+      {
+        "name": "color",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "textAlign",
+        "type": "\"left\" | \"center\" | \"right\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ]
+        },
+        "bindable": false
+      },
+      {
+        "name": "gradient",
+        "type": "{ enabled: boolean, from: string, via: string, to: string, direction: \"to-r\" | \"to-l\" | \"to-t\" | \"to-b\" | \"to-tr\" | \"to-tl\" | \"to-br\" | \"to-bl\" }",
+        "jsonSchema": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "type": "boolean"
+            },
+            "from": {
+              "default": "var(--pw-color-primary, #3b82f6)",
+              "type": "string"
+            },
+            "via": {
+              "type": "string"
+            },
+            "to": {
+              "default": "var(--pw-color-accent, #8b5cf6)",
+              "type": "string"
+            },
+            "direction": {
+              "default": "to-r",
+              "type": "string",
+              "enum": [
+                "to-r",
+                "to-l",
+                "to-t",
+                "to-b",
+                "to-tr",
+                "to-tl",
+                "to-br",
+                "to-bl"
+              ]
+            }
+          }
+        },
+        "bindable": false
+      },
+      {
+        "name": "accentBar",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Short accent bar to the left of the heading (theme accent token)."
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "uppercase",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Uppercases the text with CSS (beware the Turkish İ/I innerText trap)."
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "rich",
+        "type": "boolean",
+        "description": "Opt-in inline emphasis: when true, `text` may carry mini-markdown — **bold**, *italic*, ~~strike~~ (error-token underline), ==mark== (accent highlight with on-accent ink). No HTML is accepted; unknown syntax renders literally.",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "focusOn",
+        "type": "string | number | boolean",
+        "jsonSchema": {
+          "type": [
+            "string",
+            "number",
+            "boolean"
+          ],
+          "description": "Move keyboard focus to this heading whenever this value changes after the first render — bind it to what the heading announces, e.g. {{state.step}} on a wizard's step heading, so a keyboard or screen-reader visitor lands on the new step's title. The first render never moves focus. Set, the heading is focusable by script (tabIndex -1), not a Tab stop."
+        },
+        "bindable": true
+      }
+    ],
+    "defaultProps": {
+      "text": "",
+      "level": "h2"
+    },
+    "canHaveChildren": false,
+    "icon": "H",
+    "traits": [
+      "form-content",
+      "modal-content"
+    ]
+  },
+  "tags": [
+    "tier:content"
+  ]
+}

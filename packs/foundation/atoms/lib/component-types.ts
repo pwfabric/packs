@@ -1,0 +1,109 @@
+/**
+ * Block Component Types
+ *
+ * Minimal type definitions for block React components.
+ * These types are structurally compatible with @pwfabric/runtime's
+ * BlockComponent and BlockComponentRegistry types.
+ *
+ * @module @pwfabric/runtime/blocks/component-types
+ */
+
+import type { ReactNode } from 'react'
+import type { Block } from '@pwfabric/contracts'
+import type { BreakpointName } from '@pwfabric/core'
+
+// ============================================================
+// SURFACE EVENTS (minimal subset used by block components)
+// ============================================================
+
+/**
+ * Surface event types emitted by block components
+ */
+export type BlockSurfaceEventType = 'click' | 'submit' | 'change' | 'navigate' | 'custom'
+
+/**
+ * Surface event emitted by block components
+ */
+export interface BlockSurfaceEvent {
+  /** Event type */
+  readonly type: BlockSurfaceEventType
+  /** Block ID that triggered the event */
+  readonly blockId: string
+  /** Event payload */
+  readonly payload?: unknown
+  /** Original DOM event (if applicable) */
+  readonly originalEvent?: Event
+}
+
+// ============================================================
+// BLOCK CONTEXT (minimal subset needed by block components)
+// ============================================================
+
+/**
+ * Minimal block rendering context available to block components.
+ * Structurally compatible with @pwfabric/runtime's BlockContext.
+ */
+export interface BlockComponentContext {
+  /** Event handler for block events */
+  readonly onEvent?: ((event: BlockSurfaceEvent) => void) | undefined
+  /** Current viewport breakpoint */
+  readonly viewport?: BreakpointName
+  /** Image adapter (optional, runtime-provided) */
+  readonly imageAdapter?: unknown
+  /** Capabilities (optional, runtime-provided) */
+  readonly capabilities?: Map<string, unknown>
+  /**
+   * Interaction mode. `onEvent` is a pure
+   * notification and always fires; `interactionMode` gates real SIDE-EFFECTS.
+   * Blocks that perform real navigation or data writes (e.g.
+   * `window.location.href`) MUST skip those when `interactionMode === 'inert'`
+   * so editor/preview renders don't navigate or mutate. Defaults to `live`.
+   */
+  readonly interactionMode?: 'live' | 'inert'
+  /**
+   * The app's locale (BCP 47, `en-GB`): what a block writes numbers, prices
+   * and dates in. Absent when the host names none; the visitor's formats then
+   * apply. Read here, never off the document.
+   */
+  readonly locale?: string
+  /**
+   * An app page's root-relative path (`/webhooks?x=1`) in the host's router
+   * form: `#/webhooks?x=1` in hash mode, `<base>/webhooks?x=1` in path mode.
+   * A link a block BUILDS itself — a markdown link in a prose prop, a table
+   * cell from a `hrefTemplate` — is written through it; an `href`/`*Href` prop
+   * has been rewritten by the host already. Absolute URLs, fragments, media
+   * links and `""` come back as given. Absent outside a runtime: write the
+   * path as given.
+   */
+  readonly appHref?: (path: string) => string
+}
+
+// ============================================================
+// BLOCK COMPONENT TYPES
+// ============================================================
+
+/**
+ * Props passed to block components
+ */
+export interface BlockComponentProps<T = Record<string, unknown>> {
+  /** Block instance */
+  readonly block: Block
+  /** Resolved props (validated and defaulted) */
+  readonly props: T
+  /** Rendered children (for container blocks) */
+  readonly children?: ReactNode
+  /** Block context */
+  readonly context: BlockComponentContext
+}
+
+/**
+ * Block component type
+ */
+export type BlockComponent<T = Record<string, unknown>> = (
+  props: BlockComponentProps<T>
+) => ReactNode
+
+/**
+ * Block component registry — maps block type strings to React component implementations
+ */
+export type BlockComponentRegistry = Record<string, BlockComponent>

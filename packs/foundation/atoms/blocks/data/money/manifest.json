@@ -1,0 +1,169 @@
+{
+  "id": "data.money",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "data",
+  "name": "money",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "A price printed once and printed properly: amount, currency, optional period, compare-at and a derived saving",
+    "useCases": [
+      "Plan price in a pricing tier",
+      "Product price with a struck-through compare-at",
+      "Line total in a cart or an order summary",
+      "Invoice amount in a billing history row"
+    ],
+    "composesWith": [
+      "container.card",
+      "data.repeater",
+      "platform/entities"
+    ],
+    "antiPatterns": [
+      "Writing a price into text.heading as a string — no currency, no locale, nothing bindable",
+      "A separate text block for the saving — it can then contradict the two prices beside it",
+      "A non-money quantity — use text.text"
+    ],
+    "implementation": "The amount is a NUMBER so it can bind from data. `minorUnits` says the amount is in kuruş/cents; the exponent is asked of Intl rather than assumed to be 100, because JPY has none and KWD has three. The saving is derived from compareAt and is suppressed unless the earlier price was higher — a negative saving is a data defect and printing it would make the page claim it."
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "amount",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "description": "The value. In the currency's major unit unless minorUnits is true."
+        },
+        "bindable": true,
+        "default": 0
+      },
+      {
+        "name": "currency",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "ISO 4217 code, e.g. TRY, EUR, USD."
+        },
+        "bindable": true,
+        "default": "TRY"
+      },
+      {
+        "name": "minorUnits",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "The amount is in the smallest unit (kuruş, cent)."
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "locale",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Formatting locale (e.g. \"tr-TR\"). Omitted: the app's declared locale (plan.json `locale`), else the currency's home locale (TRY → tr-TR, \"₺95,00\"; EUR → de-DE; GBP → en-GB), else the browser default."
+        },
+        "bindable": false
+      },
+      {
+        "name": "period",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Trailing qualifier: \"/mo\", \"per seat\", \"+ VAT\"."
+        },
+        "bindable": true
+      },
+      {
+        "name": "compareAt",
+        "type": "number | null",
+        "jsonSchema": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The price this one replaces. Struck through, and only when it is higher. Absent or null: none."
+        },
+        "bindable": true
+      },
+      {
+        "name": "showSave",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Show the saving derived from compareAt."
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "size",
+        "type": "\"sm\" | \"md\" | \"lg\" | \"xl\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "sm",
+            "md",
+            "lg",
+            "xl"
+          ]
+        },
+        "bindable": false,
+        "default": "md"
+      },
+      {
+        "name": "emphasis",
+        "type": "\"normal\" | \"strong\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "normal",
+            "strong"
+          ]
+        },
+        "bindable": false,
+        "default": "strong"
+      },
+      {
+        "name": "align",
+        "type": "\"start\" | \"center\" | \"end\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "start",
+            "center",
+            "end"
+          ]
+        },
+        "bindable": false,
+        "default": "start"
+      },
+      {
+        "name": "whole",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Whole currency units with no decimals (\"€249\", not \"€249.00\") for prices set in whole units. A fraction is rounded to the nearest unit."
+        },
+        "bindable": true,
+        "default": false
+      }
+    ],
+    "defaultProps": {
+      "amount": 0,
+      "currency": "TRY",
+      "minorUnits": false,
+      "showSave": false,
+      "size": "md",
+      "emphasis": "strong",
+      "align": "start"
+    },
+    "canHaveChildren": false,
+    "icon": "¤",
+    "traits": []
+  },
+  "tags": [
+    "tier:data"
+  ]
+}

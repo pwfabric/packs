@@ -1,0 +1,174 @@
+{
+  "id": "form.radio",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "form",
+  "name": "radio",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Mutually exclusive choice from a small fixed set of labelled options",
+    "useCases": [
+      "Plan tier selection (Free / Pro / Enterprise)",
+      "Yes / No / N/A survey answer",
+      "Layout variant picker"
+    ],
+    "composesWith": [
+      "form.form",
+      "platform/entities"
+    ],
+    "antiPatterns": [
+      "Long option list — use form.select instead",
+      "Boolean on/off — two radios for yes/no are heavier than one form.checkbox",
+      "Multi-select — use form.checkbox group"
+    ],
+    "implementation": "Further use cases:\n- Shipping or payment method selection"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "name",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "options",
+        "type": "[{value, label}] | rows",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              },
+              "label": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "defaultValue",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "value",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "The value page state holds — bind it to the key the radio writes (\"{{state.<stateKey>}}\"). Wins over defaultValue, so a radio that mounts again (a wizard step hidden and shown again) shows the answer the visitor gave. An unresolved binding is ignored."
+        },
+        "bindable": true
+      },
+      {
+        "name": "required",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "disabled",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": true,
+        "default": false
+      },
+      {
+        "name": "orientation",
+        "type": "\"vertical\" | \"horizontal\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "vertical",
+            "horizontal"
+          ]
+        },
+        "bindable": false,
+        "default": "vertical"
+      },
+      {
+        "name": "labelColor",
+        "type": "string",
+        "description": "Text colour for the group label and option labels. Any CSS colour or theme token (e.g. var(--pw-color-card)). Defaults to var(--pw-color-text) so radios read correctly on a dark card.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "optionValueField",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Data-bound options: when options come from a source, the field name holding each item's VALUE (e.g. 'LookupId' in a SharePoint multi-lookup)."
+        },
+        "bindable": false,
+        "default": "value"
+      },
+      {
+        "name": "optionLabelField",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Data-bound options: the field name holding each item's VISIBLE LABEL (e.g. 'LookupValue')."
+        },
+        "bindable": false,
+        "default": "label"
+      },
+      {
+        "name": "stateKey",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Surface state key the value is written to on change, so {{state.<key>}} reads it — a summary step of a multi-step form, or a list filter. Mirrors form.select and form.segmented-control."
+        },
+        "bindable": false
+      }
+    ],
+    "defaultProps": {
+      "options": [],
+      "required": false,
+      "disabled": false,
+      "orientation": "vertical"
+    },
+    "canHaveChildren": false,
+    "allowedParents": [
+      "form",
+      "container"
+    ],
+    "icon": "◉",
+    "traits": [
+      "form-field"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

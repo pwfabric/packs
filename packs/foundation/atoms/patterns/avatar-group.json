@@ -1,0 +1,176 @@
+{
+  "name": "avatar-group",
+  "role": "part",
+  "description": "Overlapping avatar row of the people involved: the first three faces, then a \"+N\" badge counting the rest. The people are the app's records, with the brief's names as the fallback.",
+  "provenPattern": "A pure arrangement with no state or behaviour of its own, so it is a composition rather than a block (arrangement-only → template).",
+  "knowledge": {
+    "purpose": "Represents a group on one line with a row of overlapping small avatars and a \"+N\" overflow badge",
+    "useCases": [
+      "Showing a task's or document's participants at the end of the row",
+      "Summarising members on a team card without listing names",
+      "Showing participants densely on the comment/like row"
+    ],
+    "composesWith": [
+      "container.card",
+      "layout.container"
+    ],
+    "antiPatterns": [
+      "Showing more than five avatars — the arrangement was built for the overflow badge; a crowd is unreadable",
+      "Making avatars the only carrier of identity — the name must also exist as accessible text",
+      "Avatars that look clickable but go nowhere",
+      "Guessing row field names — rows arrive with the source's own field names; take them from a sample the person supplied, the entity's declared fields, or the connector's documented row fields",
+      "Faces with no caption — a row of initials does not say whose group it is",
+      "The caption alone while the people load, then the faces pushing the row taller — while they load, three placeholder faces hold the row"
+    ]
+  },
+  "placeholders": {
+    "{{ID}}": "block id prefix",
+    "{{ENTITY}}": "the app's entity type whose records are the participants (e.g. Member). The host that keeps the app's records serves them; without any, the fallback below is shown",
+    "{{PEOPLE}}": "fallback rows: [{ {{NAME_FIELD}}: string }] — objects of the same shape as the live {{ENTITY}} rows, keyed by the field names chosen for the field slots. Shown when the app has no records of {{ENTITY}} yet; [] for none. The brief's names may stand in; never invent people to fill it.",
+    "{{NAME_FIELD}}": {
+      "description": "the {{ENTITY}} row field holding the person's name (e.g. name). Take the name from the bound rows — a sample the person supplied or the entity's declared fields; never guess it.",
+      "type": "field"
+    },
+    "{{CAPTION}}": "text.content — who these people are, in words, e.g. Platform squad · 6 members — the faces alone do not say it"
+  },
+  "usesBlocks": [
+    "avatar",
+    "badge",
+    "container",
+    "text",
+    "skeleton"
+  ],
+  "dataSources": [
+    {
+      "id": "participants",
+      "kind": "entity",
+      "entityType": "{{ENTITY}}",
+      "fallback": "{{PEOPLE}}"
+    }
+  ],
+  "snippet": {
+    "id": "{{ID}}",
+    "type": "container",
+    "props": {
+      "direction": "row",
+      "align": "center",
+      "keepRow": true,
+      "gap": 0
+    },
+    "style": {
+      "paddingLeft": "8px"
+    },
+    "visibleWhen": "{{__loading.participants || length(participants) > 0}}",
+    "children": [
+      {
+        "id": "{{ID}}-wait",
+        "type": "container",
+        "visibleWhen": "{{__loading.participants && length(participants) === 0}}",
+        "props": {
+          "direction": "row",
+          "align": "center",
+          "keepRow": true,
+          "gap": 0
+        },
+        "style": {
+          "flex": "0 0 auto"
+        },
+        "children": [
+          {
+            "id": "{{ID}}-wait-1",
+            "type": "skeleton",
+            "props": {
+              "variant": "circle",
+              "width": 32,
+              "height": 32,
+              "animated": true
+            },
+            "style": {
+              "marginLeft": "-8px"
+            }
+          },
+          {
+            "id": "{{ID}}-wait-2",
+            "type": "skeleton",
+            "props": {
+              "variant": "circle",
+              "width": 32,
+              "height": 32,
+              "animated": true
+            },
+            "style": {
+              "marginLeft": "-8px"
+            }
+          },
+          {
+            "id": "{{ID}}-wait-3",
+            "type": "skeleton",
+            "props": {
+              "variant": "circle",
+              "width": 32,
+              "height": 32,
+              "animated": true
+            },
+            "style": {
+              "marginLeft": "-8px"
+            }
+          }
+        ]
+      },
+      {
+        "id": "{{ID}}-faces",
+        "type": "container",
+        "props": {
+          "direction": "row",
+          "align": "center",
+          "keepRow": true,
+          "gap": 0
+        },
+        "repeat": "{{slice(participants, 0, 3)}}",
+        "children": [
+          {
+            "id": "{{ID}}-a",
+            "type": "avatar",
+            "props": {
+              "name": "{{item.{{NAME_FIELD}}}}",
+              "size": "sm"
+            },
+            "style": {
+              "marginLeft": "-8px"
+            }
+          }
+        ],
+        "style": {
+          "flex": "0 0 auto"
+        }
+      },
+      {
+        "id": "{{ID}}-more",
+        "type": "badge",
+        "props": {
+          "text": "+{{length(participants) - 3}}",
+          "rounded": true
+        },
+        "style": {
+          "marginLeft": "-4px",
+          "flex": "0 0 auto"
+        },
+        "visibleWhen": "{{length(participants) > 3}}"
+      },
+      {
+        "id": "{{ID}}-caption",
+        "type": "text",
+        "props": {
+          "content": "{{CAPTION}}",
+          "color": "var(--pw-color-text-muted)"
+        },
+        "style": {
+          "marginLeft": "12px",
+          "flex": "1 1 0",
+          "minWidth": "0"
+        }
+      }
+    ]
+  },
+  "mobileCollapse": "Stays one row on a phone (keepRow): the faces, the +N badge and the caption never stack."
+}

@@ -1,0 +1,136 @@
+{
+  "id": "data.progress",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "data",
+  "name": "progress",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Linear progress indicator for a quantitative completion value (0–100%)",
+    "useCases": [
+      "File upload progress",
+      "Multi-step wizard completion bar",
+      "Onboarding checklist progress"
+    ],
+    "composesWith": [
+      "form.form",
+      "container.card",
+      "platform/entities"
+    ],
+    "antiPatterns": [
+      "Indeterminate loading — use data.skeleton",
+      "Discrete step indicator — numbered badges, one per step",
+      "Rating display — a rating is a score out of N shown as marks, not a completion amount"
+    ],
+    "implementation": "Always name the bar: `label` (bindable text, e.g. \"{{item.name}} completion\") or `labelledBy` (the id of the heading or text beside it). An unnamed progressbar fails axe aria-progressbar-name; the fallback name is a bare \"Progress\". aria-valuetext carries the formatted value (\"64%\", \"3/5\").\nFurther use cases:\n- Quota or usage meter"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "value",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number"
+        },
+        "bindable": true,
+        "default": 0
+      },
+      {
+        "name": "max",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number"
+        },
+        "bindable": true,
+        "default": 100
+      },
+      {
+        "name": "showLabel",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "labelFormat",
+        "type": "\"percent\" | \"value\" | \"fraction\" | \"none\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "percent",
+            "value",
+            "fraction",
+            "none"
+          ]
+        },
+        "bindable": false,
+        "default": "percent"
+      },
+      {
+        "name": "size",
+        "type": "\"sm\" | \"md\" | \"lg\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "bindable": false,
+        "default": "md"
+      },
+      {
+        "name": "color",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "animated",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "The bar's accessible name (aria-label), e.g. \"Sprint points done\". Not drawn: the page's own text says it. Without label or labelledBy the bar is named \"Progress\"."
+        },
+        "bindable": true
+      },
+      {
+        "name": "labelledBy",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "The id of the block whose text names the bar (aria-labelledby); wins over label."
+        },
+        "bindable": false
+      }
+    ],
+    "defaultProps": {
+      "value": 50,
+      "max": 100,
+      "showLabel": false,
+      "labelFormat": "percent",
+      "size": "md",
+      "animated": false
+    },
+    "canHaveChildren": false,
+    "icon": "▬",
+    "traits": []
+  },
+  "tags": [
+    "tier:data"
+  ]
+}

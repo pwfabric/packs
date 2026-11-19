@@ -1,0 +1,145 @@
+{
+  "id": "text.code",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "text",
+  "name": "code",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Monospaced code snippet block with optional language hint and copy affordance",
+    "useCases": [
+      "API documentation example",
+      "Inline shell command in a guide",
+      "Configuration sample"
+    ],
+    "composesWith": [
+      "layout.container",
+      "container.card"
+    ],
+    "antiPatterns": [
+      "Plain prose — use text.text",
+      "Editable code entry — use form.textarea",
+      "Heading-level emphasis — use text.heading"
+    ],
+    "implementation": "Further use cases:\n- Error trace display"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "code",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false,
+        "default": ""
+      },
+      {
+        "name": "language",
+        "type": "\"plaintext\" | \"javascript\" | \"typescript\" | \"jsx\" | \"tsx\" | \"json\" | \"html\" | \"css\" | \"bash\" | \"python\" | \"go\" | \"rust\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "plaintext",
+            "javascript",
+            "typescript",
+            "jsx",
+            "tsx",
+            "json",
+            "html",
+            "css",
+            "bash",
+            "python",
+            "go",
+            "rust"
+          ]
+        },
+        "bindable": false
+      },
+      {
+        "name": "showLineNumbers",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "highlightLines",
+        "type": "number[]",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "bindable": false
+      },
+      {
+        "name": "filename",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "copyButton",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "copyLabel",
+        "type": "string",
+        "description": "Header copy button label. Write it in the app language.",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Header copy button label. Write it in the app language."
+        },
+        "bindable": true
+      },
+      {
+        "name": "copiedLabel",
+        "type": "string",
+        "description": "Shown and announced after the code reached the clipboard. Write it in the app language.",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Shown and announced after the code reached the clipboard. Write it in the app language."
+        },
+        "bindable": true
+      },
+      {
+        "name": "tone",
+        "type": "\"default\" | \"dark\"",
+        "description": "The code surface. default: the theme code tokens (--pw-color-code-surface / -text / -muted / -border), else the muted card ground. dark: a dark surface with light ink whatever the page theme is.",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "default",
+            "dark"
+          ],
+          "description": "The code surface. default: the theme code tokens (--pw-color-code-surface / -text / -muted / -border), else the muted card ground. dark: a dark surface with light ink whatever the page theme is."
+        },
+        "bindable": false,
+        "default": "default"
+      }
+    ],
+    "defaultProps": {
+      "code": "",
+      "language": "typescript",
+      "showLineNumbers": true,
+      "copyButton": true
+    },
+    "canHaveChildren": false,
+    "icon": "</>",
+    "traits": []
+  },
+  "tags": [
+    "tier:content"
+  ]
+}

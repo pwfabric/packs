@@ -1,0 +1,133 @@
+{
+  "id": "container.tree-view",
+  "kind": "block",
+  "version": "0.1.0",
+  "category": "container",
+  "name": "tree-view",
+  "state": "experimental",
+  "knowledge": {
+    "purpose": "Renders a recursive, expand/collapsible tree of nodes (label, optional icon, optional link, children) for hierarchical navigation or structure display.",
+    "useCases": [
+      "Organization chart / reporting-line browser (OrganizationChart)",
+      "Document library folder tree (DocumentLibrary)",
+      "Site navigation menu with nested sections (Navigation)"
+    ],
+    "composesWith": [
+      "control.button"
+    ],
+    "antiPatterns": [
+      "Do not use for a flat list — use data.list instead",
+      "Not meant for very deep (10+ level) trees without external virtualization"
+    ]
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "title",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Tree heading."
+        },
+        "bindable": true
+      },
+      {
+        "name": "titleLevel",
+        "type": "\"h2\" | \"h3\" | \"h4\" | \"h5\" | \"h6\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "h6"
+          ],
+          "description": "The heading level the title is drawn at, so the tree takes its place in the page outline (h2 for a page-level section, h3 under one)."
+        },
+        "bindable": false,
+        "default": "h3"
+      },
+      {
+        "name": "nav",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "The tree is a navigation landmark (<nav>): named by its title, or by navLabel when given. Set it when the tree is the page or section navigation (a docs sidebar)."
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "navLabel",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "The accessible name of the nav landmark when the tree has no visible title (or a different name is wanted), e.g. Documentation."
+        },
+        "bindable": true
+      },
+      {
+        "name": "nodes",
+        "type": "{ id: string; label: string; icon?: string; href?: string; children?: TreeNode[] }[]",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "icon": {
+                "type": "string"
+              },
+              "href": {
+                "type": "string"
+              },
+              "children": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                },
+                "description": "Child nodes, the same shape at every depth (checked one level deep)."
+              }
+            }
+          },
+          "description": "Tree nodes: [{id, label, href?, children?[]}] — recursive expand/collapse."
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "defaultExpandedIds",
+        "type": "string[]",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Node ids expanded on first render."
+        },
+        "bindable": false,
+        "default": []
+      },
+      {
+        "name": "activeHref",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "href of the page in view: its node is marked as the current page (aria-current=\"page\") and the branch holding it opens. Set it whenever the tree is the page's navigation."
+        },
+        "bindable": true
+      }
+    ],
+    "defaultProps": {},
+    "canHaveChildren": false
+  },
+  "tags": [
+    "tier:data"
+  ]
+}

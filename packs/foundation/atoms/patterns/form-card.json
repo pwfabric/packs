@@ -1,0 +1,218 @@
+{
+  "name": "form-card",
+  "role": "band",
+  "body": "flow",
+  "description": "Single-task card: one narrow card that says what is asked and why, one form, one thing asked (a verification code by default); the confirmed answer is written once the code is in, and only then does the reader go on. Its form ends in an empty carry region for hidden inputs that hold what earlier steps gathered.",
+  "provenPattern": "Derived from 28 real requests that had been met with hand-built workarounds — the band counterpart of those arrangements.",
+  "knowledge": {
+    "purpose": "Getting a single task done without distraction",
+    "useCases": [
+      "Confirming a code sent by email or SMS",
+      "RSVP",
+      "Payment details"
+    ],
+    "composesWith": [
+      "legal-footnote"
+    ],
+    "antiPatterns": [
+      "Adding a second task to the card",
+      "More than four required fields — completion drops",
+      "Showing the error message far from the field",
+      "A card that only says \"code\" — the heading names the task and the intro says where the code was sent",
+      "Leading on before the write has answered — the card writes through its form binding and its successRedirect follows only a successful write; a failed write keeps the card on screen with its error",
+      "Centring the card — a single field sits on the page’s own left edge; give WIDTH (e.g. 420px) when the column is wider than the task needs",
+      "Another h1 on the page: the title is the page's one h1 (this pattern is the whole task of its page); it keeps an h2's size",
+      "Asking again for what earlier steps already gathered — those answers ride along as hidden inputs (input type \"hidden\", value bound to state) in the card's carry region, so the one write holds the whole task",
+      "Writing the task without the code — the code travels with the write under code, so the server that writes the record is the one that checks it",
+      "One failure line for every refusal — the failure copy follows the write's reason (statusKeys.reason → {{state.failReason}}: validation, unauthenticated, forbidden, conflict, network, server or error): the page's words for that reason, held in {{state.failCopy}}, else the generic failure copy; the refused field names are in {{state.failFields}}. The server's own words are never shown",
+      "A result nobody notices — a failure line under the form takes focus when it appears"
+    ]
+  },
+  "mobileCollapse": "A single column on the page’s left edge, as wide as its column or WIDTH; on a phone it takes the full width.",
+  "placeholders": {
+    "{{ID}}": "block id prefix",
+    "{{TITLE}}": "heading.text — the one task, e.g. Check your e-mail",
+    "{{INTRO}}": "text.content — one sentence saying what is asked and where it came from, e.g. We sent a 6-digit code to the address you gave.",
+    "{{FIELD_LABEL}}": "otp-input.label — the single thing being asked",
+    "{{SUBMIT}}": "form.submitLabel — the single primary action, e.g. Confirm and continue; it may read state (e.g. a different label after a failed write)",
+    "{{ENTITY}}": "the app's entity type the confirmed task is written to (e.g. Booking). It declares a text field code: the card submits the 6 digits under that name with the write, so the server can check them; the fields the earlier steps gathered ride along in the carry region",
+    "{{SUCCESS_HREF}}": {
+      "description": "where the reader goes once the write has succeeded — resolved against the page and {{result}}, the written record, e.g. /booked?ref={{result.id}}",
+      "type": "url"
+    },
+    "{{FAILED_TEXT}}": {
+      "description": "alert.title under the form when the write failed and no copy for its reason is given, e.g. Nothing is booked yet — try again; plain text. Left out (and no reason copy), the card shows no failure line of its own: the page says it (e.g. a feedback band reading {{state.failed}} and {{state.failReason}})",
+      "optional": true
+    },
+    "{{FAILED_VALIDATION}}": {
+      "description": "the failure copy when the server refused one or more fields (400) — the refused field names are in {{state.failFields}}, in the visitor's words; plain text. Left out, {{FAILED_TEXT}} is shown",
+      "optional": true
+    },
+    "{{FAILED_UNAUTHENTICATED}}": {
+      "description": "the failure copy when the visitor is not signed in (401), in the visitor's words; plain text. Left out, {{FAILED_TEXT}} is shown",
+      "optional": true
+    },
+    "{{FAILED_FORBIDDEN}}": {
+      "description": "the failure copy when the visitor may not write this (403), in the visitor's words; plain text. Left out, {{FAILED_TEXT}} is shown",
+      "optional": true
+    },
+    "{{FAILED_CONFLICT}}": {
+      "description": "the failure copy when the record already exists (409, a unique field) — e.g. \"You are already on the list\", in the visitor's words; plain text. Left out, {{FAILED_TEXT}} is shown",
+      "optional": true
+    },
+    "{{FAILED_NETWORK}}": {
+      "description": "the failure copy when nothing reached the server (no connection), in the visitor's words; plain text. Left out, {{FAILED_TEXT}} is shown",
+      "optional": true
+    },
+    "{{FAILED_SERVER}}": {
+      "description": "the failure copy when the server failed (5xx), in the visitor's words; plain text. Left out, {{FAILED_TEXT}} is shown",
+      "optional": true
+    },
+    "{{WIDTH}}": {
+      "description": "max-width of the card column, a CSS length, e.g. 420px. Left out, the card takes the width of the column it is placed in",
+      "optional": true
+    }
+  },
+  "initialState": {
+    "submitting": false,
+    "failed": false,
+    "failReason": "",
+    "failFields": [],
+    "failCopy": {
+      "error": "{{FAILED_TEXT}}",
+      "validation": "{{FAILED_VALIDATION}}",
+      "unauthenticated": "{{FAILED_UNAUTHENTICATED}}",
+      "forbidden": "{{FAILED_FORBIDDEN}}",
+      "conflict": "{{FAILED_CONFLICT}}",
+      "network": "{{FAILED_NETWORK}}",
+      "server": "{{FAILED_SERVER}}"
+    }
+  },
+  "usesBlocks": [
+    "alert",
+    "card",
+    "container",
+    "form",
+    "heading",
+    "otp-input",
+    "section",
+    "text"
+  ],
+  "snippet": {
+    "id": "{{ID}}",
+    "type": "section",
+    "props": {
+      "padding": 0
+    },
+    "children": [
+      {
+        "id": "{{ID}}-c",
+        "type": "container",
+        "props": {
+          "direction": "column",
+          "padding": 0
+        },
+        "children": [
+          {
+            "id": "{{ID}}-c2",
+            "type": "card",
+            "props": {
+              "padding": 28,
+              "gap": 16,
+              "shadow": "sm"
+            },
+            "children": [
+              {
+                "id": "{{ID}}-h",
+                "type": "heading",
+                "props": {
+                  "text": "{{TITLE}}",
+                  "level": "h1"
+                },
+                "style": {
+                  "fontSize": "var(--pw-font-size-h2, var(--pw-font-size-3xl, 30px))"
+                }
+              },
+              {
+                "id": "{{ID}}-intro",
+                "type": "text",
+                "props": {
+                  "content": "{{INTRO}}",
+                  "color": "var(--pw-color-text-muted)"
+                }
+              },
+              {
+                "id": "{{ID}}-f",
+                "type": "form",
+                "props": {
+                  "submittingWhen": "{{state.submitting}}",
+                  "submitLabel": "{{SUBMIT}}"
+                },
+                "children": [
+                  {
+                    "id": "{{ID}}-code",
+                    "type": "otp-input",
+                    "props": {
+                      "name": "code",
+                      "label": "{{FIELD_LABEL}}",
+                      "length": 6,
+                      "inputMode": "numeric",
+                      "required": true
+                    }
+                  },
+                  {
+                    "id": "{{ID}}-carry",
+                    "type": "container",
+                    "props": {
+                      "direction": "column",
+                      "padding": 0,
+                      "gap": 0
+                    },
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "id": "{{ID}}-err",
+                "type": "alert",
+                "visibleWhen": "{{state.failed && !state.submitting && (state.failCopy[state.failReason] || state.failCopy.error) != ''}}",
+                "props": {
+                  "title": "{{state.failCopy[state.failReason] || state.failCopy.error}}",
+                  "variant": "error",
+                  "focusOnShow": true
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "maxWidth": "{{WIDTH}}",
+          "width": "100%",
+          "margin": "0"
+        }
+      }
+    ]
+  },
+  "dataSources": [
+    {
+      "id": "confirmed",
+      "kind": "entity",
+      "entityType": "{{ENTITY}}",
+      "fallback": []
+    }
+  ],
+  "formBindings": [
+    {
+      "formId": "{{ID}}-f",
+      "sourceId": "confirmed",
+      "method": "POST",
+      "successRedirect": "{{SUCCESS_HREF}}",
+      "statusKeys": {
+        "loading": "submitting",
+        "error": "failed",
+        "reason": "failReason",
+        "fields": "failFields"
+      }
+    }
+  ]
+}

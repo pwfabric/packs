@@ -1,0 +1,142 @@
+{
+  "id": "form.textarea",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "form",
+  "name": "textarea",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Multi-line text input with auto-grow and validation",
+    "useCases": [
+      "Comment or message body",
+      "Description or bio field",
+      "Long-form note entry"
+    ],
+    "composesWith": [
+      "form.form",
+      "platform/entities"
+    ],
+    "antiPatterns": [
+      "Single-line input — use form.input",
+      "Displaying code — a textarea is for input; show read-only code as a fenced block in text.prose"
+    ],
+    "implementation": "Operational constraints (install, permissions, polling, read-only scope):\n- Rich-text editing — out of scope for core-ui form blocks\n\nFurther use cases:\n- Code snippet entry without syntax highlighting"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "name",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "placeholder",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "rows",
+        "type": "number",
+        "jsonSchema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "bindable": false,
+        "default": 4
+      },
+      {
+        "name": "maxLength",
+        "type": "number",
+        "jsonSchema": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "bindable": false
+      },
+      {
+        "name": "required",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "disabled",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": true,
+        "default": false
+      },
+      {
+        "name": "resize",
+        "type": "\"none\" | \"vertical\" | \"horizontal\" | \"both\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "none",
+            "vertical",
+            "horizontal",
+            "both"
+          ]
+        },
+        "bindable": false,
+        "default": "vertical"
+      },
+      {
+        "name": "stateKey",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Surface state key the value is written to on change, so {{state.<key>}} reads it — a summary step of a multi-step form, or a list filter. Mirrors form.select and form.segmented-control."
+        },
+        "bindable": false
+      },
+      {
+        "name": "defaultValue",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Initial text — expression-bindable ({{record.notes}}), so an edit form shows the stored value; applied by remount once the data resolves."
+        },
+        "bindable": true
+      }
+    ],
+    "defaultProps": {
+      "rows": 4,
+      "required": false,
+      "disabled": false,
+      "resize": "vertical"
+    },
+    "canHaveChildren": false,
+    "allowedParents": [
+      "form",
+      "container"
+    ],
+    "icon": "⬚",
+    "traits": [
+      "form-field"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

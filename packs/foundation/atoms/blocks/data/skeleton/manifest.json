@@ -1,0 +1,109 @@
+{
+  "id": "data.skeleton",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "data",
+  "name": "skeleton",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Placeholder shimmer block displayed while real content is loading",
+    "useCases": [
+      "Loading state for a list row or a row of cards",
+      "Image placeholder before media.image resolves",
+      "Card skeleton while async data is fetched"
+    ],
+    "composesWith": [
+      "data.list",
+      "container.card",
+      "media.image"
+    ],
+    "antiPatterns": [
+      "Determinate progress — a skeleton says only that content is coming, never how much of it",
+      "Empty-state messaging — use the callout pattern or text.alert",
+      "Permanent placeholder content — render the real block disabled instead"
+    ],
+    "implementation": "Further use cases:\n- List loading state before items arrive"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "variant",
+        "type": "\"text\" | \"circle\" | \"rectangle\" | \"card\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "text",
+            "circle",
+            "rectangle",
+            "card"
+          ]
+        },
+        "bindable": false,
+        "default": "rectangle"
+      },
+      {
+        "name": "lines",
+        "type": "number",
+        "jsonSchema": {
+          "type": "integer"
+        },
+        "bindable": false,
+        "default": 3
+      },
+      {
+        "name": "animated",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "width",
+        "type": "number | string",
+        "jsonSchema": {
+          "type": [
+            "number",
+            "string"
+          ],
+          "description": "The frame's width: a number is px, a string a CSS length (\"100%\", \"12rem\"). Left out, it fills the row. A text frame's last line is 60% of it; a circle without height takes it as its size."
+        },
+        "bindable": false
+      },
+      {
+        "name": "height",
+        "type": "number | string",
+        "jsonSchema": {
+          "type": [
+            "number",
+            "string"
+          ],
+          "description": "The frame's height, in the same units as width: a number is px, a string a CSS length. Left out: a rectangle 20px, a card 120px, a circle 48px (text lines are always 16px). Size it to what loads in its place, so the page does not shift when the data arrives."
+        },
+        "bindable": false
+      },
+      {
+        "name": "count",
+        "type": "number",
+        "jsonSchema": {
+          "type": "integer"
+        },
+        "bindable": false,
+        "default": 1
+      }
+    ],
+    "defaultProps": {
+      "variant": "text",
+      "lines": 3,
+      "animated": true,
+      "count": 1
+    },
+    "canHaveChildren": false,
+    "icon": "⬚",
+    "traits": []
+  },
+  "tags": [
+    "tier:content"
+  ]
+}

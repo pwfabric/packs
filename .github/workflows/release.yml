@@ -1,0 +1,54 @@
+name: Release
+
+# A tag `<pack>@<version>` (for example `foundation@1.0.0`) releases one pack:
+# the tag must agree with the pack's pwpack.json, the whole pipeline must be
+# green, and the engine's writer produces the `.pwpack`, which is attached to
+# a GitHub Release with its sha256.
+
+on:
+  push:
+    tags: ['*@*']
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Resolve the pack and version from the tag
+        id: tag
+        run: |
+          pack="${GITHUB_REF_NAME%@*}"
+          version="${GITHUB_REF_NAME##*@}"
+          file="packs/$pack/pwpack.json"
+          test -f "$file" || { echo "no pack '$pack' (no $file)"; exit 1; }
+          declared=$(node -p "require('./$file').version")
+          test "$declared" = "$version" || { echo "tag says $version, $file says $declared"; exit 1; }
+          echo "pack=$pack" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm verify
+      - run: pnpm build ${{ steps.tag.outputs.pack }}
+
+      - name: Publish the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PACK: ${{ steps.tag.outputs.pack }}
+          VERSION: ${{ steps.tag.outputs.version }}
+        run: |
+          name="$(node -p "require('./packs/$PACK/pwpack.json').name ?? '$PACK'")"
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$name $VERSION" \
+            --generate-notes \
+            "dist/$PACK-$VERSION.pwpack" "dist/$PACK-$VERSION.pwpack.sha256"

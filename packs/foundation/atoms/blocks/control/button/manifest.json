@@ -1,0 +1,582 @@
+{
+  "id": "control.button",
+  "kind": "block",
+  "version": "1.1.0",
+  "category": "control",
+  "name": "button",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Clickable trigger for an action, navigation, or form submit — primary interactive control",
+    "useCases": [
+      "Form submit",
+      "Primary call-to-action on a marketing page",
+      "Modal confirm or cancel",
+      "Wizard step navigation on one page — action setState step, sections gated by visibleWhen"
+    ],
+    "composesWith": [
+      "form.form",
+      "layout.container",
+      "layout.section",
+      "platform/navigation",
+      "platform/interaction"
+    ],
+    "antiPatterns": [
+      "Plain text styled as a button — use control.link for navigation",
+      "Multiple primary buttons in the same visual area",
+      "Buttons that are actually on/off switches — a button fires an action and holds no state; a visible two-way choice is form.segmented-control",
+      "href and action on the same button — href navigates first and the action never runs; give a button one job"
+    ],
+    "implementation": "CLICK WRITES STATE — `action`: one action or a list, run in order on the click (never on other events). Same shape as a behavior's actions: setState {key, value}, refresh {sourceId}, refreshAll, showBlock/hideBlock {blockId}, navigate {url}, write {sourceId, op: create | update | delete, id?, values?, statusKeys?} (one record; inside a repeat id \"{{item.id}}\" updates or deletes that row), auth:signIn / auth:register {method?} and auth:signOut (the host performs them).\nWizard on one page: initialState {\"step\": 1}; sections carry visibleWhen \"{{state.step == 1}}\", \"{{state.step == 2}}\" …; \"Next\" → \"action\": [{\"type\":\"setState\",\"key\":\"step\",\"value\":2},{\"type\":\"setState\",\"key\":\"stepError\",\"value\":\"\"}]; \"Back\" → {\"type\":\"setState\",\"key\":\"step\",\"value\":1}.\nInside a repeat the action resolves per row, so {\"type\":\"setState\",\"key\":\"selectedId\",\"value\":\"{{item.id}}\"} writes that row's id. To open a detail PAGE from a row use a link instead: href \"/product?id={{item.id}}\" — the published app seeds state.id from the address.\nIf href is set it wins: the button renders a real link (<a href> in the button look — open-in-new-tab, middle-click and a screen reader announce it as a link) and the action does not run. Disabled, or without href, it is a <button type=button>. Where it opens: `target` (_self | _blank) decides; unset, an external absolute http(s) address opens in a new tab (noopener, noreferrer) like the link block, while relative addresses, # and same-origin addresses stay in this tab; mailto: and tel: are unchanged. Without href the button emits its click and the runtime runs the action.\n\nLabel weight follows the theme voice: font-weight reads var(--pw-font-weight-heading, 600) — a fixed 500 made every theme’s controls look alike while headingWeight runs 400–800.\nCorners: border-radius reads var(--pw-button-radius, var(--pw-border-radius)) — a theme sets --pw-button-radius (styleVariables) for pill or square buttons without changing the corners of cards and inputs; unset, buttons follow the theme corner."
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "default": ""
+      },
+      {
+        "name": "variant",
+        "type": "\"primary\" | \"secondary\" | \"outline\" | \"ghost\" | \"destructive\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "primary",
+            "secondary",
+            "accent",
+            "outline",
+            "ghost",
+            "destructive"
+          ]
+        },
+        "bindable": true,
+        "default": "primary"
+      },
+      {
+        "name": "size",
+        "type": "\"small\" | \"medium\" | \"large\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "small",
+            "medium",
+            "large"
+          ]
+        },
+        "bindable": false,
+        "default": "medium"
+      },
+      {
+        "name": "href",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "target",
+        "type": "\"_self\" | \"_blank\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "_self",
+            "_blank"
+          ]
+        },
+        "bindable": false
+      },
+      {
+        "name": "disabled",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": true,
+        "default": false
+      },
+      {
+        "name": "fullWidth",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "icon",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "iconPosition",
+        "type": "\"left\" | \"right\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "left",
+            "right"
+          ]
+        },
+        "bindable": false
+      },
+      {
+        "name": "action",
+        "type": "SurfaceAction | SurfaceAction[]",
+        "required": false,
+        "jsonSchema": {
+          "oneOf": [
+            {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "setState"
+                    },
+                    "key": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "value": {}
+                  },
+                  "required": [
+                    "type",
+                    "key"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "refresh"
+                    },
+                    "sourceId": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "sourceId"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "refreshAll"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "showBlock"
+                    },
+                    "blockId": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "blockId"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "hideBlock"
+                    },
+                    "blockId": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "blockId"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "navigate"
+                    },
+                    "url": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "url"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "write"
+                    },
+                    "sourceId": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "op": {
+                      "type": "string",
+                      "enum": [
+                        "create",
+                        "update",
+                        "delete"
+                      ]
+                    },
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ]
+                    },
+                    "values": {
+                      "type": "object",
+                      "additionalProperties": {}
+                    },
+                    "statusKeys": {
+                      "type": "object",
+                      "properties": {
+                        "loading": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "success": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "error": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "reason": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "fields": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "detail": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "sourceId",
+                    "op"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "auth:signIn"
+                    },
+                    "method": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "auth:register"
+                    },
+                    "method": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "auth:signOut"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "setState"
+                      },
+                      "key": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "value": {}
+                    },
+                    "required": [
+                      "type",
+                      "key"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "refresh"
+                      },
+                      "sourceId": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "sourceId"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "refreshAll"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "showBlock"
+                      },
+                      "blockId": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "blockId"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "hideBlock"
+                      },
+                      "blockId": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "blockId"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "navigate"
+                      },
+                      "url": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "url"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "write"
+                      },
+                      "sourceId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "op": {
+                        "type": "string",
+                        "enum": [
+                          "create",
+                          "update",
+                          "delete"
+                        ]
+                      },
+                      "id": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          }
+                        ]
+                      },
+                      "values": {
+                        "type": "object",
+                        "additionalProperties": {}
+                      },
+                      "statusKeys": {
+                        "type": "object",
+                        "properties": {
+                          "loading": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "success": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "error": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "reason": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "fields": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "detail": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "sourceId",
+                      "op"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "auth:signIn"
+                      },
+                      "method": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "auth:register"
+                      },
+                      "method": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "auth:signOut"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "bindable": true
+      },
+      {
+        "name": "current",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "This button names the page the visitor is on (a pill nav item): it carries aria-current=\"page\". No visual change; the variant draws the active look. Bindable: \"{{item.active}}\"."
+        },
+        "bindable": true
+      }
+    ],
+    "defaultProps": {
+      "label": "",
+      "variant": "primary",
+      "size": "medium",
+      "disabled": false,
+      "fullWidth": false
+    },
+    "canHaveChildren": false,
+    "icon": "⊡",
+    "traits": [
+      "form-content",
+      "inline",
+      "modal-content"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

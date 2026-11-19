@@ -1,0 +1,119 @@
+{
+  "$comment": [
+    "THE PACK MAP — which pack exists, which packs it stands on (`requires`),",
+    "and what it is called in a listing. Each pack's `pwpack.json` is generated",
+    "from this file (node tools/apply-pack-map.mjs).",
+    "",
+    "NAMES. Pack ids carry no vendor prefix; `foundation` is the floor every",
+    "other pack stands on (`floor`).",
+    "",
+    "PLACEMENT. An atom lives in the pack whose VOCABULARY it belongs to. The",
+    "floor carries the block vocabulary every app needs, the shells, the page",
+    "furniture, the form family, the themes, the icons and the engines; widgets",
+    "carries the occasional blocks, kept off the floor so an app that never",
+    "places them never lists them.",
+    "",
+    "REQUIRES IS EXPLICIT. Every pack lists its `requires`, the floor included",
+    "(an empty list). In `pwpack.json` each entry becomes `{ id, range }`, the",
+    "range being the peer's current major. A pack's closure is the transitive set",
+    "of its `requires`; the integrity check's `--resolve-against` roots and the",
+    "tsconfig `rootDirs` are derived from it.",
+    "",
+    "INVARIANT RULES (gate: tools/check-pack-map.mjs):",
+    "  (a) every pattern's `usesBlocks` is a subset of its own pack's blocks plus",
+    "      the blocks of its `requires` closure;",
+    "  (c) block, pattern and surface counts match `expect` exactly, and the",
+    "      catalogue total matches `expectTotal` (so a map edited to hide a lost",
+    "      atom is still caught);",
+    "  (d) every pack stays under `atomCap` atoms;",
+    "  (e) no manifest (usesBlocks, composesWith, a `category.name` reference in",
+    "      knowledge text, surface blocks, patternsExercised) names an atom",
+    "      outside its closure.",
+    "A pack may name the packs below it, never the ones above: widgets may name",
+    "foundation, foundation may not name widgets.",
+    "",
+    "EVERY BLOCK IS SEEN. A block counts as shown when a pattern or surface of",
+    "its own pack, or of a pack that stands on it, places it, or when a DOM test",
+    "of its own pack renders it (check-integrity). A block nothing renders fails.",
+    "",
+    "SOURCE ACROSS PACK BOUNDARIES. A published pack's archive carries only its",
+    "own files, so a relative import into a neighbour pack does not resolve. The",
+    "few shared helpers a pack's blocks need are GENERATED into the pack, never",
+    "copied by hand: `vendors` names floor files the pack gets a copy of, and",
+    "`kit` names single symbols from the floor's shared utilities collected into",
+    "the pack's `atoms/lib/_kit.ts`. check-integrity verifies each copy matches",
+    "its source. A block must resolve inside its own pack: each block atom is",
+    "bundled on its own."
+  ],
+  "floor": "foundation",
+  "defaults": {
+    "engines": ">=3.1.0 <4",
+    "tokens": [
+      "--pw-color-primary-ink"
+    ]
+  },
+  "atomCap": 100,
+  "expectTotal": {
+    "blocks": 69,
+    "patterns": 26,
+    "surfaces": 0
+  },
+  "rules": {
+    "closure": "A pattern's usesBlocks is a subset of its own pack's blocks plus the blocks of its requires closure.",
+    "noGhosts": "No manifest names an atom outside its requires closure: usesBlocks, composesWith, dotted block ids in knowledge text, surface blocks, patternsExercised.",
+    "counts": "Each pack carries exactly expect.blocks blocks and expect.patterns patterns (and expect.surfaces surfaces where declared).",
+    "atomCap": "Every pack stays under atomCap atoms (blocks + patterns + surfaces + capabilities + themes + icon set + connectors + providers + identity methods — what the canonical builder counts)."
+  },
+  "packs": {
+    "foundation": {
+      "requires": [],
+      "expect": {
+        "blocks": 52,
+        "patterns": 26
+      },
+      "license": "Apache-2.0",
+      "listing": {
+        "name": "Foundation",
+        "description": "The ground floor every app stands on: the core block vocabulary (layout, text, controls, forms, data, feedback, media), the top-bar, bottom-bar and chrome-less shells with their page parts, six themes, each with its own dark mode (zinc, midnight, paper, linen, slate, ember), the icon dictionary, four capabilities and the REST connector.",
+        "category": "ui-design"
+      }
+    },
+    "widgets": {
+      "requires": [
+        "foundation"
+      ],
+      "expect": {
+        "blocks": 17,
+        "patterns": 0
+      },
+      "vendors": [
+        "lib/component-types.ts",
+        "lib/hooks.ts",
+        "lib/_kit.ts",
+        "lib/_shared-account-menu.tsx"
+      ],
+      "kit": [
+        "CSSUnit",
+        "HIT_AREA_CSS",
+        "ICON_PATHS",
+        "MEDIA_LETTERBOX",
+        "ON_OVERLAY_SCRIM",
+        "OVERLAY_SCRIM",
+        "OVERLAY_SCRIM_STRONG",
+        "cssUnit",
+        "listOf",
+        "localeUses24h",
+        "safeFrameSrc",
+        "safeHref",
+        "safeRenderValue",
+        "textOf"
+      ],
+      "license": "Apache-2.0",
+      "listing": {
+        "name": "Widgets",
+        "description": "The occasional blocks, kept out of the floor so an app that never places them never lists them: rich-text editor, file dropzone, tag input, combobox, slider, chart, month calendar, rating, map, carousel, video, embed, gallery, world clock, tree view, command palette and like button.",
+        "category": "ui-design"
+      }
+    }
+  }
+}

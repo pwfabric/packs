@@ -1,0 +1,101 @@
+{
+  "id": "control.divider",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "control",
+  "name": "divider",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Thin horizontal or vertical rule that visually separates groups of content",
+    "useCases": [
+      "Section break between two card regions",
+      "Separator inside a dropdown menu",
+      "Vertical divider between toolbar groups"
+    ],
+    "composesWith": [
+      "layout.container",
+      "layout.section",
+      "container.card"
+    ],
+    "antiPatterns": [
+      "Full-bleed page band — use layout.section with a background colour",
+      "Decorative ornament — use media.image",
+      "Spacing-only separation — adjust gap on the parent container instead"
+    ],
+    "implementation": "Further use cases:\n- Thematic break between paragraphs"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "orientation",
+        "type": "\"horizontal\" | \"vertical\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "horizontal",
+            "vertical"
+          ]
+        },
+        "bindable": false,
+        "default": "horizontal"
+      },
+      {
+        "name": "thickness",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "bindable": false,
+        "default": 1
+      },
+      {
+        "name": "color",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "spacing",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number"
+        },
+        "bindable": false,
+        "default": 16
+      },
+      {
+        "name": "style",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "solid",
+            "dashed",
+            "dotted"
+          ],
+          "description": "Line style (the component's own prop — its name collides with the block-level CSS style field; inherited naming)."
+        },
+        "bindable": false,
+        "default": "solid"
+      }
+    ],
+    "defaultProps": {
+      "orientation": "horizontal",
+      "thickness": 1,
+      "spacing": 16
+    },
+    "canHaveChildren": false,
+    "icon": "―",
+    "traits": [
+      "form-content",
+      "modal-content"
+    ]
+  },
+  "tags": [
+    "tier:structure"
+  ]
+}

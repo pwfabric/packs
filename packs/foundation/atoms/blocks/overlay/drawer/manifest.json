@@ -1,0 +1,131 @@
+{
+  "id": "overlay.drawer",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "overlay",
+  "name": "drawer",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Off-canvas side sheet that slides in from an edge to host detail content or actions",
+    "useCases": [
+      "Detail pane that opens beside a list",
+      "Mobile navigation menu",
+      "Filter sidebar on a results page"
+    ],
+    "composesWith": [
+      "layout.container",
+      "form.form",
+      "data.list",
+      "control.button",
+      "platform/interaction"
+    ],
+    "antiPatterns": [
+      "Confirmation dialog — use overlay.modal",
+      "Persistent layout sidebar — use layout.container with appropriate sizing",
+      "Tooltip-sized hint — use overlay.tooltip"
+    ],
+    "implementation": "Further use cases:\n- Quick-edit form for a selected row"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "triggerLabel",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Text of the button that opens the sheet. No button is drawn without it."
+        },
+        "bindable": true
+      },
+      {
+        "name": "defaultOpen",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "placement",
+        "type": "\"left\" | \"right\" | \"top\" | \"bottom\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "left",
+            "right",
+            "top",
+            "bottom"
+          ]
+        },
+        "bindable": false,
+        "default": "right"
+      },
+      {
+        "name": "size",
+        "type": "\"sm\" | \"md\" | \"lg\" | \"full\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "sm",
+            "md",
+            "lg",
+            "full"
+          ]
+        },
+        "bindable": false,
+        "default": "md"
+      },
+      {
+        "name": "closeOnOverlayClick",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "closeOnEscape",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "showCloseButton",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Heading of the open sheet; also its accessible name."
+        },
+        "bindable": true
+      }
+    ],
+    "defaultProps": {
+      "defaultOpen": false,
+      "placement": "right",
+      "size": "md",
+      "closeOnOverlayClick": true,
+      "closeOnEscape": true,
+      "showCloseButton": true
+    },
+    "canHaveChildren": true,
+    "icon": "◧",
+    "traits": []
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

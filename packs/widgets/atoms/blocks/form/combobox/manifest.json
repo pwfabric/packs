@@ -1,0 +1,178 @@
+{
+  "id": "form.combobox",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "form",
+  "name": "combobox",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Searchable single-select that filters a dropdown list as the user types",
+    "useCases": [
+      "Country, currency, or timezone picker",
+      "Assignee / owner selection from many people",
+      "Tag or category chooser with type-ahead"
+    ],
+    "composesWith": [
+      "form.form",
+      "form.input",
+      "control.button",
+      "container.card"
+    ],
+    "antiPatterns": [
+      "Two-to-four fixed options — use form.segmented-control",
+      "Small static list — use form.select",
+      "Free-form text with no options — use form.input"
+    ],
+    "implementation": "Further use cases:\n- Any select with more options than fit comfortably in form.select"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "name",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "FormData key. The chosen option VALUE is submitted, not its label."
+        },
+        "bindable": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "options",
+        "type": "[{label, value}] | string[] | rows",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "label": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "label",
+                  "value"
+                ]
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "object",
+                "additionalProperties": {}
+              }
+            ]
+          },
+          "description": "The choices: {label, value} objects, plain strings (each is both label and value), or rows bound from a source ({{records}}) with the source's own field names, which labelKey and valueKey name. Without the keys a row's value falls back to value then id, its label to label, name, then title."
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "labelKey",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Bound rows: the field shown as each option's label (e.g. \"name\", or \"data.name\"). Same as form.select. Take the name from the bound source's rows — never guess it."
+        },
+        "bindable": false
+      },
+      {
+        "name": "valueKey",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Bound rows: the field submitted as each option's value (e.g. \"id\"). Same as form.select."
+        },
+        "bindable": false
+      },
+      {
+        "name": "placeholder",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "searchable",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "defaultValue",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Option value selected before the visitor chooses (an edit form). Bindable."
+        },
+        "bindable": true
+      },
+      {
+        "name": "required",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "A choice must be made before the form submits."
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "emptyText",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Shown when the search matches nothing. Nothing is shown when omitted."
+        },
+        "bindable": true
+      },
+      {
+        "name": "stateKey",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "State key the chosen value is written to on change — {{state.<key>}} then reads it (a filter)."
+        },
+        "bindable": false
+      }
+    ],
+    "defaultProps": {
+      "options": [],
+      "searchable": true,
+      "required": false
+    },
+    "canHaveChildren": false,
+    "allowedParents": [
+      "form",
+      "container"
+    ],
+    "icon": "▾",
+    "traits": [
+      "form-field",
+      "modal-content"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

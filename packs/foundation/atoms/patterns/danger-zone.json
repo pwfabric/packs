@@ -1,0 +1,180 @@
+{
+  "name": "danger-zone",
+  "role": "part",
+  "description": "The destructive action, set apart, behind a confirmation the reader has to type: the button stays disabled until the name is typed exactly, then writes the scheduled action to its record and says so in place, with a way to take it back until it runs.",
+  "provenPattern": "Derived from a production account application: its auth shell, its destructive-action sections and its usage rows are the measured versions of these three arrangements.",
+  "knowledge": {
+    "purpose": "Keep an irreversible action reachable but impossible to take by accident",
+    "useCases": [
+      "Delete an account",
+      "Delete a workspace",
+      "Transfer ownership",
+      "Revoke every session"
+    ],
+    "composesWith": [
+      "form-card"
+    ],
+    "antiPatterns": [
+      "A destructive button among ordinary settings — proximity is what makes a misclick possible",
+      "A yes/no dialog as the only gate; typing the name is what proves the reader knows which thing they are deleting",
+      "Describing the action without naming what is lost — “this cannot be undone” says nothing about what goes",
+      "An enabled destructive button before the name is typed — the typed name is the gate, so the button is disabled until it matches exactly",
+      "Demoting the title below h2 — the danger zone is a section of the page beside the settings cards, not inside one; its title is h2 (drawn small), so the outline never skips a level",
+      "A confirmation that leads elsewhere — the result is said in place, where the reader clicked, with the way to undo it next to it",
+      "Typing a name the page wrote by hand — the text to type is read from the record (CONFIRM_VALUE is an expression), so a renamed workspace is confirmed by its new name"
+    ]
+  },
+  "mobileCollapse": "One column: the warning, the confirm field, then the action last; once confirmed the field and the button give way to the result line and its undo.",
+  "placeholders": {
+    "{{ID}}": "block id prefix",
+    "{{TITLE}}": "heading.text — the action, e.g. Delete this workspace",
+    "{{WHAT_IS_LOST}}": "alert.message — what goes with it, named",
+    "{{CONFIRM_VALUE}}": "expression WITHOUT braces for the exact text the reader must type, read from the record so it follows a rename (e.g. settingsRecord.0.workspaceName), or a quoted literal (e.g. 'Example workspace')",
+    "{{CONFIRM_LABEL}}": "input.label — names what to type; it may be an expression over the record, e.g. {{'Type ' + settingsRecord.0.workspaceName + ' to confirm'}}",
+    "{{ACTION}}": "button.label — the destructive verb",
+    "{{SOURCE}}": "id of the page source that holds the record the action changes (e.g. settingsRecord) — the server decides who may change it",
+    "{{RECORD_ID}}": "expression for that record's id, e.g. {{settingsRecord.0.id}}",
+    "{{DO_VALUES}}": "the fields the confirmed action writes, as an object (e.g. {\"closingScheduled\": true}) — the host carries the action out from that record",
+    "{{SCHEDULED}}": "expression WITHOUT braces that is true once the action is scheduled, read from the record (e.g. settingsRecord.0.closingScheduled === true)",
+    "{{DONE_TEXT}}": "alert.message shown in place once confirmed, saying what happens and when (e.g. Closing is scheduled for 30 Nov 2026.)",
+    "{{UNDO_LABEL}}": "label of the button that takes the scheduled action back (e.g. Keep the workspace)",
+    "{{UNDO_VALUES}}": "the fields the undo writes, as an object (e.g. {\"closingScheduled\": false})",
+    "{{FAILED_TEXT}}": "human message when the write is refused or fails — never the server's words"
+  },
+  "initialState": {
+    "confirmText": "",
+    "dangerBusy": false,
+    "dangerFailed": false
+  },
+  "usesBlocks": [
+    "alert",
+    "button",
+    "card",
+    "container",
+    "heading",
+    "input"
+  ],
+  "snippet": {
+    "id": "{{ID}}",
+    "type": "card",
+    "props": {
+      "padding": 24,
+      "gap": 12,
+      "shadow": "none"
+    },
+    "children": [
+      {
+        "id": "{{ID}}-h",
+        "type": "heading",
+        "props": {
+          "text": "{{TITLE}}",
+          "level": "h2"
+        },
+        "style": {
+          "fontSize": "var(--pw-font-size-h4, var(--pw-font-size-xl, 20px))"
+        }
+      },
+      {
+        "id": "{{ID}}-what",
+        "type": "alert",
+        "props": {
+          "message": "{{WHAT_IS_LOST}}",
+          "variant": "warning"
+        },
+        "visibleWhen": "{{!({{SCHEDULED}})}}"
+      },
+      {
+        "id": "{{ID}}-confirm",
+        "type": "input",
+        "props": {
+          "type": "text",
+          "name": "confirm",
+          "label": "{{CONFIRM_LABEL}}",
+          "required": true,
+          "stateKey": "confirmText",
+          "value": "{{state.confirmText}}"
+        },
+        "visibleWhen": "{{!({{SCHEDULED}})}}"
+      },
+      {
+        "id": "{{ID}}-act",
+        "type": "button",
+        "props": {
+          "label": "{{ACTION}}",
+          "variant": "destructive",
+          "disabled": "{{state.confirmText != ({{CONFIRM_VALUE}}) || state.dangerBusy}}",
+          "action": {
+            "type": "write",
+            "sourceId": "{{SOURCE}}",
+            "op": "update",
+            "id": "{{RECORD_ID}}",
+            "values": "{{DO_VALUES}}",
+            "statusKeys": {
+              "loading": "dangerBusy",
+              "error": "dangerFailed"
+            }
+          }
+        },
+        "visibleWhen": "{{!({{SCHEDULED}})}}"
+      },
+      {
+        "id": "{{ID}}-done",
+        "type": "container",
+        "props": {
+          "direction": "row",
+          "wrap": true,
+          "gap": 12,
+          "align": "center",
+          "padding": 0
+        },
+        "visibleWhen": "{{{{SCHEDULED}}}}",
+        "children": [
+          {
+            "id": "{{ID}}-done-msg",
+            "type": "alert",
+            "props": {
+              "message": "{{DONE_TEXT}}",
+              "variant": "info"
+            },
+            "style": {
+              "flex": "1 1 320px",
+              "minWidth": "0"
+            }
+          },
+          {
+            "id": "{{ID}}-undo",
+            "type": "button",
+            "props": {
+              "label": "{{UNDO_LABEL}}",
+              "variant": "outline",
+              "disabled": "{{state.dangerBusy}}",
+              "action": {
+                "type": "write",
+                "sourceId": "{{SOURCE}}",
+                "op": "update",
+                "id": "{{RECORD_ID}}",
+                "values": "{{UNDO_VALUES}}",
+                "statusKeys": {
+                  "loading": "dangerBusy",
+                  "error": "dangerFailed"
+                }
+              }
+            },
+            "style": {
+              "flex": "0 0 auto"
+            }
+          }
+        ]
+      },
+      {
+        "id": "{{ID}}-fail",
+        "type": "alert",
+        "props": {
+          "message": "{{FAILED_TEXT}}",
+          "variant": "error"
+        },
+        "visibleWhen": "{{state.dangerFailed}}"
+      }
+    ]
+  }
+}

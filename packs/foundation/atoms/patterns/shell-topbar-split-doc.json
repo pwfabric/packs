@@ -1,0 +1,160 @@
+{
+  "name": "shell-topbar-split-doc",
+  "role": "shell",
+  "description": "Top navigation + a selecting list on the left, the document read on the right. The selection travels in the URL.",
+  "provenPattern": "Shell matrix — chrome × body: 5 chromes × 4 bodies = 20, four eliminated (with no chrome a grid has no way out, a dense surface has no interaction, a split refutes itself) → 16 cells.",
+  "knowledge": {
+    "purpose": "The frame of a pile of records: select on the left, read on the right — and the selected record is shareable as a link",
+    "useCases": [
+      "Inbox",
+      "Application/request list and detail",
+      "Document archive"
+    ],
+    "composesWith": [
+      "weave-pair",
+      "weave-notice"
+    ],
+    "antiPatterns": [
+      "Keeping the selection out of the URL — then the record cannot be shared and Back does not work",
+      "Turning the detail pane into a second menu — the detail is the answer",
+      "Using it with a single record — with nothing to choose this is not a split",
+      "A page with no h1 — the split titles the selected record (h2); the lead region carries the page's own heading"
+    ]
+  },
+  "mobileCollapse": "The top bar collapses into a drawer; links are listed in one column. Two panes collapse to one: a list page, and selecting NAVIGATES to a detail page — the URL already carries the selection, so Back returns to the list.",
+  "placeholders": {
+    "{{HEADER}}": "top bar — brand name",
+    "{{NAV_LINKS}}": "top-bar links: [{label, href}]",
+    "{{ITEMS}}": "records of the split list: [{id, title, meta?, excerpt?, body?, entries?}]",
+    "{{LIST}}": "heading of the list column",
+    "{{SEL}}": "name of the URL parameter that carries the selection",
+    "{{EMPTY_LABEL}}": {
+      "description": "split-view.emptyLabel — what the detail says while no record is open, in the page language: also when the address names an id that is not in the list (a stale link selects nothing, never the first row), e.g. {{state.<SEL> ? 'There is no such entry. Pick one from the list.' : 'Pick an entry from the list.'}}. Given, nothing opens until the visitor picks; empty (\"\"), the first record opens when the address names none",
+      "optional": true
+    },
+    "{{MAIN}}": "main slot — the page header above the split (its h1 names the page; the split never carries one). Two further regions, in order: the action area BELOW the detail (the composer in stream mode) and the bands AFTER the split, full width",
+    "{{LEGAL}}": "copyright / legal line — PLAIN TEXT, one line (e.g. \"© 2026 Example Co.\"). The ONLY place the copyright appears: the `footer` band carries link columns and never a copyright. Leave it empty (\"\") for none",
+    "{{ACTIVE}}": "href of the top-bar link for this page (e.g. \"/it\") — that link is marked as the current page (aria-current)"
+  },
+  "usesBlocks": [
+    "container",
+    "navbar",
+    "split-view",
+    "text"
+  ],
+  "snippet": {
+    "id": "{{ID}}",
+    "type": "container",
+    "props": {
+      "direction": "column",
+      "padding": 0
+    },
+    "layout": {
+      "widthScope": {
+        "xs": "viewport"
+      }
+    },
+    "children": [
+      {
+        "id": "{{ID}}-nav",
+        "type": "navbar",
+        "props": {
+          "logoText": "{{HEADER}}",
+          "links": "{{NAV_LINKS}}",
+          "sticky": true,
+          "activeHref": "{{ACTIVE}}"
+        },
+        "layout": {
+          "widthScope": {
+            "xs": "viewport"
+          }
+        }
+      },
+      {
+        "id": "{{ID}}-content",
+        "type": "container",
+        "props": {
+          "direction": "column",
+          "landmark": "main",
+          "gap": 24
+        },
+        "style": {
+          "width": "100%",
+          "maxWidth": "var(--pw-layout-container-max-width, 1280px)",
+          "marginInline": "auto",
+          "paddingInline": "max(16px, var(--pw-layout-surface-padding, 24px))",
+          "--pw-section-inset": "0px",
+          "boxSizing": "border-box"
+        },
+        "children": [
+          {
+            "id": "{{ID}}-lead",
+            "type": "container",
+            "props": {
+              "direction": "column",
+              "gap": 8,
+              "padding": 0
+            },
+            "children": []
+          },
+          {
+            "id": "{{ID}}-main",
+            "type": "split-view",
+            "props": {
+              "items": "{{ITEMS}}",
+              "detailMode": "document",
+              "listTitle": "{{LIST}}",
+              "selectionKey": "{{SEL}}",
+              "emptyLabel": "{{EMPTY_LABEL}}"
+            },
+            "children": []
+          },
+          {
+            "id": "{{ID}}-after",
+            "type": "container",
+            "props": {
+              "direction": "column",
+              "padding": 0
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "{{ID}}-foot",
+        "type": "container",
+        "props": {
+          "direction": "column",
+          "padding": 0,
+          "landmark": "footer"
+        },
+        "style": {
+          "width": "100%",
+          "maxWidth": "var(--pw-layout-container-max-width, 1280px)",
+          "marginInline": "auto",
+          "paddingInline": "max(16px, var(--pw-layout-surface-padding, 24px))",
+          "boxSizing": "border-box"
+        },
+        "children": [
+          {
+            "id": "{{ID}}-legal",
+            "type": "text",
+            "props": {
+              "content": "{{LEGAL}}",
+              "textAlign": "left",
+              "color": "var(--pw-color-text-muted)"
+            },
+            "style": {
+              "fontSize": "var(--pw-font-size-xs)",
+              "padding": "16px 0"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "chrome": "topbar",
+  "body": "split",
+  "layoutOnly": true,
+  "detail": "doc"
+}

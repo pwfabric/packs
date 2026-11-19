@@ -1,0 +1,103 @@
+{
+  "id": "text.alert",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "text",
+  "name": "alert",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Inline banner that conveys a status message (info / success / warning / error)",
+    "useCases": [
+      "Form validation summary at the top of a form",
+      "System status (maintenance, downtime)",
+      "Success confirmation after a save"
+    ],
+    "composesWith": [
+      "layout.container",
+      "form.form",
+      "control.button"
+    ],
+    "antiPatterns": [
+      "Tooltip-sized hint — put a short line of text next to the control instead",
+      "Promotional callout — use the callout pattern",
+      "Modal-blocking confirmation — an alert informs inline and never blocks"
+    ],
+    "implementation": "Further use cases:\n- Warning before a risky action"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "title",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "message",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "default": ""
+      },
+      {
+        "name": "variant",
+        "type": "\"info\" | \"success\" | \"warning\" | \"error\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "info",
+            "success",
+            "warning",
+            "error"
+          ]
+        },
+        "bindable": false,
+        "default": "info"
+      },
+      {
+        "name": "closeable",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "showIcon",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "focusOnShow",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Take keyboard focus when the alert appears — for the result of a submit (sent, or why it failed) shown by visibleWhen, so the visitor hears it and the next Tab starts from it. An alert visible as the page loads takes focus then too, so set it only on an alert that appears after an action. Focusable by script (tabIndex -1), not a Tab stop."
+        },
+        "bindable": false,
+        "default": false
+      }
+    ],
+    "defaultProps": {
+      "message": "",
+      "variant": "info",
+      "closeable": false,
+      "showIcon": true
+    },
+    "canHaveChildren": false,
+    "icon": "⚠",
+    "traits": []
+  },
+  "tags": [
+    "tier:content"
+  ]
+}

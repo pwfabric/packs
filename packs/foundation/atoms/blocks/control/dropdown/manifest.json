@@ -1,0 +1,119 @@
+{
+  "id": "control.dropdown",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "control",
+  "name": "dropdown",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Click-triggered menu of action items anchored to a button or trigger",
+    "useCases": [
+      "Profile menu in a navbar",
+      "Row actions on a data table",
+      "Sort or filter selector"
+    ],
+    "composesWith": [
+      "layout.navbar",
+      "data.table",
+      "control.button",
+      "control.avatar",
+      "control.divider"
+    ],
+    "antiPatterns": [
+      "Form value selection — use form.select",
+      "Entering several free-form values as removable chips — this is a single-choice menu, not a multi-value entry field",
+      "Persistent navigation — use layout.navbar links"
+    ],
+    "implementation": "Further use cases:\n- Overflow menu for less-common actions"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "trigger",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "items",
+        "type": "[{id, label, href, icon, disabled, divider}]",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "href": {
+                "type": "string"
+              },
+              "icon": {
+                "type": "string"
+              },
+              "disabled": {
+                "type": "boolean"
+              },
+              "divider": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "label"
+            ]
+          }
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "placement",
+        "type": "\"bottom-start\" | \"bottom-end\" | \"top-start\" | \"top-end\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "bottom-start",
+            "bottom-end",
+            "top-start",
+            "top-end"
+          ]
+        },
+        "bindable": false,
+        "default": "bottom-start"
+      },
+      {
+        "name": "triggerVariant",
+        "type": "\"primary\" | \"secondary\" | \"outline\" | \"ghost\" | \"destructive\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "primary",
+            "secondary",
+            "outline",
+            "ghost",
+            "destructive"
+          ]
+        },
+        "bindable": false,
+        "default": "secondary"
+      }
+    ],
+    "defaultProps": {
+      "items": [],
+      "placement": "bottom-start",
+      "triggerVariant": "secondary"
+    },
+    "canHaveChildren": false,
+    "icon": "▾",
+    "traits": []
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

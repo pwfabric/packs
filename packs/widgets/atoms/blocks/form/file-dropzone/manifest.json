@@ -1,0 +1,98 @@
+{
+  "id": "form.file-dropzone",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "form",
+  "name": "file-dropzone",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Drag-and-drop file selection area with click-to-browse fallback and file-name preview. Inside a form, a picked file goes with the write; a record with no file field refuses it (a validation failure naming the field)",
+    "useCases": [
+      "Image or avatar upload",
+      "Attach documents to a form or ticket",
+      "Bulk CSV / data import drop target"
+    ],
+    "composesWith": [
+      "form.form",
+      "control.button",
+      "container.card",
+      "feedback.toast"
+    ],
+    "antiPatterns": [
+      "Inside a bound form whose record has no file field — the write is refused before sending (validation, naming this field) and the dropzone warns in the console; do not promise the file is kept",
+      "Single short text value — use form.input",
+      "Choosing from existing items — use form.select or form.combobox",
+      "Boolean consent — use form.checkbox"
+    ],
+    "implementation": "A record write carries the record's fields as JSON, not files (data-protocol §4.1): the foundation form posts JSON, a File serialises to {}, so the form LEAVES FILE FIELDS OUT of its payload and a dropzone placed inside a form logs a one-time console warning for the developer. The picked file names are emitted on input:change (payload.names), so a page may show them, but nothing reaches the record. Keep the dropzone out of bound forms (settings, sign-up), or say on the page that the file is not kept.\n\nFurther use cases:\n- Media asset upload in a content editor that sends the file itself"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "name",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Name of the file input. Dropped and picked files are both attached to it."
+        },
+        "bindable": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "accept",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Accepted types (\".png\", \"image/*\", \"image/png\"). A file that does not match is refused with a visible message."
+        },
+        "bindable": false,
+        "default": ""
+      },
+      {
+        "name": "multiple",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "maxSizeMb",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "description": "Largest accepted file in MB; 0 = no limit. A larger file is refused with a visible message."
+        },
+        "bindable": false,
+        "default": 0
+      }
+    ],
+    "defaultProps": {
+      "label": "Drop files here or browse",
+      "accept": "",
+      "multiple": false,
+      "maxSizeMb": 0
+    },
+    "canHaveChildren": false,
+    "allowedParents": [
+      "form",
+      "container"
+    ],
+    "icon": "⇪",
+    "traits": [
+      "form-field",
+      "modal-content"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

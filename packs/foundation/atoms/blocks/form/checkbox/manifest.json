@@ -1,0 +1,111 @@
+{
+  "id": "form.checkbox",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "form",
+  "name": "checkbox",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Boolean checkbox input with label: consent or opt-in submitted as true/false, or one member of a multi-select group sharing a name",
+    "useCases": [
+      "Terms acceptance opt-in (required)",
+      "Multi-select group: several boxes with one name and their own values",
+      "Boolean filter written to page state with stateKey"
+    ],
+    "composesWith": [
+      "form.form",
+      "data.list",
+      "data.table",
+      "platform/entities"
+    ],
+    "antiPatterns": [
+      "On/off setting that reads as a live switch — a checkbox reads as selection or consent, applied on submit",
+      "Single-choice list — use form.radio",
+      "Action trigger — use control.button"
+    ],
+    "implementation": "Further use cases:\n- Persisted boolean preference"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "name",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "description": "Visible text next to the box. Required in practice — the box has no name without it."
+      },
+      {
+        "name": "checked",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": true,
+        "default": false
+      },
+      {
+        "name": "required",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "disabled",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": true,
+        "default": false
+      },
+      {
+        "name": "value",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "description": "Omit for a boolean field: the form receives \"true\"/\"false\" under `name`, checked or not. Give a value only for a group of boxes sharing one `name`; then the value is submitted while checked."
+      },
+      {
+        "name": "stateKey",
+        "type": "string",
+        "description": "State key the checked state (a boolean) is written to on change; `{{state.<key>}}` then reads it (a consent lock, a summary step, a per-row filter).",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      }
+    ],
+    "defaultProps": {
+      "checked": false,
+      "required": false,
+      "disabled": false
+    },
+    "canHaveChildren": false,
+    "allowedParents": [
+      "form",
+      "container"
+    ],
+    "icon": "☑",
+    "traits": [
+      "form-field"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "id": "control.like-button",
+  "kind": "block",
+  "version": "0.1.0",
+  "category": "control",
+  "name": "like-button",
+  "state": "experimental",
+  "knowledge": {
+    "purpose": "A toggleable like/appreciation button with a live count — pure UI state, does not persist the like itself.",
+    "useCases": [
+      "Engagement action under a post, announcement, photo or comment",
+      "Next to a comment list as a lightweight reaction instead of writing a reply"
+    ],
+    "composesWith": [
+      "control.avatar"
+    ],
+    "antiPatterns": [
+      "Using it as a generic boolean toggle — this is specifically a social 'like' affordance; use form.toggle",
+      "Expecting it to persist: the block never fetches or writes; the click leaves as block:click {liked, itemId} for a behavior/capability to act on"
+    ]
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "itemId",
+        "type": "string | number",
+        "jsonSchema": {
+          "type": [
+            "string",
+            "number"
+          ],
+          "description": "Identity of the thing being liked — echoed in the click payload so a behavior or capability can persist the like where the data lives."
+        },
+        "bindable": true
+      },
+      {
+        "name": "liked",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Initial liked state (bind it from a data source)."
+        },
+        "bindable": true,
+        "default": false
+      },
+      {
+        "name": "count",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "description": "Like count (bind it from a data source)."
+        },
+        "bindable": true,
+        "default": 0
+      },
+      {
+        "name": "showCount",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "false: the count is not drawn — the button is the like alone (a page that shows no tally, or says it elsewhere)."
+        },
+        "bindable": true,
+        "default": true
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Optional label text beside the counter."
+        },
+        "bindable": true
+      }
+    ],
+    "defaultProps": {
+      "liked": false,
+      "count": 0,
+      "label": "Like"
+    },
+    "canHaveChildren": false
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

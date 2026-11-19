@@ -1,0 +1,138 @@
+{
+  "id": "control.avatar",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "control",
+  "name": "avatar",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Profile photo or initials representation of a user/entity, with optional status dot",
+    "useCases": [
+      "User profile in a navbar or header",
+      "Comment author thumbnail",
+      "Team member list row"
+    ],
+    "composesWith": [
+      "layout.navbar",
+      "container.card",
+      "data.list"
+    ],
+    "antiPatterns": [
+      "Decorative imagery — use media.image",
+      "Brand logo — use the logo prop on layout.navbar",
+      "Anything bigger than ~80px — use media.image instead"
+    ],
+    "implementation": "Further use cases:\n- Inline mention chip"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "src",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "alt",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "default": ""
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "size",
+        "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | \"xl\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "xs",
+            "sm",
+            "md",
+            "lg",
+            "xl"
+          ]
+        },
+        "bindable": false,
+        "default": "md"
+      },
+      {
+        "name": "shape",
+        "type": "\"circle\" | \"square\" | \"rounded\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "circle",
+            "square",
+            "rounded"
+          ]
+        },
+        "bindable": false,
+        "default": "circle"
+      },
+      {
+        "name": "fallbackColor",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "showStatus",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "status",
+        "type": "\"online\" | \"offline\" | \"away\" | \"busy\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "online",
+            "offline",
+            "away",
+            "busy"
+          ]
+        },
+        "bindable": true
+      },
+      {
+        "name": "backgroundColor",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Ground colour of the initials fallback circle (a theme token value is recommended)."
+        },
+        "bindable": false
+      }
+    ],
+    "defaultProps": {
+      "alt": "",
+      "size": "md",
+      "shape": "circle",
+      "showStatus": false
+    },
+    "canHaveChildren": false,
+    "icon": "⊚",
+    "traits": []
+  },
+  "tags": [
+    "tier:content"
+  ]
+}

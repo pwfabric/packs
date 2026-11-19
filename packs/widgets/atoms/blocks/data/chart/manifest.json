@@ -1,0 +1,162 @@
+{
+  "id": "data.chart",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "data",
+  "name": "chart",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Compact SVG data chart (line, area, bar, or sparkline) for trends and metrics on dashboards and marketing pages",
+    "useCases": [
+      "Revenue / active-users trend on a dashboard KPI card",
+      "Sparkline inside a stat tile",
+      "Bar chart of weekly or category values"
+    ],
+    "composesWith": [
+      "container.card",
+      "layout.section",
+      "layout.grid"
+    ],
+    "antiPatterns": [
+      "Single value — a large text with its label, or feedback.radial-progress",
+      "Percentage of a whole — use data.progress or feedback.radial-progress",
+      "Tabular numbers — use data.table"
+    ],
+    "implementation": "Further use cases:\n- Area chart of a growth metric on a landing hero card"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "variant",
+        "type": "\"line\" | \"area\" | \"bar\" | \"sparkline\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "line",
+            "area",
+            "bar",
+            "sparkline"
+          ]
+        },
+        "bindable": false,
+        "default": "line"
+      },
+      {
+        "name": "data",
+        "type": "rows",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "description": "The points, in order — row objects with the source's own field names; labelField and valueField name the fields read (defaults label, value)."
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "labelField",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Row field naming each point (an axis label). Take the name from the bound source's rows — never guess it."
+        },
+        "bindable": false,
+        "default": "label"
+      },
+      {
+        "name": "valueField",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Row field holding each point's number."
+        },
+        "bindable": false,
+        "default": "value"
+      },
+      {
+        "name": "color",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false,
+        "default": ""
+      },
+      {
+        "name": "height",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number"
+        },
+        "bindable": false,
+        "default": 160
+      },
+      {
+        "name": "showAxis",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "description": "Two faint baseline lines, drawn only when showValues is off (the value scale has its own gridlines).",
+        "default": false
+      },
+      {
+        "name": "showLabels",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "description": "The point labels under the plot. Labels that would touch are thinned to every n-th one, so a 24-hour series stays readable on a phone.",
+        "default": false
+      },
+      {
+        "name": "showValues",
+        "type": "boolean",
+        "description": "The value scale of a line, area or bar chart: 3–5 round values at the left (zero included), each on a faint gridline. On by default; a sparkline never shows one. Turn off only where the numbers are printed elsewhere.",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "strokeWidth",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number"
+        },
+        "bindable": false,
+        "default": 2
+      },
+      {
+        "name": "emptyText",
+        "type": "string",
+        "description": "Shown in place of the chart when there is no data (a bound source returned []). Empty = the box stays quiet. No sample curve is ever drawn for visitors.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      }
+    ],
+    "defaultProps": {
+      "variant": "line",
+      "height": 160,
+      "showAxis": false,
+      "showLabels": false,
+      "showValues": true,
+      "strokeWidth": 2
+    },
+    "canHaveChildren": false,
+    "icon": "📈",
+    "traits": [
+      "modal-content"
+    ]
+  },
+  "tags": [
+    "tier:data"
+  ]
+}

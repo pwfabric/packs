@@ -1,0 +1,181 @@
+{
+  "id": "form.date-input",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "form",
+  "name": "date-input",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "A single date, time or date-time field (native input, or an opt-in month calendar for dates); submits ISO text under its name",
+    "useCases": [
+      "Birthday or appointment field",
+      "One end of a date filter over a timestamped table (two inputs, each with its own stateKey)",
+      "Booking start / end as two fields",
+      "Edit form pre-filled from the record through defaultValue",
+      "A booking day that is never a Sunday (disabledWeekdays: [0])"
+    ],
+    "composesWith": [
+      "form.form",
+      "data.table",
+      "platform/entities"
+    ],
+    "antiPatterns": [
+      "Free-text date entry in a plain input — date-input submits ISO text the backend can parse",
+      "A single range picker — this is one date; use two date-inputs for a range",
+      "Recurring schedule — out of scope for a single date input"
+    ],
+    "implementation": "mode: date | time | datetime. calendar:true (date mode only) opens a month grid; the value still reaches the form as ISO yyyy-MM-dd. required is enforced in both modes. The calendar is keyboard-complete: arrows move a day / a week, Home/End the week's start/end, PageUp/PageDown a month (Shift: a year), Enter picks, Esc or a press outside closes it from anywhere and Esc returns focus to the field; each day is named in full (\"Wednesday, 18 November 2026\"). disabledWeekdays (0 = Sunday) greys those days out and the form refuses one in either mode. On a phone the field, the day cells and the month arrows are 44px targets."
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "name",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "mode",
+        "type": "\"date\" | \"time\" | \"datetime\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "date",
+            "time",
+            "datetime"
+          ]
+        },
+        "bindable": false,
+        "default": "date"
+      },
+      {
+        "name": "required",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "disabled",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": true,
+        "default": false
+      },
+      {
+        "name": "placeholder",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "minDate",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "maxDate",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "calendar",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "true → popover month calendar (locale display + ISO hidden input for FormData); false → native date input."
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "defaultValue",
+        "type": "string",
+        "description": "Initial ISO value (yyyy-MM-dd, HH:mm or yyyy-MM-ddTHH:mm). Bind it to a record field in an edit form.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "value",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "The value page state holds — bind it to the key the field writes (\"{{state.<stateKey>}}\"). Wins over defaultValue, so a field that mounts again (a wizard step hidden and shown again) shows the date the visitor picked. An unresolved binding is ignored."
+        },
+        "bindable": true
+      },
+      {
+        "name": "stateKey",
+        "type": "string",
+        "description": "State key the ISO value is written to on change; `{{state.<key>}}` then reads it (a date filter, a summary step).",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "disabledWeekdays",
+        "type": "Array<number | string> | string",
+        "description": "Weekdays that cannot be picked: 0 = Sunday … 6 = Saturday (numbers, numeric strings, or a comma-separated string such as \"0,6\"). The calendar greys them out (still reachable by the arrow keys, never pickable) and a form refuses such a date in either mode.",
+        "jsonSchema": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": [
+                  "number",
+                  "string"
+                ]
+              }
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "bindable": true
+      }
+    ],
+    "defaultProps": {
+      "mode": "date",
+      "required": false,
+      "disabled": false
+    },
+    "canHaveChildren": false,
+    "allowedParents": [
+      "form",
+      "container"
+    ],
+    "icon": "📅",
+    "traits": [
+      "form-field"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

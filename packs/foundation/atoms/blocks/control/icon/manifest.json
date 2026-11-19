@@ -1,0 +1,112 @@
+{
+  "id": "control.icon",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "control",
+  "name": "icon",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Single inline SVG icon from the bundled icon set, used as a glyph or decoration",
+    "useCases": [
+      "Leading or trailing icon inside a button",
+      "Visual cue beside a list item",
+      "Status indicator next to text"
+    ],
+    "composesWith": [
+      "control.button",
+      "control.link",
+      "control.badge",
+      "data.list",
+      "text.alert",
+      "callout"
+    ],
+    "antiPatterns": [
+      "Custom illustrations — use media.image",
+      "Logo display — use the logo prop on layout.navbar",
+      "Large hero artwork — use media.image"
+    ],
+    "implementation": "Further use cases:\n- Accessibility-marked decorative glyph"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "name",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "default": "circle"
+      },
+      {
+        "name": "size",
+        "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | number | string",
+        "jsonSchema": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "xs",
+                "sm",
+                "md",
+                "lg",
+                "xl"
+              ]
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "bindable": false,
+        "description": "A named size (xs 12px, sm 16px, md 20px, lg 24px, xl 32px), a number of pixels, or any CSS length ('2rem').",
+        "default": "md"
+      },
+      {
+        "name": "color",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "strokeWidth",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 4
+        },
+        "bindable": false,
+        "default": 2
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "What the icon means when it stands alone (a status glyph with no text beside it): the icon becomes role=\"img\" with this accessible name. Omit for a decorative icon next to text — it is then aria-hidden."
+        },
+        "bindable": true
+      }
+    ],
+    "defaultProps": {
+      "name": "circle",
+      "size": "md",
+      "strokeWidth": 2
+    },
+    "canHaveChildren": false,
+    "icon": "◈",
+    "traits": [
+      "inline",
+      "modal-content"
+    ]
+  },
+  "tags": [
+    "tier:content"
+  ]
+}

@@ -1,0 +1,188 @@
+{
+  "id": "media.image",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "media",
+  "name": "image",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Image element with responsive sizing, alt text, and adapter-aware loading (Next.js / default)",
+    "useCases": [
+      "Hero image on a marketing surface",
+      "Avatar replacement when the photo is large",
+      "Product image in a card or grid"
+    ],
+    "composesWith": [
+      "layout.grid",
+      "container.card",
+      "layout.section"
+    ],
+    "antiPatterns": [
+      "Decorative icon — use control.icon",
+      "User profile photo at small sizes — use control.avatar",
+      "Animated or moving content — this shows a still picture",
+      "An unsized hero or product shot above the fold — give it aspectRatio (or width + height) and priority: true; leave priority off for every other image"
+    ],
+    "implementation": "Empty or placeholder src keeps the layout: the slot renders a themeable box (card ground, dashed border) at the declared width/height/aspectRatio in the editor and in the live app; live it carries no label text. A platform placeholder src (data:image/svg+xml with pw-placeholder:<key>) is never drawn as the grey SVG: the block shows the themeable slot and sets data-pw-placeholder=\"<key>\". hideWhenEmpty draws nothing for either.\nFurther use cases:\n- Inline screenshot in documentation"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "src",
+        "type": "string",
+        "description": "Image URL, or the platform placeholder (a data:image/svg+xml value carrying pw-placeholder:<key>). An empty or placeholder src keeps the layout: the block draws a themeable slot of the same size, in the editor and in the live app (quiet there, no label), and a placeholder src exposes its key as data-pw-placeholder until the real picture replaces it.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "default": ""
+      },
+      {
+        "name": "alt",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "default": ""
+      },
+      {
+        "name": "objectFit",
+        "type": "\"cover\" | \"contain\" | \"fill\" | \"none\" | \"scale-down\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "cover",
+            "contain",
+            "fill",
+            "none",
+            "scale-down"
+          ]
+        },
+        "bindable": false,
+        "default": "cover"
+      },
+      {
+        "name": "width",
+        "type": "number | string",
+        "jsonSchema": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "bindable": false,
+        "description": "Preferred width (px number or CSS length); never wider than the column. With a numeric height too, both are written as the img width/height attributes, which reserve the box before the picture loads."
+      },
+      {
+        "name": "height",
+        "type": "number | string",
+        "jsonSchema": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "bindable": false,
+        "description": "Height (px number or CSS length). Give a size (width + height, or aspectRatio) for any picture above the fold so the layout does not shift when it loads."
+      },
+      {
+        "name": "aspectRatio",
+        "type": "string",
+        "description": "CSS aspect-ratio for the image slot, e.g. '16/9', '4/3', '1/1', '21/9', '3/2', or a number. Sets the slot ratio without forcing a fixed height; object-fit:cover keeps the photo filling it. It also writes the img width/height attributes, so the box is reserved before the picture loads (no layout shift).",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "borderRadius",
+        "type": "number | string",
+        "jsonSchema": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "bindable": false
+      },
+      {
+        "name": "loading",
+        "type": "\"lazy\" | \"eager\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "lazy",
+            "eager"
+          ]
+        },
+        "bindable": false,
+        "default": "lazy"
+      },
+      {
+        "name": "priority",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "The page's main picture (its LCP: a hero, a product shot or a logo above the fold): loaded eagerly at high fetch priority (fetchpriority=\"high\"), whatever `loading` says. Leave it off for every other image — they stay lazy."
+        },
+        "bindable": false
+      },
+      {
+        "name": "align",
+        "type": "\"left\" | \"center\" | \"right\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ]
+        },
+        "bindable": false
+      },
+      {
+        "name": "overlayTitle",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Over-image heading on a dark bottom gradient. Without it the block is a plain image."
+        },
+        "bindable": true
+      },
+      {
+        "name": "overlaySubtitle",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Secondary line under the overlay heading."
+        },
+        "bindable": true
+      },
+      {
+        "name": "hideWhenEmpty",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "An optional image (a logo beside a text brand): with no src, or only the platform placeholder, it draws nothing, in the editor too. Leave false for a content image: an empty or placeholder src then keeps the layout with a themeable slot."
+        },
+        "bindable": false,
+        "default": false
+      }
+    ],
+    "defaultProps": {
+      "src": "",
+      "alt": "",
+      "objectFit": "cover",
+      "loading": "lazy"
+    },
+    "canHaveChildren": false,
+    "icon": "⊟",
+    "traits": [
+      "modal-content"
+    ]
+  },
+  "tags": [
+    "tier:content"
+  ]
+}

@@ -1,0 +1,172 @@
+{
+  "name": "card-grid",
+  "role": "band",
+  "body": "flow",
+  "description": "Card grid — team, portfolio, service or case list, one card per item the brief gives; with none, the band does not draw. panel.card is a CONTAINER (it has no heading/text props); content goes in as children.",
+  "provenPattern": "A survey of 54 sector demo homepages: this band appears in 24 of them, mean vertical position 0.51 (0 = top of page, 1 = bottom). The surveyed sites add a hover/caption layer; this pattern has none yet, the arrangement is equivalent",
+  "knowledge": {
+    "purpose": "Page band presenting a team, portfolio, service or case list as a card grid",
+    "useCases": [
+      "Introducing a service list with image + heading + short text",
+      "Case-study or portfolio selection",
+      "Showing team members in a grid"
+    ],
+    "composesWith": [
+      "feature-card",
+      "page-header",
+      "footer"
+    ],
+    "antiPatterns": [
+      "Trying to give the card block heading/text props — card is a CONTAINER; content goes in as children",
+      "Leaving a card count that does not divide by the grid columns — a lone card on the last row breaks the balance",
+      "Leaving card images without alt text",
+      "A second card-grid band on the same page — repetition makes monotony, not rhythm",
+      "Inventing members, services or cases to fill the grid — draw only the items the brief gives",
+      "A card with an href and no cta text, or cta text with no href — the link needs both a destination and words",
+      "Expecting it to list the app's own records — its cards are the brief's fixed content; a list of the app's records is a data-bound band",
+      "Alt text that repeats the card title — when the picture only illustrates the title next to it, its alt is \"\"",
+      "A centred band heading over left-aligned cards on a page whose other headings start at the left edge — one left edge"
+    ]
+  },
+  "mobileCollapse": "The grid collapses to single-column cards.",
+  "placeholders": {
+    "{{HEADING}}": "band heading",
+    "{{SUBHEADING}}": "text.content",
+    "{{CARDS}}": "array of {image, alt, title, text, href?, cta?} — exactly the team members, services or cases the brief gives, in its words; image is a URL or \"\" for none; alt says what the picture shows, or \"\" when it only illustrates the title beside it; href (root-relative, e.g. /services/audit) and cta (the link text, e.g. Read the case) only when the card leads somewhere — a card without href draws no link; [] for none. Never invent an entry to reach a count.",
+    "{{TITLE_SIZE}}": {
+      "description": "the size of the card titles, as a theme size step: xl, lg or base — e.g. lg when the page already has larger headings above the cards and the h3 default would compete with them. Empty (\"\"): the theme’s h3 size",
+      "optional": true
+    }
+  },
+  "usesBlocks": [
+    "section",
+    "container",
+    "heading",
+    "grid",
+    "card",
+    "image",
+    "text",
+    "link"
+  ],
+  "initialState": {
+    "cardItems": "{{CARDS}}"
+  },
+  "snippet": {
+    "id": "{{ID}}",
+    "type": "section",
+    "props": {
+      "paddingY": 32,
+      "gap": 32
+    },
+    "children": [
+      {
+        "id": "{{ID}}-head",
+        "type": "container",
+        "props": {
+          "direction": "column",
+          "gap": 8,
+          "align": "start"
+        },
+        "children": [
+          {
+            "id": "{{ID}}-h",
+            "type": "heading",
+            "props": {
+              "text": "{{HEADING}}",
+              "level": "h2",
+              "textAlign": "left"
+            }
+          },
+          {
+            "id": "{{ID}}-sub",
+            "type": "text",
+            "props": {
+              "content": "{{SUBHEADING}}",
+              "color": "var(--pw-color-text-muted)",
+              "textAlign": "left"
+            }
+          }
+        ]
+      },
+      {
+        "id": "{{ID}}-grid",
+        "type": "grid",
+        "props": {
+          "columns": 3,
+          "gap": 24,
+          "alignItems": "stretch"
+        },
+        "children": [
+          {
+            "id": "{{ID}}-c",
+            "type": "card",
+            "props": {
+              "padding": 0,
+              "gap": 0,
+              "shadow": "sm"
+            },
+            "children": [
+              {
+                "id": "{{ID}}-c-img",
+                "type": "image",
+                "props": {
+                  "src": "{{item.image}}",
+                  "alt": "{{item.alt}}",
+                  "aspectRatio": "16/9",
+                  "objectFit": "cover",
+                  "hideWhenEmpty": true
+                }
+              },
+              {
+                "id": "{{ID}}-c-body",
+                "type": "container",
+                "props": {
+                  "direction": "column",
+                  "gap": 8,
+                  "padding": 20
+                },
+                "children": [
+                  {
+                    "id": "{{ID}}-c-h",
+                    "type": "heading",
+                    "props": {
+                      "text": "{{item.title}}",
+                      "level": "h3"
+                    },
+                    "style": {
+                      "fontSize": "var(--pw-font-size-{{TITLE_SIZE}}, var(--pw-font-size-h3))"
+                    }
+                  },
+                  {
+                    "id": "{{ID}}-c-t",
+                    "type": "text",
+                    "props": {
+                      "content": "{{item.text}}",
+                      "color": "var(--pw-color-text-muted)"
+                    },
+                    "style": {
+                      "fontSize": "var(--pw-font-size-sm)"
+                    }
+                  },
+                  {
+                    "id": "{{ID}}-c-cta",
+                    "type": "link",
+                    "visibleWhen": "{{isNotEmpty(item.href)}}",
+                    "props": {
+                      "text": "{{item.cta}}",
+                      "href": "{{item.href}}",
+                      "icon": "arrow-right",
+                      "fontWeight": "medium"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "repeat": "{{state.cardItems}}"
+      }
+    ],
+    "visibleWhen": "{{state.cardItems.length > 0}}"
+  }
+}

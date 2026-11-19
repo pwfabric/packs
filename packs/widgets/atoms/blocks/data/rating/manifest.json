@@ -1,0 +1,149 @@
+{
+  "id": "data.rating",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "data",
+  "name": "rating",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Star (or similar) display of a discrete rating score, optionally interactive",
+    "useCases": [
+      "Product or review score display",
+      "Inline 5-star feedback widget",
+      "Aggregate average rating beside an item title"
+    ],
+    "composesWith": [
+      "container.card",
+      "data.list",
+      "data.table",
+      "form.form"
+    ],
+    "antiPatterns": [
+      "Continuous percentage value — use data.progress",
+      "Status indicator — use control.badge",
+      "Free-form numeric input — use form.input type=number"
+    ],
+    "implementation": "Further use cases:\n- Compact reputation badge"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "value",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "bindable": true,
+        "default": 0
+      },
+      {
+        "name": "max",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "bindable": false,
+        "default": 5
+      },
+      {
+        "name": "readonly",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "size",
+        "type": "\"sm\" | \"md\" | \"lg\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "bindable": false,
+        "default": "md"
+      },
+      {
+        "name": "color",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "shape",
+        "type": "\"star\" | \"heart\" | \"circle\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "star",
+            "heart",
+            "circle"
+          ]
+        },
+        "bindable": false,
+        "default": "star"
+      },
+      {
+        "name": "showCount",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "description": "Form field name: inside a form the picked value is submitted under it as a number.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "stateKey",
+        "type": "string",
+        "description": "State key the picked value is written to; {{state.<key>}} then reads it (a review form, a filter).",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "description": "What is being rated, e.g. \"Your rating\" — names the control for screen readers.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      }
+    ],
+    "defaultProps": {
+      "value": 0,
+      "max": 5,
+      "readonly": false,
+      "size": "md",
+      "shape": "star",
+      "showCount": false
+    },
+    "canHaveChildren": false,
+    "icon": "★",
+    "traits": []
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

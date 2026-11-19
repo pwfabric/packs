@@ -1,0 +1,105 @@
+{
+  "id": "control.pagination",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "control",
+  "name": "pagination",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Numeric page navigator for paged collections (next / previous / specific page)",
+    "useCases": [
+      "Paged data table footer — with stateKey it writes the offset a dataSource query reads",
+      "Long results list under a filter bar",
+      "Search result navigation"
+    ],
+    "composesWith": [
+      "data.table",
+      "data.list",
+      "layout.section",
+      "platform/navigation",
+      "data.repeater"
+    ],
+    "antiPatterns": [
+      "Infinite scroll affordance — handle in data binding instead",
+      "Stepper-style wizard — one form per step, with a progress line or badges for the steps",
+      "Use on collections of fewer than ~20 items"
+    ],
+    "implementation": "Further use cases:\n- Blog or article archive listing"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "totalPages",
+        "type": "number",
+        "jsonSchema": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "bindable": true,
+        "default": 10
+      },
+      {
+        "name": "currentPage",
+        "type": "number",
+        "jsonSchema": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "bindable": true,
+        "default": 1
+      },
+      {
+        "name": "showFirstLast",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "maxVisible",
+        "type": "number",
+        "jsonSchema": {
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 10
+        },
+        "bindable": false,
+        "default": 5
+      },
+      {
+        "name": "stateKey",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Surface state key the offset is written to on page change (state[stateKey] = (page-1)*pageSize). A data source whose query reads {{state.<key>}} re-fetches — this is what makes the control drive a list instead of only reporting a page."
+        },
+        "bindable": false
+      },
+      {
+        "name": "pageSize",
+        "type": "number",
+        "jsonSchema": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "description": "Rows per page — multiplies the page index into the offset written to stateKey."
+        },
+        "bindable": false,
+        "default": 10
+      }
+    ],
+    "defaultProps": {
+      "totalPages": 10,
+      "currentPage": 1,
+      "showFirstLast": true,
+      "maxVisible": 5
+    },
+    "canHaveChildren": false,
+    "icon": "⋯",
+    "traits": []
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

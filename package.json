@@ -1,0 +1,42 @@
+{
+  "name": "packs",
+  "private": true,
+  "description": "The PWFabric foundation and widgets packs: the block vocabulary every PWFabric app is built from.",
+  "type": "module",
+  "scripts": {
+    "generate": "node tools/apply-pack-map.mjs && node tools/generators/build-icons.mjs && node tools/generators/derive-mobile-collapse.mjs --pack packs/foundation",
+    "check": "node tools/apply-pack-map.mjs --check && node tools/check-pack-map.mjs && node tools/check-packs.mjs && node tools/audit-fabrications.mjs && node tools/check-imports.mjs",
+    "validate": "node tools/validate-packs.mjs",
+    "typecheck": "node tools/typecheck.mjs",
+    "test": "vitest run",
+    "verify": "pnpm check && pnpm validate && pnpm typecheck && pnpm test",
+    "build": "node tools/pack-all.mjs"
+  },
+  "devDependencies": {
+    "@pwfabric/cli": "3.1.0",
+    "@pwfabric/contracts": "3.1.0",
+    "@pwfabric/core": "3.1.0",
+    "@pwfabric/pack": "3.1.0",
+    "@pwfabric/runtime": "3.1.0",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.2.7",
+    "jsdom": "^26.1.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "typescript": "^5.4.0",
+    "vitest": "^4.1.12"
+  },
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  },
+  "packageManager": "pnpm@10.27.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

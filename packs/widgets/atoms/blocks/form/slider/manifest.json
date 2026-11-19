@@ -1,0 +1,131 @@
+{
+  "id": "form.slider",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "form",
+  "name": "slider",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Range slider for picking a single numeric value within a bounded interval",
+    "useCases": [
+      "Volume or brightness control",
+      "Price or budget range filter (single handle)",
+      "Opacity / zoom / scale adjustment"
+    ],
+    "composesWith": [
+      "form.form",
+      "form.number-stepper",
+      "control.button",
+      "container.card"
+    ],
+    "antiPatterns": [
+      "Exact numeric entry — use form.input type=number",
+      "Discrete option choice — use form.segmented-control",
+      "Boolean on/off — use form.toggle"
+    ],
+    "implementation": "Further use cases:\n- Rating or confidence on a continuous scale"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "name",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "min",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number"
+        },
+        "bindable": true,
+        "default": 0
+      },
+      {
+        "name": "max",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number"
+        },
+        "bindable": true,
+        "default": 100
+      },
+      {
+        "name": "step",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number"
+        },
+        "bindable": false,
+        "default": 1
+      },
+      {
+        "name": "value",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number"
+        },
+        "bindable": true
+      },
+      {
+        "name": "showValue",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "disabled",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": true,
+        "default": false
+      },
+      {
+        "name": "stateKey",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "State key the number is written to on change — {{state.<key>}} then reads it (a price filter)."
+        },
+        "bindable": false
+      }
+    ],
+    "defaultProps": {
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "value": 50,
+      "showValue": true,
+      "disabled": false
+    },
+    "canHaveChildren": false,
+    "allowedParents": [
+      "form",
+      "container"
+    ],
+    "icon": "▭",
+    "traits": [
+      "form-field",
+      "modal-content"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

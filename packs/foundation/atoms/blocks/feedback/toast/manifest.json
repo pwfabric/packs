@@ -1,0 +1,98 @@
+{
+  "id": "feedback.toast",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "feedback",
+  "name": "toast",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "In-flow notification banner that conveys a success, info, warning, or error message",
+    "useCases": [
+      "Confirmation after a form is saved",
+      "Inline warning about an incomplete step",
+      "Error message on a failed action"
+    ],
+    "composesWith": [
+      "form.form",
+      "container.card",
+      "control.button"
+    ],
+    "antiPatterns": [
+      "Persistent page-top strip — use the announcement-bar block",
+      "Blocking confirmation — a toast is transient and never waits for an answer",
+      "Compact status label — use control.badge"
+    ],
+    "implementation": "Further use cases:\n- Informational tip placed within page content"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "variant",
+        "type": "\"success\" | \"info\" | \"warning\" | \"error\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "success",
+            "info",
+            "warning",
+            "error"
+          ]
+        },
+        "bindable": false,
+        "default": "info"
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "default": ""
+      },
+      {
+        "name": "message",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "default": ""
+      },
+      {
+        "name": "dismissible",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "icon",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Name of a leading icon (ICON_PATHS key). Empty picks a per-variant default: success=check, info/warning=bell, error=x."
+        },
+        "bindable": true,
+        "default": ""
+      }
+    ],
+    "defaultProps": {
+      "variant": "info",
+      "title": "",
+      "message": "",
+      "dismissible": true,
+      "icon": ""
+    },
+    "canHaveChildren": false,
+    "icon": "◧",
+    "traits": [
+      "modal-content"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

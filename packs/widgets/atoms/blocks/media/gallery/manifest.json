@@ -1,0 +1,85 @@
+{
+  "id": "media.gallery",
+  "kind": "block",
+  "version": "0.1.0",
+  "category": "media",
+  "name": "gallery",
+  "state": "experimental",
+  "knowledge": {
+    "purpose": "A responsive grid of images with a click-to-enlarge lightbox overlay.",
+    "useCases": [
+      "Event/club photo albums (PhotoAlbums, Clubs)",
+      "Company culture / social-responsibility photo sets"
+    ],
+    "composesWith": [
+      "media.image",
+      "control.button"
+    ],
+    "antiPatterns": [
+      "Not a file-upload/management UI — items are pre-resolved image URLs passed as props",
+      "Avoid extremely large image sets in one instance without external pagination"
+    ]
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "title",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Gallery heading."
+        },
+        "bindable": true
+      },
+      {
+        "name": "columns",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "description": "Fixed column count (responsive auto-fit when omitted)."
+        },
+        "bindable": false,
+        "default": 3
+      },
+      {
+        "name": "images",
+        "type": "array",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "src": {
+                "type": "string"
+              },
+              "alt": {
+                "type": "string"
+              },
+              "caption": {
+                "type": "string"
+              }
+            }
+          },
+          "description": "Images: [{src, alt?, caption?}] — opens a lightbox."
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "showCaptions",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Draw each picture’s caption under its thumbnail in the grid (default on). Off: captions show only in the enlarged view — for pictures whose captions repeat text beside the gallery."
+        },
+        "bindable": false,
+        "default": true
+      }
+    ],
+    "defaultProps": {},
+    "canHaveChildren": false
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

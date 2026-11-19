@@ -1,0 +1,211 @@
+{
+  "id": "layout.section",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "layout",
+  "name": "section",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Full-bleed page band with constrained inner max-width — the canonical wrapper for a marketing or content row",
+    "useCases": [
+      "Hero — ONE section containing a badge + heading + text + buttons as inline children",
+      "Feature row — ONE section containing a heading + a grid of cards inline",
+      "Footer band — ONE section containing link groups + copyright text inline"
+    ],
+    "composesWith": [
+      "layout.container",
+      "layout.grid",
+      "text.heading",
+      "text.text",
+      "control.button",
+      "media.image"
+    ],
+    "antiPatterns": [
+      "Tight inline grouping of a few blocks — use layout.container",
+      "Nesting sections inside other sections",
+      "Form layouts — use form.form + layout.container"
+    ],
+    "implementation": "Further anti-patterns:\n- Scaffolding an empty section then filling it in a later step — build the section COMPLETE with its children inline in one step (an empty + filled pair renders a blank duplicate)\n\nFurther use cases:\n- Visually separated content area with its own background colour"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "paddingY",
+        "type": "number | string",
+        "jsonSchema": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "bindable": false
+      },
+      {
+        "name": "paddingX",
+        "type": "number | string",
+        "jsonSchema": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "bindable": false
+      },
+      {
+        "name": "padding",
+        "type": "number | string",
+        "jsonSchema": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "bindable": false
+      },
+      {
+        "name": "gap",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number"
+        },
+        "bindable": false,
+        "default": 16
+      },
+      {
+        "name": "backgroundColor",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "backgroundGradient",
+        "type": "{ from: string; to: string; via?: string; direction?: string; type?: \"linear\" | \"radial\" | \"conic\"; at?: string; angle?: number }",
+        "description": "Themeable gradient background. Color stops are theme color roles (primary/accent/background/…) resolved to var(--pw-color-*), so the gradient follows a theme recolour. Supports linear, radial (orb/glow), and conic (angular sweep). Prefer this over a pinned block.style gradient.",
+        "jsonSchema": {
+          "type": "object",
+          "properties": {
+            "from": {
+              "type": "string"
+            },
+            "to": {
+              "type": "string"
+            },
+            "via": {
+              "type": "string"
+            },
+            "direction": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "linear",
+                "radial",
+                "conic"
+              ]
+            },
+            "at": {
+              "type": "string"
+            },
+            "angle": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "from",
+            "to"
+          ]
+        },
+        "bindable": false
+      },
+      {
+        "name": "backdropBlur",
+        "type": "\"none\" | \"sm\" | \"md\" | \"lg\"",
+        "description": "Frosted-glass backdrop-blur for the section band (mirrors panel.card's glass). sm/md/lg → blur(4px|10px|20px); 'none' = no blur. Use over a gradient/image background.",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "none",
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "bindable": false
+      },
+      {
+        "name": "textAlign",
+        "type": "\"left\" | \"center\" | \"right\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ]
+        },
+        "bindable": false
+      },
+      {
+        "name": "maxWidth",
+        "type": "number | string",
+        "jsonSchema": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "bindable": false
+      },
+      {
+        "name": "minHeight",
+        "type": "number | string",
+        "jsonSchema": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "bindable": false
+      },
+      {
+        "name": "aspectRatio",
+        "type": "number | string",
+        "description": "CSS aspect-ratio for the section band, e.g. '16/9', '4/3', '1/1', '21/9', '3/2', or a number. Sets the ratio without forcing a fixed height.",
+        "jsonSchema": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "bindable": false
+      },
+      {
+        "name": "landmark",
+        "type": "\"header\" | \"main\" | \"footer\" | \"aside\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "header",
+            "main",
+            "footer",
+            "aside"
+          ],
+          "description": "The landmark this box is: header (the bar or brand), main (the page content), footer (the legal line) or aside. Unset: a plain box. Shell patterns set it; a page has one main."
+        },
+        "bindable": false
+      }
+    ],
+    "defaultProps": {
+      "gap": 16
+    },
+    "canHaveChildren": true,
+    "icon": "▦",
+    "traits": []
+  },
+  "tags": [
+    "tier:structure"
+  ]
+}

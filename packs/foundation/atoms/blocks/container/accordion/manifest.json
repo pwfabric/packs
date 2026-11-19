@@ -1,0 +1,107 @@
+{
+  "id": "container.accordion",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "container",
+  "name": "accordion",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Vertical stack of collapsible items where each header toggles its body",
+    "useCases": [
+      "FAQ list",
+      "Settings sections that hide rare options",
+      "Mobile navigation collapse"
+    ],
+    "composesWith": [
+      "layout.section",
+      "layout.container",
+      "container.card"
+    ],
+    "antiPatterns": [
+      "Top-level page navigation — use layout.navbar",
+      "Single collapsible block — show the content plainly instead",
+      "Carousel of slides — use a carousel block (the widgets pack carries one)"
+    ],
+    "implementation": "Further use cases:\n- Long product spec breakdown"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "items",
+        "type": "[{id, title, content, disabled}]",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "disabled": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "content"
+            ]
+          }
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "allowMultiple",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "defaultOpen",
+        "type": "string[]",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "bindable": false
+      },
+      {
+        "name": "variant",
+        "type": "\"default\" | \"bordered\" | \"separated\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "default",
+            "bordered",
+            "separated"
+          ]
+        },
+        "bindable": false,
+        "default": "default"
+      }
+    ],
+    "defaultProps": {
+      "items": [],
+      "allowMultiple": false,
+      "variant": "default"
+    },
+    "canHaveChildren": false,
+    "icon": "▾",
+    "traits": []
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "id": "data.list",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "data",
+  "name": "list",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Vertical list of items: plain strings, or rows bound from a source with textField naming the field shown",
+    "useCases": [
+      "Recent activity feed",
+      "Sidebar of navigation entries",
+      "Notification list"
+    ],
+    "composesWith": [
+      "layout.container",
+      "container.card",
+      "platform/persistence",
+      "platform/entities"
+    ],
+    "antiPatterns": [
+      "Tabular data with multiple comparable columns — a list is one column of items, with no header row",
+      "Editable form rows — use form.form with repeated inputs",
+      "Image gallery — use layout.grid + media.image"
+    ],
+    "implementation": "Further use cases:\n- Comment thread display"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "items",
+        "type": "string[] | rows",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "object",
+                "additionalProperties": {}
+              }
+            ]
+          },
+          "description": "The items. Plain strings are shown as written; rows bound from a source ({{tasks}}) are objects with the source's own field names, and textField names the one shown (without it: label, then name, then title)."
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "textField",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Bound rows: the row field shown as each item's text (e.g. \"title\", or \"data.title\"). Take the name from the bound source's rows — never guess it."
+        },
+        "bindable": false
+      },
+      {
+        "name": "spacing",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number"
+        },
+        "bindable": false,
+        "default": 8
+      },
+      {
+        "name": "fontSize",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "minimum": 8,
+          "maximum": 96,
+          "description": "Size in px. Omit it: the list follows the theme's small text size (--pw-font-size-sm)."
+        },
+        "bindable": false
+      },
+      {
+        "name": "color",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "iconColor",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "style",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "none",
+            "disc",
+            "decimal",
+            "check",
+            "arrow"
+          ],
+          "description": "List marker style (the component's own prop — not the block-level CSS style field; inherited naming)."
+        },
+        "bindable": false,
+        "default": "disc"
+      }
+    ],
+    "defaultProps": {
+      "items": [],
+      "spacing": 8
+    },
+    "canHaveChildren": false,
+    "icon": "▤",
+    "traits": [
+      "modal-content"
+    ]
+  },
+  "tags": [
+    "tier:data"
+  ]
+}

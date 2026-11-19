@@ -1,0 +1,95 @@
+{
+  "id": "feedback.radial-progress",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "feedback",
+  "name": "radial-progress",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Circular ring that shows a determinate percentage toward completion",
+    "useCases": [
+      "Profile or setup completion percentage",
+      "Storage or quota usage gauge",
+      "Goal / KPI attainment ring"
+    ],
+    "composesWith": [
+      "container.card",
+      "text.heading"
+    ],
+    "antiPatterns": [
+      "Indeterminate loading — use feedback.spinner",
+      "Linear progress bar — use data.progress",
+      "Discrete score out of N — show a row of marks, not a ring that fills"
+    ],
+    "implementation": "Further use cases:\n- Compact progress meter on a dashboard card"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "value",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number"
+        },
+        "bindable": true,
+        "default": 0
+      },
+      {
+        "name": "size",
+        "type": "\"sm\" | \"md\" | \"lg\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "bindable": false,
+        "default": "md"
+      },
+      {
+        "name": "thickness",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number"
+        },
+        "bindable": false,
+        "default": 6
+      },
+      {
+        "name": "showLabel",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "color",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false,
+        "default": ""
+      }
+    ],
+    "defaultProps": {
+      "value": 0,
+      "size": "md",
+      "thickness": 6,
+      "showLabel": true,
+      "color": ""
+    },
+    "canHaveChildren": false,
+    "icon": "◔",
+    "traits": [
+      "inline"
+    ]
+  },
+  "tags": [
+    "tier:data"
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "id": "overlay.command-palette",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "overlay",
+  "name": "command-palette",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Searchable command/action palette (⌘K) that filters a list of items by label",
+    "useCases": [
+      "Global ⌘K quick-action launcher",
+      "Jump-to navigation across pages or records",
+      "Command menu for power-user actions"
+    ],
+    "composesWith": [
+      "control.button",
+      "overlay.modal",
+      "control.badge"
+    ],
+    "antiPatterns": [
+      "Plain form select — use form.combobox",
+      "Primary page navigation — compose it from primitives",
+      "Static list of links — use data.list"
+    ],
+    "implementation": "Further use cases:\n- Searchable picker inside an app shell"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "placeholder",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "items",
+        "type": "Array<{ id?: string; label: string; hint?: string; icon?: string; href?: string }>",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "hint": {
+                "type": "string"
+              },
+              "icon": {
+                "type": "string"
+              },
+              "href": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "label"
+            ]
+          },
+          "description": "The commands. Empty by default: list the app's own actions. Running one emits block:click {action:\"run\", id, value, href} and follows href in a live render."
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "hotkeyLabel",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Shortcut shown in the search row. When set, Ctrl+K / ⌘K focuses the search."
+        },
+        "bindable": true
+      },
+      {
+        "name": "emptyText",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Shown when the search matches nothing. Nothing is shown when omitted."
+        },
+        "bindable": true
+      }
+    ],
+    "defaultProps": {
+      "placeholder": "Type a command…",
+      "items": []
+    },
+    "canHaveChildren": false,
+    "icon": "⌘",
+    "traits": [
+      "modal-content"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

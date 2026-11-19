@@ -1,0 +1,138 @@
+{
+  "name": "callout",
+  "role": "band",
+  "body": "flow",
+  "layoutOnly": true,
+  "description": "Callout band: icon + heading + text in a tinted box that sits in the band column. A composition; its behavioural sibling text/alert is a BLOCK because it has dismiss/variant logic.",
+  "provenPattern": "A pure arrangement with no state or behaviour of its own, so it is a composition rather than a block (arrangement-only → template).",
+  "knowledge": {
+    "purpose": "Callout box of icon, heading and text — draws attention inside the flow, aligned with the bands around it",
+    "useCases": [
+      "Giving a warning or a tip inside a section",
+      "Note box in documentation",
+      "Stating the precondition of a step"
+    ],
+    "composesWith": [
+      "text.alert"
+    ],
+    "antiPatterns": [
+      "Using it for a dismissible/stateful alert — that is the text/alert block's job",
+      "Several callouts in one section — when all are emphasised, none is",
+      "Picking an icon unrelated to the text",
+      "Nesting it inside another band or a card — it is a band of its own; inside a card use the text/alert block",
+      "Writing the heading as plain bold text — a reader of the page outline (a screen reader jumping by heading) skips the callout"
+    ]
+  },
+  "mobileCollapse": "The icon stays beside the heading at every width; the box fills the band column and the text wraps under the heading.",
+  "placeholders": {
+    "{{ID}}": "block id prefix",
+    "{{ICON}}": "icon.name — from the icon dictionary, matching what the text says (e.g. \"package\", \"lock\")",
+    "{{TITLE}}": "heading.text — the one-line heading of the callout (an h2 in the page outline, drawn at body-large size)",
+    "{{BODY}}": "text.content — one or two sentences",
+    "{{ACTION_LABEL}}": {
+      "description": "button.label of the one thing the reader can do about it, e.g. Find the help desk; \"\" for none",
+      "optional": true
+    },
+    "{{ACTION_HREF}}": {
+      "description": "where that action goes — an app route or an in-page anchor (/venue#helpdesk). \"\" draws no button (the button shows only when this is given)",
+      "type": "url",
+      "optional": true
+    },
+    "{{ACTION_ICON}}": {
+      "description": "button.icon — from the icon dictionary, e.g. map-pin; \"\" for none",
+      "optional": true
+    }
+  },
+  "usesBlocks": [
+    "button",
+    "container",
+    "heading",
+    "icon",
+    "section",
+    "text"
+  ],
+  "snippet": {
+    "id": "{{ID}}",
+    "type": "section",
+    "props": {},
+    "children": [
+      {
+        "id": "{{ID}}-box",
+        "type": "container",
+        "props": {
+          "direction": "row",
+          "keepRow": true,
+          "gap": 12,
+          "align": "start",
+          "padding": 16,
+          "borderRadius": 10,
+          "backgroundColor": "color-mix(in srgb, var(--pw-color-primary) 8%, transparent)"
+        },
+        "children": [
+          {
+            "id": "{{ID}}-icon",
+            "type": "icon",
+            "props": {
+              "name": "{{ICON}}",
+              "size": 20,
+              "color": "var(--pw-color-primary)"
+            },
+            "style": {
+              "flex": "0 0 auto",
+              "marginTop": "2px"
+            }
+          },
+          {
+            "id": "{{ID}}-body",
+            "type": "container",
+            "props": {
+              "direction": "column",
+              "gap": 4
+            },
+            "style": {
+              "flex": "1 1 0",
+              "minWidth": "0"
+            },
+            "children": [
+              {
+                "id": "{{ID}}-title",
+                "type": "heading",
+                "props": {
+                  "text": "{{TITLE}}",
+                  "level": "h2"
+                },
+                "style": {
+                  "fontSize": "var(--pw-font-size-lg, 1.125rem)",
+                  "lineHeight": "1.3",
+                  "margin": "0"
+                }
+              },
+              {
+                "id": "{{ID}}-text",
+                "type": "text",
+                "props": {
+                  "content": "{{BODY}}"
+                }
+              },
+              {
+                "id": "{{ID}}-go",
+                "type": "button",
+                "visibleWhen": "{{'{{ACTION_HREF}}' != ''}}",
+                "props": {
+                  "label": "{{ACTION_LABEL}}",
+                  "href": "{{ACTION_HREF}}",
+                  "variant": "secondary",
+                  "icon": "{{ACTION_ICON}}"
+                },
+                "style": {
+                  "alignSelf": "flex-start",
+                  "marginTop": "4px"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

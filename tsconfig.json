@@ -1,0 +1,19 @@
+{
+  "//": "For editors: every pack in one tree. `pnpm typecheck` checks each pack against its own closure only (tools/typecheck.mjs).",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "rootDirs": [
+      "packs/foundation/atoms",
+      "packs/widgets/atoms"
+    ],
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "packs/*/atoms/**/*.ts",
+    "packs/*/atoms/**/*.tsx",
+    "packs/*/test/**/*.ts",
+    "packs/*/test/**/*.tsx"
+  ]
+}

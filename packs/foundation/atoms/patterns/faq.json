@@ -1,0 +1,62 @@
+{
+  "name": "faq",
+  "role": "band",
+  "body": "flow",
+  "layoutOnly": true,
+  "description": "FAQ band — a section holding a heading and the accordion, so the questions sit in the page column like every other band. (The faq block was merely a data-shaped accordion; on the help page the repeater had won in practice.)",
+  "provenPattern": "A pure arrangement with no state or behaviour of its own, so it is a composition rather than a block (arrangement-only → template).",
+  "knowledge": {
+    "purpose": "A frequently-asked-questions section: an h2 heading over the accordion",
+    "useCases": [
+      "Handling objections after the pricing band",
+      "Quick answers in product documentation",
+      "Removing hesitation before the sign-up form"
+    ],
+    "composesWith": [
+      "callout",
+      "container.accordion"
+    ],
+    "antiPatterns": [
+      "Starting with every question open — the accordion's job is to shorten the page",
+      "More than ten questions — the list becomes a scanning load; split by topic",
+      "Writing the question as a heading and the answer like a heading too — the hierarchy is lost",
+      "Items without an id — the accordion keys open/closed by id; give every question its own",
+      "Adding a second heading above the band — the band carries its own h2 in {{HEADING}}"
+    ]
+  },
+  "mobileCollapse": "Already one column: the heading, then each question as a full-width row that opens in place.",
+  "placeholders": {
+    "{{HEADING}}": "the band heading (h2), e.g. \"Frequently asked questions\" or a topic (\"Billing questions\")",
+    "{{FAQ_ITEMS}}": "accordion.props.items — [{id, title, content}]: id is a short unique key per question (e.g. q-refunds) — the accordion opens and closes items by it, so an item without one cannot be opened; title is the question, content the answer"
+  },
+  "usesBlocks": [
+    "section",
+    "heading",
+    "accordion"
+  ],
+  "snippet": {
+    "id": "{{ID}}",
+    "type": "section",
+    "props": {
+      "paddingY": 48,
+      "gap": 16
+    },
+    "children": [
+      {
+        "id": "{{ID}}-h",
+        "type": "heading",
+        "props": {
+          "text": "{{HEADING}}",
+          "level": "h2"
+        }
+      },
+      {
+        "id": "{{ID}}-acc",
+        "type": "accordion",
+        "props": {
+          "items": "{{FAQ_ITEMS}}"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "id": "form.otp-input",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "form",
+  "name": "otp-input",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Fixed-length one-time-code entry with per-digit boxes and auto-advancing focus",
+    "useCases": [
+      "Email or SMS verification code entry",
+      "Two-factor authentication (2FA) challenge",
+      "PIN confirmation step"
+    ],
+    "composesWith": [
+      "form.form",
+      "control.button",
+      "container.card",
+      "text.text"
+    ],
+    "antiPatterns": [
+      "Free-form or variable-length text — use form.input",
+      "Long secret or password — use form.input type=password",
+      "Numeric quantity — use form.number-stepper"
+    ],
+    "implementation": "Further use cases:\n- Short redemption or invite code"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "name",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "length",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number"
+        },
+        "bindable": false,
+        "default": 6
+      },
+      {
+        "name": "inputMode",
+        "type": "\"numeric\" | \"text\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "numeric",
+            "text"
+          ]
+        },
+        "bindable": false,
+        "default": "numeric"
+      },
+      {
+        "name": "masked",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "required",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "The code must be complete before the form submits."
+        },
+        "bindable": false,
+        "default": false
+      }
+    ],
+    "defaultProps": {
+      "label": "Verification code",
+      "length": 6,
+      "inputMode": "numeric",
+      "masked": false,
+      "required": false
+    },
+    "canHaveChildren": false,
+    "allowedParents": [
+      "form",
+      "container"
+    ],
+    "icon": "▦",
+    "traits": [
+      "form-field",
+      "modal-content"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

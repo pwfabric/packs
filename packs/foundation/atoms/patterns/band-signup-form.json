@@ -1,0 +1,240 @@
+{
+  "name": "band-signup-form",
+  "role": "band",
+  "body": "flow",
+  "description": "Sign-up band with an address check: a single-column form (name, e-mail, one choice that shapes what is sent, consent, an opt-in) that writes a record, then a verification step that confirms the address and says what happens next. It runs AFTER the platform sign-in when the app has accounts, or on its own for a letter or a list a visitor joins.",
+  "provenPattern": "The sign-up-with-verification band: ask the least the list needs, write it, confirm the address with a six-digit code, then say it worked.",
+  "knowledge": {
+    "purpose": "Joining something with a verified address: the form asks only what the list uses, writes one record through the app's entity, and on success swaps itself for a verification card with its own code form; a valid code swaps that for a confirmation. Sign-in and sign-up of an ACCOUNT are the platform's screens; this band is the app's own list or profile step, never its login door",
+    "useCases": [
+      "A newsletter or letter sign-up with a confirmed e-mail address",
+      "Event or waitlist registration with an address check",
+      "A first-run profile step after the platform sign-in"
+    ],
+    "composesWith": [
+      "form.form",
+      "form.otp-input",
+      "shell-none-flow"
+    ],
+    "antiPatterns": [
+      "Using it as the app's sign-up or sign-in form — the platform owns that screen once the app requires sign-in; a page form that posts to /auth/login or asks for a password is a gate finding",
+      "Asking for more than the list needs — a date of birth on a letter sign-up is a drop-off and a privacy cost",
+      "Showing the verification step before the record is written — it is revealed by {{state.signupSent}}, not laid out in advance",
+      "A verification step that answers nothing — a valid code always ends on the confirmation",
+      "Two sign-up bands on one page",
+      "A code step the app cannot check — a form that accepts any six digits is a pretend verification; confirm what was really written",
+      "One failure line for every refusal — the failure copy follows the write's reason (statusKeys.reason → {{state.signupReason}}: validation, unauthenticated, forbidden, conflict, network, server or error): the page's words for that reason, held in {{state.signupCopy}}, else the generic failure copy; the refused field names are in {{state.signupFields}}. The server's own words are never shown",
+      "A result nobody notices — the result (done or failed) takes focus when it appears"
+    ]
+  },
+  "mobileCollapse": "Already single-column; the form stretches to the viewport width, the verification card and the confirmation take its place.",
+  "placeholders": {
+    "{{ID}}": "block id prefix",
+    "{{TITLE}}": "band heading — what this step completes, in the app language",
+    "{{SUBTITLE}}": "one sentence under the heading: why these details are asked for",
+    "{{ENTITY}}": "the app’s entity type a sign-up is written to (e.g. Subscriber) — its fields take the form’s names: name, email, role, terms, newsletter",
+    "{{SUBMIT_LABEL}}": "label of the profile submit button, in the app language",
+    "{{NAME_LABEL}}": "label of the full-name field, in the app language",
+    "{{EMAIL_LABEL}}": "label of the contact e-mail field, in the app language",
+    "{{ROLE_LABEL}}": "label of the one choice that shapes what is sent (e.g. What do you do?), in the app language",
+    "{{ROLE_PLACEHOLDER}}": "the empty choice shown before a role is picked (e.g. \"Choose one\")",
+    "{{ROLE_OPTIONS}}": "the roles this app really has: [{label, value}] — labels in the app language, values stable ids; never invent roles",
+    "{{TERMS_LABEL}}": "consent checkbox label — ONE obligation, naming what is stored and why; the box is required",
+    "{{NEWSLETTER_LABEL}}": "newsletter toggle label — what the visitor opts in to",
+    "{{DONE_TEXT}}": "the confirmation once the sign-up is written — what happens next and when (e.g. The first letter arrives on Sunday.)",
+    "{{FAILED_TEXT}}": "alert title when the sign-up could not be written and no copy for its reason is given, in the visitor’s words (e.g. Your sign-up did not arrive — send it again); plain text. The server’s own reason is never shown",
+    "{{FAILED_VALIDATION}}": {
+      "description": "the failure copy when the server refused one or more fields (400) — the refused field names are in {{state.signupFields}}, in the visitor's words; plain text. Left out, {{FAILED_TEXT}} is shown",
+      "optional": true
+    },
+    "{{FAILED_UNAUTHENTICATED}}": {
+      "description": "the failure copy when the visitor is not signed in (401), in the visitor's words; plain text. Left out, {{FAILED_TEXT}} is shown",
+      "optional": true
+    },
+    "{{FAILED_FORBIDDEN}}": {
+      "description": "the failure copy when the visitor may not write this (403), in the visitor's words; plain text. Left out, {{FAILED_TEXT}} is shown",
+      "optional": true
+    },
+    "{{FAILED_CONFLICT}}": {
+      "description": "the failure copy when the record already exists (409, a unique field) — e.g. \"You are already on the list\", in the visitor's words; plain text. Left out, {{FAILED_TEXT}} is shown",
+      "optional": true
+    },
+    "{{FAILED_NETWORK}}": {
+      "description": "the failure copy when nothing reached the server (no connection), in the visitor's words; plain text. Left out, {{FAILED_TEXT}} is shown",
+      "optional": true
+    },
+    "{{FAILED_SERVER}}": {
+      "description": "the failure copy when the server failed (5xx), in the visitor's words; plain text. Left out, {{FAILED_TEXT}} is shown",
+      "optional": true
+    }
+  },
+  "initialState": {
+    "signupSending": false,
+    "signupSent": false,
+    "signupFailed": false,
+    "signupReason": "",
+    "signupFields": [],
+    "signupCopy": {
+      "error": "{{FAILED_TEXT}}",
+      "validation": "{{FAILED_VALIDATION}}",
+      "unauthenticated": "{{FAILED_UNAUTHENTICATED}}",
+      "forbidden": "{{FAILED_FORBIDDEN}}",
+      "conflict": "{{FAILED_CONFLICT}}",
+      "network": "{{FAILED_NETWORK}}",
+      "server": "{{FAILED_SERVER}}"
+    }
+  },
+  "dataSources": [
+    {
+      "id": "signups",
+      "kind": "entity",
+      "entityType": "{{ENTITY}}",
+      "fallback": []
+    }
+  ],
+  "formBindings": [
+    {
+      "formId": "{{ID}}-form",
+      "sourceId": "signups",
+      "method": "POST",
+      "statusKeys": {
+        "loading": "signupSending",
+        "success": "signupSent",
+        "error": "signupFailed",
+        "reason": "signupReason",
+        "fields": "signupFields"
+      }
+    }
+  ],
+  "behaviors": [],
+  "usesBlocks": [
+    "alert",
+    "checkbox",
+    "container",
+    "form",
+    "heading",
+    "input",
+    "section",
+    "select",
+    "text",
+    "toggle"
+  ],
+  "snippet": {
+    "id": "{{ID}}",
+    "type": "section",
+    "props": {
+      "paddingY": "var(--pw-space-xxl, 56px)",
+      "gap": 24
+    },
+    "children": [
+      {
+        "id": "{{ID}}-head",
+        "type": "container",
+        "props": {
+          "direction": "column",
+          "gap": 6,
+          "padding": 0
+        },
+        "children": [
+          {
+            "id": "{{ID}}-h",
+            "type": "heading",
+            "props": {
+              "text": "{{TITLE}}",
+              "level": "h2"
+            }
+          },
+          {
+            "id": "{{ID}}-s",
+            "type": "text",
+            "props": {
+              "content": "{{SUBTITLE}}",
+              "color": "var(--pw-color-text-muted)"
+            }
+          }
+        ]
+      },
+      {
+        "id": "{{ID}}-form",
+        "type": "form",
+        "props": {
+          "submitLabel": "{{SUBMIT_LABEL}}",
+          "gap": 14,
+          "submittingWhen": "{{state.signupSending}}"
+        },
+        "children": [
+          {
+            "id": "{{ID}}-name",
+            "type": "input",
+            "props": {
+              "name": "name",
+              "type": "text",
+              "label": "{{NAME_LABEL}}",
+              "required": true
+            }
+          },
+          {
+            "id": "{{ID}}-email",
+            "type": "input",
+            "props": {
+              "name": "email",
+              "type": "email",
+              "label": "{{EMAIL_LABEL}}",
+              "required": true
+            }
+          },
+          {
+            "id": "{{ID}}-role",
+            "type": "select",
+            "props": {
+              "name": "role",
+              "label": "{{ROLE_LABEL}}",
+              "placeholder": "{{ROLE_PLACEHOLDER}}",
+              "options": "{{ROLE_OPTIONS}}",
+              "required": false
+            }
+          },
+          {
+            "id": "{{ID}}-terms",
+            "type": "checkbox",
+            "props": {
+              "name": "terms",
+              "label": "{{TERMS_LABEL}}",
+              "required": true
+            }
+          },
+          {
+            "id": "{{ID}}-news",
+            "type": "toggle",
+            "props": {
+              "name": "newsletter",
+              "label": "{{NEWSLETTER_LABEL}}",
+              "size": "sm"
+            }
+          }
+        ],
+        "visibleWhen": "{{!state.signupSent}}"
+      },
+      {
+        "id": "{{ID}}-done",
+        "type": "alert",
+        "visibleWhen": "{{state.signupSent}}",
+        "props": {
+          "message": "{{DONE_TEXT}}",
+          "variant": "success",
+          "focusOnShow": true
+        }
+      },
+      {
+        "id": "{{ID}}-err",
+        "type": "alert",
+        "visibleWhen": "{{state.signupFailed}}",
+        "props": {
+          "title": "{{state.signupCopy[state.signupReason] || state.signupCopy.error}}",
+          "variant": "error",
+          "focusOnShow": true
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "id": "media.interactive-map",
+  "kind": "block",
+  "version": "0.1.0",
+  "category": "media",
+  "name": "interactive-map",
+  "state": "experimental",
+  "knowledge": {
+    "purpose": "Shows the app's own map picture (an SVG or image in its media: a venue plan, a campus, a neighbourhood drawn for the app) with a marker for each named location placed on it; the chosen one is highlighted and a chip row picks between them. Nothing is fetched from a tile server or any other origin.",
+    "useCases": [
+      "Venue, campus or office map drawn for the app, with its entrances and stops",
+      "A route's stops on a drawn line map"
+    ],
+    "composesWith": [
+      "data.list",
+      "layout.split-view"
+    ],
+    "antiPatterns": [
+      "Not a GIS or routing tool, and not a street map: it draws the app's own picture only — for real directions link out to a maps app",
+      "Placing markers by latitude/longitude — a position is x/y in % of the picture",
+      "Leaving the address only on the map — write it out as text as well"
+    ]
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "title",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Map card heading."
+        },
+        "bindable": true
+      },
+      {
+        "name": "image",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "The map picture: a path in the app's own media (\"pwpack/media/venue-map.svg\"). An absolute URL or another origin is refused."
+        },
+        "bindable": true
+      },
+      {
+        "name": "imageAlt",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "What the picture shows, in the app's words (\"Map of Example Hall and the stops nearby\"): the map's accessible name."
+        },
+        "bindable": true
+      },
+      {
+        "name": "imageWidth",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "The picture's width (its viewBox width for an SVG). With imageHeight it sets the box's proportions before the picture loads. Unset: 4:3."
+        },
+        "bindable": false
+      },
+      {
+        "name": "imageHeight",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "The picture's height (its viewBox height for an SVG)."
+        },
+        "bindable": false
+      },
+      {
+        "name": "locations",
+        "type": "array",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "address": {
+                "type": "string"
+              },
+              "x": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "% of the picture's width from the left"
+              },
+              "y": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "% of the picture's height from the top"
+              }
+            },
+            "required": [
+              "label"
+            ]
+          }
+        },
+        "bindable": true,
+        "description": "Locations, each { label, address?, x?, y? }. Every location with x/y (in % of the picture) is a marker; the chips select one, which is highlighted. A location without a position is a chip only; with no picture the chosen location's address is shown instead.",
+        "default": []
+      }
+    ],
+    "defaultProps": {},
+    "canHaveChildren": false
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

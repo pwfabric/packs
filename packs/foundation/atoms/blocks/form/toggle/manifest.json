@@ -1,0 +1,107 @@
+{
+  "id": "form.toggle",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "form",
+  "name": "toggle",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "On/off switch input for binary settings, with immediate visual feedback",
+    "useCases": [
+      "Enable / disable a feature flag",
+      "Notifications on / off",
+      "Dark mode preference"
+    ],
+    "composesWith": [
+      "form.form",
+      "platform/entities",
+      "platform/persistence"
+    ],
+    "antiPatterns": [
+      "Multi-option choice — use form.radio",
+      "List item check — use form.checkbox",
+      "Action trigger — use control.button"
+    ],
+    "implementation": "Further use cases:\n- Admin row activate / deactivate"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "name",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "FormData key. The switch submits \"true\" or \"false\" (typed boolean), on or off — never absent."
+        },
+        "bindable": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "checked",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Initial state. Bindable: a value that arrives later re-selects."
+        },
+        "bindable": true,
+        "default": false
+      },
+      {
+        "name": "disabled",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": true,
+        "default": false
+      },
+      {
+        "name": "size",
+        "type": "\"sm\" | \"md\" | \"lg\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "bindable": false,
+        "default": "md"
+      },
+      {
+        "name": "stateKey",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "State key the boolean is written to on change — {{state.<key>}} then reads it."
+        },
+        "bindable": false
+      }
+    ],
+    "defaultProps": {
+      "checked": false,
+      "disabled": false,
+      "size": "md"
+    },
+    "canHaveChildren": false,
+    "allowedParents": [
+      "form",
+      "container"
+    ],
+    "icon": "⊙",
+    "traits": [
+      "form-field"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

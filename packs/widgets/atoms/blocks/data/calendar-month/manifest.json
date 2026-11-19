@@ -1,0 +1,103 @@
+{
+  "id": "data.calendar-month",
+  "kind": "block",
+  "version": "0.1.0",
+  "category": "data",
+  "name": "calendar-month",
+  "state": "experimental",
+  "knowledge": {
+    "purpose": "Renders a single month as a 7-column calendar grid with optional per-day event markers/labels.",
+    "useCases": [
+      "Cafeteria/lunch menu calendar (LunchMenu)",
+      "Meeting-room / resource availability overview (MeetingRoomReservation)"
+    ],
+    "composesWith": [
+      "control.button",
+      "data.table"
+    ],
+    "antiPatterns": [
+      "Not a full scheduling/booking UI — pair with a form for actual reservation actions",
+      "Avoid packing long event descriptions into a day cell; keep labels short"
+    ]
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "title",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Calendar card heading."
+        },
+        "bindable": true
+      },
+      {
+        "name": "month",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "description": "Month shown (1-12). Defaults to the current month."
+        },
+        "bindable": true
+      },
+      {
+        "name": "year",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "description": "Year shown. Defaults to the current year."
+        },
+        "bindable": true
+      },
+      {
+        "name": "events",
+        "type": "rows",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "description": "Rows marked on their day — objects with the source's own field names; dateField, labelField and colorField name the fields read (defaults date, label, color). A day is YYYY-MM-DD or an ISO date-time."
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "dateField",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Row field holding the day (YYYY-MM-DD, or an ISO date-time). Take the name from the bound source's rows — never guess it."
+        },
+        "bindable": false,
+        "default": "date"
+      },
+      {
+        "name": "labelField",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Row field shown on the day."
+        },
+        "bindable": false,
+        "default": "label"
+      },
+      {
+        "name": "colorField",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Row field holding the event colour; rows without it use the primary colour."
+        },
+        "bindable": false,
+        "default": "color"
+      }
+    ],
+    "defaultProps": {},
+    "canHaveChildren": false
+  },
+  "tags": [
+    "tier:data"
+  ]
+}

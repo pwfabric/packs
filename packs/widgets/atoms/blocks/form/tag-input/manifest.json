@@ -1,0 +1,145 @@
+{
+  "id": "form.tag-input",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "form",
+  "name": "tag-input",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Multi-value chip input where the user types and adds tokens",
+    "useCases": [
+      "Email recipient list",
+      "Keyword or tag entry on a content item",
+      "Multi-tenant facet selection"
+    ],
+    "composesWith": [
+      "form.form",
+      "control.badge",
+      "platform/entities"
+    ],
+    "antiPatterns": [
+      "Single-value text — use form.input",
+      "Selection from a closed list — use form.select with multi mode (when available)",
+      "Free-form description — use form.textarea"
+    ],
+    "implementation": "Further use cases:\n- Topic subscription list"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "name",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "FormData key. The tags are submitted as ONE value, comma-joined (a tag cannot contain a comma)."
+        },
+        "bindable": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "placeholder",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "tags",
+        "type": "string[]",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Initial tags. Empty when omitted."
+        },
+        "bindable": true
+      },
+      {
+        "name": "maxTags",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "minimum": 1
+        },
+        "bindable": false
+      },
+      {
+        "name": "allowCreate",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "required",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "disabled",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": true,
+        "default": false
+      },
+      {
+        "name": "delimiter",
+        "type": "\"enter\" | \"comma\" | \"space\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "enter",
+            "comma",
+            "space"
+          ]
+        },
+        "bindable": false,
+        "default": "enter"
+      },
+      {
+        "name": "stateKey",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "State key the tag list (an array) is written to on change — {{state.<key>}} then reads it."
+        },
+        "bindable": false
+      }
+    ],
+    "defaultProps": {
+      "allowCreate": true,
+      "required": false,
+      "disabled": false,
+      "delimiter": "enter"
+    },
+    "canHaveChildren": false,
+    "allowedParents": [
+      "form",
+      "container"
+    ],
+    "icon": "⊕",
+    "traits": [
+      "form-field"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "id": "media.embed",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "media",
+  "name": "embed",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Generic iframe wrapper for third-party embeds (YouTube, Vimeo, maps, gists)",
+    "useCases": [
+      "YouTube or Vimeo player embed",
+      "Google Maps location embed",
+      "Twitter / X post embed"
+    ],
+    "composesWith": [
+      "layout.section",
+      "container.card"
+    ],
+    "antiPatterns": [
+      "Self-hosted media file — use media.video",
+      "Static image — use media.image",
+      "Untrusted user-supplied URL — risk of XSS / phishing inside the iframe"
+    ],
+    "implementation": "Further use cases:\n- CodePen or Gist demo"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "src",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "default": ""
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "aspectRatio",
+        "type": "\"16:9\" | \"4:3\" | \"1:1\" | \"custom\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "custom"
+          ]
+        },
+        "bindable": false,
+        "default": "16:9"
+      },
+      {
+        "name": "height",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "minimum": 100,
+          "maximum": 2000
+        },
+        "bindable": false
+      },
+      {
+        "name": "allowFullscreen",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      }
+    ],
+    "defaultProps": {
+      "src": "",
+      "title": "Embedded content",
+      "aspectRatio": "16:9",
+      "allowFullscreen": true
+    },
+    "canHaveChildren": false,
+    "icon": "⬡",
+    "traits": []
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

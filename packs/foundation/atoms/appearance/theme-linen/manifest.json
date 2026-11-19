@@ -1,0 +1,146 @@
+{
+  "id": "theme-linen",
+  "kind": "ui-appearance",
+  "version": "1.0.0",
+  "category": "ui",
+  "name": "Linen",
+  "state": "stable",
+  "description": "Warm service: cream ground, terracotta primary, Lora headings over Work Sans body, soft rounded corners, a 17px size read comfortably on a phone.",
+  "tags": [
+    "theme",
+    "appearance",
+    "light",
+    "warm"
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#8c4a2b",
+      "secondary": "#f2e8da",
+      "accent": "#f6e8d3",
+      "background": "#faf6ef",
+      "card": "#fffdf9",
+      "text": "#2a211a",
+      "textMuted": "#665649",
+      "border": "#e7dac8",
+      "error": "#b42318",
+      "success": "#2e6b3c",
+      "warning": "#8a5300",
+      "info": "#245b8f",
+      "textOnPrimary": "#ffffff"
+    },
+    "border": {
+      "radius": "12px",
+      "width": "1px",
+      "style": "solid",
+      "radiusLarge": "16px",
+      "radiusSmall": "8px",
+      "radiusXl": "20px",
+      "radius2xl": "24px",
+      "radiusFull": "9999px"
+    },
+    "typography": {
+      "fontFamily": "\"Work Sans\", ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif",
+      "headingFontFamily": "Lora, Georgia, \"Times New Roman\", serif",
+      "monoFontFamily": "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+      "baseFontSize": "17px",
+      "headingWeight": "600",
+      "headingLineHeight": "1.2",
+      "letterSpacing": "-0.01em",
+      "bodyLineHeight": "1.6",
+      "bodyWeight": "400",
+      "bodyLetterSpacing": "0em",
+      "fontSizeXs": "13px",
+      "fontSizeSm": "15px",
+      "fontSizeLg": "19px",
+      "fontSizeXl": "22px",
+      "fontSize2xl": "26px",
+      "fontSize3xl": "32px",
+      "fontSize4xl": "40px"
+    },
+    "spacing": {
+      "base": "1rem",
+      "xs": "0.25rem",
+      "sm": "0.5rem",
+      "md": "1rem",
+      "lg": "1.5rem",
+      "xl": "2.25rem",
+      "xxl": "3.25rem"
+    },
+    "shadows": {
+      "card": "0 1px 3px rgba(74,44,26,.08)",
+      "button": "none",
+      "sm": "0 1px 2px rgba(74,44,26,.06)",
+      "md": "0 6px 16px -4px rgba(74,44,26,.12)",
+      "lg": "0 14px 28px -8px rgba(74,44,26,.16)",
+      "xl": "0 24px 44px -12px rgba(74,44,26,.2)"
+    },
+    "motion": {
+      "durationFast": "150ms",
+      "durationNormal": "200ms",
+      "durationSlow": "300ms",
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "easingBounce": "cubic-bezier(0.68, -0.55, 0.27, 1.55)"
+    },
+    "layout": {
+      "gap": "0px",
+      "padding": "0px",
+      "containerMaxWidth": "1120px",
+      "gridGap": "20px",
+      "sectionPaddingY": "clamp(2.5rem, 5vw, 4rem)",
+      "sectionPaddingX": "clamp(1rem, 4vw, 1.5rem)"
+    },
+    "focus": {
+      "ringColor": "#b86a43",
+      "ringWidth": "2px",
+      "ringOffset": "2px"
+    },
+    "zIndex": {
+      "sticky": 150,
+      "nav": 200,
+      "dropdown": 300,
+      "drawer": 400,
+      "modal": 500,
+      "toast": 540
+    }
+  },
+  "darkTheme": {
+    "colors": {
+      "primary": "#e8b590",
+      "secondary": "#2d241d",
+      "accent": "#33281f",
+      "background": "#1a1511",
+      "card": "#231c16",
+      "text": "#f6ede1",
+      "textMuted": "#c3b3a1",
+      "border": "#3f3329",
+      "error": "#f3a59b",
+      "success": "#9ed3a6",
+      "warning": "#efc277",
+      "info": "#9dc4ec",
+      "textOnPrimary": "#2a170c"
+    },
+    "focus": {
+      "ringColor": "#e8b590"
+    }
+  },
+  "knowledge": {
+    "purpose": "A warm, friendly look for places and services people visit: cream and terracotta, rounded corners, a larger body size and roomy controls for a phone held in one hand.",
+    "useCases": [
+      "A café, restaurant or bakery menu",
+      "Booking for a clinic, salon, studio or class",
+      "A local shop, a venue or a small hotel",
+      "Pick it as a starting point and edit token values one by one"
+    ],
+    "composesWith": [
+      "platform/persistence",
+      "platform/entities",
+      "platform/navigation"
+    ],
+    "antiPatterns": [
+      "A dense data screen — wear slate or midnight",
+      "A product launch on a dark stage — wear ember",
+      "Pinning colours in block props — theme tokens already cascade",
+      "Expecting two themes on one surface — a surface carries a single token set"
+    ]
+  }
+}

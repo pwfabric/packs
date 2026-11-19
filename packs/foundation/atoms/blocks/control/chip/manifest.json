@@ -1,0 +1,556 @@
+{
+  "id": "control.chip",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "control",
+  "name": "chip",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "A small labelled token the reader can act on: choose it, follow it, or dismiss it",
+    "useCases": [
+      "A filter currently narrowing a list, with a way to drop it",
+      "A facet value with its result count",
+      "A tag on an article or a product card",
+      "A session track or topic marker"
+    ],
+    "composesWith": [
+      "container.card",
+      "data.repeater",
+      "layout.container",
+      "control.badge"
+    ],
+    "antiPatterns": [
+      "A status that cannot be acted on — use control.badge",
+      "Collecting new tokens from the reader — a chip displays or filters; it takes no typed input",
+      "A page-level action — use control.button"
+    ],
+    "implementation": "With an href it renders as a link; without one, a button — never a div that only looks clickable. A selected chip is filled with the primary colour and its paired ink (and set in 600): a thin ring was measured too faint to tell the chosen filter from the rest. On a phone or touch screen an actionable chip is a real 44px-tall box. Tones mirror control.badge exactly, including its color-mix wash of the label's own token, so a chip stays legible inside a card where --pw-color-text is overridden. Pressing it emits one block:click; the runtime runs its action prop then, as for control.button. A removable chip is one control whose press — label or × — is the removal, named \"Remove <label>\" for a screen reader."
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "default": ""
+      },
+      {
+        "name": "value",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Carried in the event payload so a strip can tell its chips apart. Defaults to the label."
+        },
+        "bindable": true
+      },
+      {
+        "name": "href",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "An address makes the chip a link instead of a button."
+        },
+        "bindable": true
+      },
+      {
+        "name": "action",
+        "type": "SurfaceAction | SurfaceAction[]",
+        "required": false,
+        "jsonSchema": {
+          "oneOf": [
+            {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "setState"
+                    },
+                    "key": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "value": {}
+                  },
+                  "required": [
+                    "type",
+                    "key"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "refresh"
+                    },
+                    "sourceId": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "sourceId"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "refreshAll"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "showBlock"
+                    },
+                    "blockId": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "blockId"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "hideBlock"
+                    },
+                    "blockId": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "blockId"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "navigate"
+                    },
+                    "url": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "url"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "write"
+                    },
+                    "sourceId": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "op": {
+                      "type": "string",
+                      "enum": [
+                        "create",
+                        "update",
+                        "delete"
+                      ]
+                    },
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ]
+                    },
+                    "values": {
+                      "type": "object",
+                      "additionalProperties": {}
+                    },
+                    "statusKeys": {
+                      "type": "object",
+                      "properties": {
+                        "loading": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "success": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "error": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "reason": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "fields": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "detail": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "sourceId",
+                    "op"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "auth:signIn"
+                    },
+                    "method": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "auth:register"
+                    },
+                    "method": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "auth:signOut"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "setState"
+                      },
+                      "key": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "value": {}
+                    },
+                    "required": [
+                      "type",
+                      "key"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "refresh"
+                      },
+                      "sourceId": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "sourceId"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "refreshAll"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "showBlock"
+                      },
+                      "blockId": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "blockId"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "hideBlock"
+                      },
+                      "blockId": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "blockId"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "navigate"
+                      },
+                      "url": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "url"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "write"
+                      },
+                      "sourceId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "op": {
+                        "type": "string",
+                        "enum": [
+                          "create",
+                          "update",
+                          "delete"
+                        ]
+                      },
+                      "id": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          }
+                        ]
+                      },
+                      "values": {
+                        "type": "object",
+                        "additionalProperties": {}
+                      },
+                      "statusKeys": {
+                        "type": "object",
+                        "properties": {
+                          "loading": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "success": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "error": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "reason": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "fields": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "detail": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "sourceId",
+                      "op"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "auth:signIn"
+                      },
+                      "method": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "auth:register"
+                      },
+                      "method": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "auth:signOut"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "description": "What pressing the chip does: one surface action, or a list run in order — the same actions as control.button. Resolved per repeated copy (item, index), so a chip in a repeated strip can drop exactly its own row. A removable chip runs it from its × too, so for a filter in force this is the removal. With href set, pressing the label follows the link instead."
+        },
+        "bindable": true
+      },
+      {
+        "name": "tone",
+        "type": "\"neutral\" | \"primary\" | \"accent\" | \"success\" | \"warning\" | \"error\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "neutral",
+            "primary",
+            "accent",
+            "success",
+            "warning",
+            "error"
+          ],
+          "description": "The wash and ink. Bindable, so a row can pick its own: \"{{item.status == 'Late' ? 'warning' : 'neutral'}}\"."
+        },
+        "bindable": true,
+        "default": "neutral"
+      },
+      {
+        "name": "size",
+        "type": "\"sm\" | \"md\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "sm",
+            "md"
+          ]
+        },
+        "bindable": false,
+        "default": "md"
+      },
+      {
+        "name": "selected",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": true,
+        "default": false
+      },
+      {
+        "name": "removable",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Make the chip a filter in force that can be dropped: a × follows the label, and pressing the chip (label or ×) emits block:click {removed: true, value} and runs its action; its accessible name is \"Remove <label>\". On a link chip only the × removes."
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "count",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "description": "How many results this value would leave. Omitted shows nothing."
+        },
+        "bindable": true
+      }
+    ],
+    "defaultProps": {
+      "label": "",
+      "tone": "neutral",
+      "size": "md",
+      "selected": false,
+      "removable": false
+    },
+    "canHaveChildren": false,
+    "icon": "◗",
+    "traits": []
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

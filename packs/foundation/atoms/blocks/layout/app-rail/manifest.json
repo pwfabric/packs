@@ -1,0 +1,195 @@
+{
+  "id": "layout.app-rail",
+  "kind": "block",
+  "version": "0.1.0",
+  "category": "layout",
+  "name": "app-rail",
+  "state": "experimental",
+  "knowledge": {
+    "purpose": "Shell block: a narrow, PERSISTENT left rail on desktop that TURNS INTO a bottom bar on the xs viewport — one block, two shapes. Switches between a few top-level areas; every destination carries an icon + short label, and an optional subset (account, settings) is pinned to the foot of the rail. Sticky along its row on desktop.",
+    "useCases": [
+      "Persistent navigation of a multi-area tool (the left-rail shell)",
+      "The vertical half of the composite shell used together with the top bar",
+      "The area picker on the left of a split surface"
+    ],
+    "composesWith": [
+      "layout.navbar",
+      "layout.container",
+      "layout.split-view"
+    ],
+    "antiPatterns": [
+      "Navigating a hierarchy — the rail is one level; anything deeper than two levels needs a tree, not a rail",
+      "Giving it dozens of destinations — the rail is a set of shortcuts, not an index",
+      "Pairing it with a separate layout.bottom-bar for mobile — the rail already becomes the bottom bar at xs; two bars would stack",
+      "More than five primary destinations — at xs only the first five (rail items, then footer items) survive, the rest are hidden",
+      "Authoring `account` in a receipt or pattern — the runner injects the real visitor; a hand-written one is a fake session"
+    ],
+    "implementation": "Further anti-patterns:\n- Leaving it empty — a rail with no destinations is an empty column on screen, and a measured real defect\n\nxs shape: renders the first five destinations as a fixed bottom bar (60px, icon + label) that takes no room in flow — it publishes `--pw-bottom-bar-height` and the page (its shell's root) pads its bottom by `var(--pw-bottom-bar-height, 0px)`; the rail form returns from sm upward. Reads context.viewport, so SSR with an explicit viewport draws the right shape.\n\nAccount control: the injected `account` renders at the bottom of the rail through the shared account menu (popover opening to the right, bottom-aligned). On the xs bottom-bar shape it follows the bottom-bar rule — last target, a destination routing to profileHref is folded into it, otherwise it takes the 5th slot — and opens as a bottom sheet; that shape also publishes `--pw-bottom-bar-height` on the document root. An app whose rail already carries 5 destinations should declare the account in its navbar instead, so the phone bar keeps them all."
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "items",
+        "type": "array",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "href": {
+                "type": "string"
+              },
+              "icon": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "label"
+            ]
+          },
+          "description": "Top-level destinations: [{label, href?, icon?}]."
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "footerItems",
+        "type": "array",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "href": {
+                "type": "string"
+              },
+              "icon": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "label"
+            ]
+          },
+          "description": "Secondary destinations pinned to the foot of the rail (account, settings, help)."
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "activeHref",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "href of the active destination — the matching item gets aria-current=\"page\"."
+        },
+        "bindable": true
+      },
+      {
+        "name": "width",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number",
+          "description": "Rail width (px). Default 88 — a one-word label such as Dashboard fits at 12px; a longer label wraps onto a second line."
+        },
+        "bindable": false,
+        "default": 88
+      },
+      {
+        "name": "showLabels",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Show labels under the icons. When off, the label moves to aria-label + title — it is never lost."
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "ariaLabel",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Accessible name of the nav element."
+        },
+        "bindable": true
+      },
+      {
+        "name": "account",
+        "type": "{state: 'signed-in' | 'signed-out', name?, email?, avatarSrc?, profileHref?, profileLabel?, links?: [{label, href}], signInLabel?, signOutLabel?}",
+        "jsonSchema": {
+          "type": "object",
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": [
+                "signed-in",
+                "signed-out"
+              ]
+            },
+            "name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            },
+            "avatarSrc": {
+              "type": "string"
+            },
+            "profileHref": {
+              "type": "string"
+            },
+            "profileLabel": {
+              "type": "string"
+            },
+            "links": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "label": {
+                    "type": "string"
+                  },
+                  "href": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "label",
+                  "href"
+                ]
+              }
+            },
+            "signInLabel": {
+              "type": "string"
+            },
+            "signOutLabel": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "state"
+          ],
+          "description": "The published app's visitor, INJECTED BY THE RUNNER — do not author it. Rendered at the rail's bottom, below footerItems, as an avatar button opening the account menu beside the rail (\"Sign in\" target when signed out). On xs, where the rail becomes a bottom bar, it is the last target and opens as a sheet."
+        },
+        "bindable": false
+      }
+    ],
+    "defaultProps": {
+      "items": [],
+      "footerItems": [],
+      "width": 88,
+      "showLabels": true
+    },
+    "canHaveChildren": false
+  },
+  "tags": [
+    "tier:structure"
+  ]
+}

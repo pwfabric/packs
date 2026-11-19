@@ -1,0 +1,150 @@
+{
+  "id": "form.number-stepper",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "form",
+  "name": "number-stepper",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Increment/decrement counter for bounded numeric entry (integer or decimal via step) with minus and plus controls; submits a number",
+    "useCases": [
+      "Item quantity on a cart line or order form",
+      "Guest / seat / ticket count",
+      "Bounded numeric setting (columns, retries, copies)"
+    ],
+    "composesWith": [
+      "form.form",
+      "control.button",
+      "container.card"
+    ],
+    "antiPatterns": [
+      "Wide or unbounded range — stepping one unit at a time is too slow; take a typed number in form.input",
+      "Choice from labelled options — use form.segmented-control",
+      "Unlabelled stepper — the label is the field's name; there is no fallback"
+    ],
+    "implementation": "Further use cases:\n- Compact quantity picker inside a card"
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "name",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true,
+        "description": "Visible label; also names the field for screen readers. Give it — there is no fallback text."
+      },
+      {
+        "name": "min",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number"
+        },
+        "bindable": true,
+        "default": 0
+      },
+      {
+        "name": "max",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number"
+        },
+        "bindable": true,
+        "default": 100
+      },
+      {
+        "name": "step",
+        "type": "number | \"any\"",
+        "jsonSchema": {
+          "anyOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "string",
+              "const": "any"
+            }
+          ]
+        },
+        "bindable": false,
+        "description": "Increment of the +/- buttons and the field step, e.g. 0.5 or 0.01 for money. \"any\" accepts every decimal (buttons then move by 1).",
+        "default": 1
+      },
+      {
+        "name": "value",
+        "type": "number",
+        "jsonSchema": {
+          "type": "number"
+        },
+        "bindable": true,
+        "default": 1
+      },
+      {
+        "name": "disabled",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": true,
+        "default": false
+      },
+      {
+        "name": "stateKey",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "Surface state key the value is written to on change, so {{state.<key>}} reads it — a summary step of a multi-step form, or a list filter. Mirrors form.select and form.segmented-control."
+        },
+        "bindable": false
+      },
+      {
+        "name": "decreaseLabel",
+        "type": "string",
+        "description": "Accessible name of the minus button, in the app's language.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "increaseLabel",
+        "type": "string",
+        "description": "Accessible name of the plus button, in the app's language.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      }
+    ],
+    "defaultProps": {
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "value": 1,
+      "disabled": false
+    },
+    "canHaveChildren": false,
+    "allowedParents": [
+      "form",
+      "container"
+    ],
+    "icon": "⊞",
+    "traits": [
+      "form-field",
+      "modal-content"
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}
