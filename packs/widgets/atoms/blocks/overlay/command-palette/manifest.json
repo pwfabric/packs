@@ -5,8 +5,9 @@
   "category": "overlay",
   "name": "command-palette",
   "state": "stable",
+  "description": "A searchable command list (⌘K) that lives inside an overlay host: place it as the child of an overlay.modal or overlay.drawer, which opens it and which it closes when a command runs.",
   "knowledge": {
-    "purpose": "Searchable command/action palette (⌘K) that filters a list of items by label",
+    "purpose": "Searchable command/action palette (⌘K) that filters a list of items by label, placed inside an overlay.modal or overlay.drawer that opens and closes it",
     "useCases": [
       "Global ⌘K quick-action launcher",
       "Jump-to navigation across pages or records",
@@ -15,9 +16,11 @@
     "composesWith": [
       "control.button",
       "overlay.modal",
+      "overlay.drawer",
       "control.badge"
     ],
     "antiPatterns": [
+      "Placed bare on a page, outside an overlay.modal or overlay.drawer — it has no open/close of its own: its list stays open, and running a command dismisses a host that is not there",
       "Plain form select — use form.combobox",
       "Primary page navigation — compose it from primitives",
       "Static list of links — use data.list"

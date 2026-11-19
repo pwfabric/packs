@@ -411,6 +411,13 @@ describe('command-palette', () => {
     fireEvent.click(screen.getByRole('option', { name: 'New order' }))
     expect(events.some((e) => e.payload?.action === 'run' && e.payload?.id === 'new-order')).toBe(true)
   })
+
+  it('its search field has an accessible name, an id and a name', () => {
+    mount(el(CommandPaletteBlock, 'cp', 'command-palette', { placeholder: 'Search commands' }))
+    const search = screen.getByRole('combobox', { name: 'Search commands' })
+    expect(search.id).toBe('cp-search')
+    expect(search.getAttribute('name')).toBe('cp-search')
+  })
 })
 
 // ── fallback text ────────────────────────────────────────────────
