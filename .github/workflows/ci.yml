@@ -54,14 +54,18 @@ jobs:
     name: commitlint
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    # The action lists the PR's commits through the API.
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 22
-      - run: npx --yes -p @commitlint/cli@19 -p @commitlint/config-conventional@19 commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}
+      # As the engine repository does: the action carries commitlint and the
+      # conventional config, which `npx -p …` could not resolve from the repo.
+      - name: Validate PR commit messages
+        uses: wagoid/commitlint-github-action@b948419dd99f3fd78a6548d48f94e3df7f6bf3ed # v6.2.1
 
   # One required status check for branch protection.
   ci:
