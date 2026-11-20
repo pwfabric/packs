@@ -92,6 +92,8 @@ export const CommandPaletteBlock: BlockComponent = ({ props, block, context }) =
   )
   const inert = context?.interactionMode === 'inert'
   const listId = `${block.id}-list`
+  // A form field has an id and a name (the browser flags one with neither).
+  const searchId = `${block.id}-search`
   const optionId = (i: number): string => `${block.id}-cmd-${i}`
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const rootRef = React.useRef<HTMLDivElement | null>(null)
@@ -231,7 +233,10 @@ export const CommandPaletteBlock: BlockComponent = ({ props, block, context }) =
         </span>
         <input
           ref={inputRef}
+          id={searchId}
+          name={searchId}
           type="text"
+          autoComplete="off"
           role="combobox"
           aria-expanded="true"
           aria-controls={listId}
