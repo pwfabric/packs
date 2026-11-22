@@ -5,7 +5,7 @@ import { messageOf, useAppMessages } from '@pwfabric/runtime'
 import type { BlockComponent } from '../../../lib/component-types.js'
 import { HIT_AREA_CSS, listOf, safeHref, safeRenderValue } from '../../../lib/_shared-utils.js'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
-import { sameRoute } from '../../../lib/_shared-account-menu.js'
+import { routeState } from '../../../lib/_shared-account-menu.js'
 
 // ============================================================
 // PROPS — declared in manifest.json, applied by the runtime
@@ -23,6 +23,8 @@ export interface SidebarItem {
   readonly children?: readonly SidebarItem[]
   /** A group that starts open. The group holding the current page always does. */
   readonly open?: boolean
+  /** `prefix`: also marks this entry as the section on every page below its href. Default exact. */
+  readonly match?: 'exact' | 'prefix'
 }
 
 export interface SidebarProps {
@@ -70,7 +72,7 @@ export function sidebarTrail(items: readonly SidebarItem[], activeHref: string |
     for (let i = 0; i < list.length; i++) {
       const item = list[i] as SidebarItem
       const key = `${prefix}${i}`
-      if (item.href && sameRoute(item.href, activeHref)) return trail
+      if (item.href && routeState(item.href, activeHref, item.match) !== null) return trail
       const children = sidebarChildren(item)
       if (children.length) {
         const hit = visit(children, `${key}.`, [...trail, key])
@@ -159,7 +161,9 @@ export const SidebarBlock: BlockComponent = ({ props, block, context }) => {
     gap: '4px',
     paddingLeft: `${depth * 12}px`,
   })
-  const linkStyle = (current: boolean, group: boolean): React.CSSProperties => ({
+  const linkStyle = (state: 'page' | 'section' | null, group: boolean): React.CSSProperties => {
+    const current = state === 'page'
+    return {
     flex: '1 1 auto',
     minWidth: 0,
     display: 'flex',
@@ -167,14 +171,20 @@ export const SidebarBlock: BlockComponent = ({ props, block, context }) => {
     alignSelf: 'stretch',
     padding: '6px 10px',
     borderRadius: 'var(--pw-border-radius-sm, 6px)',
-    borderLeft: current ? '3px solid var(--pw-color-primary)' : '3px solid transparent',
+    // The section the page is in (a `match: "prefix"` entry above it): a lighter edge, no tint.
+    borderLeft: current
+      ? '3px solid var(--pw-color-primary)'
+      : state === 'section'
+        ? '3px solid color-mix(in srgb, var(--pw-color-primary) 45%, transparent)'
+        : '3px solid transparent',
     backgroundColor: current ? 'color-mix(in srgb, var(--pw-color-primary) 10%, transparent)' : undefined,
     color: 'var(--pw-color-text)',
     textDecoration: 'none',
     fontSize: 'var(--pw-font-size-sm)',
-    fontWeight: current || group ? 600 : 400,
+    fontWeight: state !== null || group ? 600 : 400,
     overflowWrap: 'anywhere',
-  })
+    }
+  }
   const toggleStyle: React.CSSProperties = {
     display: 'inline-flex',
     alignItems: 'center',
@@ -203,16 +213,17 @@ export const SidebarBlock: BlockComponent = ({ props, block, context }) => {
         const target = safe && safe !== '#' ? safe : undefined
         // Already in the router's form: the host rewrites the href of each entry.
         const href = target
-        const current = Boolean(target) && sameRoute(item.href, activeHref)
+        const state = target ? routeState(item.href, activeHref, item.match) : null
         const listId = `${block.id}-group-${key.replace(/\./g, '-')}`
         const link = href ? (
           <a
             href={href}
             data-pw-sidebar-link=""
             data-pw-hit=""
-            aria-current={current ? 'page' : undefined}
+            aria-current={state === 'page' ? 'page' : undefined}
+            data-pw-current={state ?? undefined}
             onClick={onLinkClick(target as string)}
-            style={linkStyle(current, false)}
+            style={linkStyle(state, false)}
           >
             {label}
           </a>
@@ -221,7 +232,7 @@ export const SidebarBlock: BlockComponent = ({ props, block, context }) => {
           return (
             <li key={key}>
               <div data-pw-sidebar-row="" style={rowStyle(depth)}>
-                {link ?? <span style={{ ...linkStyle(false, false), color: 'var(--pw-color-text-muted)' }}>{label}</span>}
+                {link ?? <span style={{ ...linkStyle(null, false), color: 'var(--pw-color-text-muted)' }}>{label}</span>}
               </div>
             </li>
           )
@@ -231,7 +242,7 @@ export const SidebarBlock: BlockComponent = ({ props, block, context }) => {
         let head: React.ReactNode
         if (!collapsible) {
           head = link ?? (
-            <span style={{ ...linkStyle(false, true), textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: 'var(--pw-font-size-xs)', color: 'var(--pw-color-text-muted)' }}>
+            <span style={{ ...linkStyle(null, true), textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: 'var(--pw-font-size-xs)', color: 'var(--pw-color-text-muted)' }}>
               {label}
             </span>
           )
@@ -261,7 +272,7 @@ export const SidebarBlock: BlockComponent = ({ props, block, context }) => {
               aria-expanded={isOpen}
               aria-controls={listId}
               onClick={() => toggle(key)}
-              style={{ ...toggleStyle, ...linkStyle(false, true), justifyContent: 'space-between', width: '100%', textAlign: 'left' }}
+              style={{ ...toggleStyle, ...linkStyle(null, true), justifyContent: 'space-between', width: '100%', textAlign: 'left' }}
             >
               <span>{label}</span>
               <Chevron open={isOpen} />

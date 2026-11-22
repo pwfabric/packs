@@ -129,6 +129,28 @@ export function sameRoute(a: string | undefined, b: string | undefined): boolean
   return na !== undefined && na === normalizeHref(b)
 }
 
+/**
+ * How a navigation item matches the page in view: `exact` (the default) only
+ * its own address; `prefix` also every page below it, so a "/guides" item
+ * marks its section on "/guides/records". The root `/` is never a prefix of
+ * anything (it would mark every page).
+ */
+export type RouteMatch = 'exact' | 'prefix'
+
+/**
+ * Where the page in view stands to an item: `page` when the item routes to it
+ * (the only state that carries aria-current="page"), `section` when the item
+ * matches by `prefix` and the page lies below it, else null.
+ */
+export function routeState(href: string | undefined, activeHref: string | undefined, match?: unknown): 'page' | 'section' | null {
+  if (sameRoute(href, activeHref)) return 'page'
+  if (match !== 'prefix') return null
+  const item = normalizeHref(href)
+  const page = normalizeHref(activeHref)
+  if (item === undefined || page === undefined || item === '/') return null
+  return page.startsWith(`${item}/`) ? 'section' : null
+}
+
 export function accountDisplayName(account: AccountInfo): string {
   return account.name?.trim() || account.email?.trim() || ''
 }

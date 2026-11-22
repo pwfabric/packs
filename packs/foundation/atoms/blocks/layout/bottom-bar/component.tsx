@@ -9,6 +9,7 @@ import {
   placeAccountInBar,
   firstWord,
   readAccount,
+  routeState,
   sameRoute,
   useBottomBarHeightVar,
 } from '../../../lib/_shared-account-menu.js'
@@ -32,6 +33,8 @@ export interface BottomBarItem {
   readonly label: string
   readonly href?: string
   readonly icon?: string
+  /** `prefix`: also marks the section on every page below href. Default exact. */
+  readonly match?: 'exact' | 'prefix'
 }
 
 export interface BottomBarProps {
@@ -133,7 +136,7 @@ export const BottomBarBlock: BlockComponent = ({ props, block, context }) => {
     ...block.style,
   }
 
-  const itemStyle = (active: boolean): React.CSSProperties => ({
+  const itemStyle = (state: 'page' | 'section' | null): React.CSSProperties => ({
     flex: '1 1 0',
     display: 'flex',
     flexDirection: 'column',
@@ -144,9 +147,10 @@ export const BottomBarBlock: BlockComponent = ({ props, block, context }) => {
     padding: '6px 4px',
     textDecoration: 'none',
     fontSize: 'var(--pw-font-size-xs, 12px)',
-    fontWeight: active ? 600 : 400,
-    // Active label is INK (primary pushed to AA), not the fill colour.
-    color: active ? 'var(--pw-color-primary-ink, var(--pw-color-primary, #18181b))' : 'var(--pw-color-text-muted, #71717a)',
+    // The page in view is bold ink; the section a `match: "prefix"` tab marks
+    // is ink at a medium weight. Active label is INK (primary pushed to AA), not the fill colour.
+    fontWeight: state === 'page' ? 600 : state === 'section' ? 500 : 400,
+    color: state !== null ? 'var(--pw-color-primary-ink, var(--pw-color-primary, #18181b))' : 'var(--pw-color-text-muted, #71717a)',
   })
 
   return (
@@ -162,7 +166,7 @@ export const BottomBarBlock: BlockComponent = ({ props, block, context }) => {
       <nav style={barStyle} aria-label={safeRenderValue(props.ariaLabel) || messageOf(appWords, 'ui.nav.bottom', '')}>
         {items.map((item, i) => {
           const href = safeHref(item.href)
-          const active = sameRoute(item.href, activeHref)
+          const state = routeState(item.href, activeHref, item.match)
           const body = (
             <>
               {item.icon ? <BarIcon name={item.icon} /> : null}
@@ -182,13 +186,14 @@ export const BottomBarBlock: BlockComponent = ({ props, block, context }) => {
             <a
               key={`${item.label}-${i}`}
               href={href}
-              style={itemStyle(active)}
-              aria-current={active ? 'page' : undefined}
+              style={itemStyle(state)}
+              aria-current={state === 'page' ? 'page' : undefined}
+              data-pw-current={state ?? undefined}
             >
               {body}
             </a>
           ) : (
-            <span key={`${item.label}-${i}`} style={itemStyle(active)}>
+            <span key={`${item.label}-${i}`} style={itemStyle(state)}>
               {body}
             </span>
           )
@@ -211,7 +216,7 @@ export const BottomBarBlock: BlockComponent = ({ props, block, context }) => {
                   {...trigger}
                   aria-current={active ? 'page' : undefined}
                   style={{
-                    ...itemStyle(active || state.open),
+                    ...itemStyle(active || state.open ? 'page' : null),
                     flex: '1 1 0',
                     border: 'none',
                     background: 'transparent',

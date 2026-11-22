@@ -10,7 +10,7 @@ import {
   AccountControl,
   accountSignInButtonStyle,
   readAccount,
-  sameRoute,
+  routeState,
   type AccountInfo,
 } from '../../../lib/_shared-account-menu.js'
 
@@ -119,6 +119,8 @@ export const navbarDefinition: BlockDefinition = {
 interface NavSubLinkData {
   label: string
   href: string
+  /** `prefix`: also current on every page below href (a section). Default exact. */
+  match?: 'exact' | 'prefix'
 }
 
 interface NavMegaItemData {
@@ -143,6 +145,8 @@ interface NavFeatureTileData {
 interface NavLinkData {
   label: string
   href: string
+  /** `prefix`: also current on every page below href (a section). Default exact. */
+  match?: 'exact' | 'prefix'
   items?: NavSubLinkData[]
   megaColumns?: NavMegaColumnData[]
   feature?: NavFeatureTileData
@@ -189,9 +193,20 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
   const links = listOf<NavLinkData>(p.links)
   const activeHref = typeof props.activeHref === 'string' ? props.activeHref : undefined
   /** A link is active when it, or one of its dropdown entries, routes to activeHref. */
-  const isActiveLink = (link: NavLinkData): boolean =>
-    sameRoute(link.href, activeHref) ||
-    (Array.isArray(link.items) && link.items.some((sub) => sameRoute(sub.href, activeHref)))
+  //
+  // A link marks the page in view (`page`: aria-current="page", the full
+  // mark) or, with `match: "prefix"`, the section the page is in (`section`:
+  // a lighter mark and no aria-current — the visitor is below it, not on it).
+  const stateOf = (item: { href?: string; match?: unknown }): 'page' | 'section' | null =>
+    routeState(item.href, activeHref, item.match)
+  const linkState = (link: NavLinkData): 'page' | 'section' | null => {
+    const own = stateOf(link)
+    const subs = Array.isArray(link.items) ? link.items.map(stateOf) : []
+    if (own === 'page' || subs.includes('page')) return 'page'
+    return own === 'section' || subs.includes('section') ? 'section' : null
+  }
+  const linkStyleOf = (state: 'page' | 'section' | null): React.CSSProperties =>
+    state === 'page' ? activeLinkTextStyle : state === 'section' ? sectionLinkTextStyle : linkTextStyle
   const lang = langOf(props.lang)
   const alignment = p.alignment
   const ctaLabel = textOf(p.ctaLabel).trim()
@@ -645,6 +660,16 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
     textDecorationThickness: '2px',
     textUnderlineOffset: '6px',
   }
+  // The section the page is in (a `match: "prefix"` link above it): the same
+  // weight, a thinner and lighter underline.
+  const sectionLinkTextStyle: React.CSSProperties = {
+    ...linkTextStyle,
+    fontWeight: 600,
+    textDecorationLine: 'underline',
+    textDecorationColor: 'color-mix(in srgb, var(--pw-color-primary) 55%, transparent)',
+    textDecorationThickness: '1px',
+    textUnderlineOffset: '6px',
+  }
 
   /** The links' landmark name. */
   const drawerLabel = mainNavWord
@@ -653,20 +678,28 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
    * the CURRENT page visibly marked — a brand bar on its left edge and a tint,
    * not only a heavier weight that a parent with sub-links also had.
    */
-  const drawerLinkStyle = (current: boolean, parent: boolean, sub: boolean): React.CSSProperties => ({
+  const drawerLinkStyle = (state: 'page' | 'section' | null, parent: boolean, sub: boolean): React.CSSProperties => {
+    const current = state === 'page'
+    return {
     display: 'flex',
     alignItems: 'center',
     minHeight: '44px',
     boxSizing: 'border-box',
     padding: sub ? '0 12px 0 28px' : '0 12px',
     borderRadius: 'var(--pw-border-radius-sm, 6px)',
-    borderLeft: current ? '3px solid var(--pw-color-primary)' : '3px solid transparent',
+    // The section the page is in: a lighter edge, no tint.
+    borderLeft: current
+      ? '3px solid var(--pw-color-primary)'
+      : state === 'section'
+        ? '3px solid color-mix(in srgb, var(--pw-color-primary) 45%, transparent)'
+        : '3px solid transparent',
     backgroundColor: current ? 'color-mix(in srgb, var(--pw-color-primary) 10%, transparent)' : undefined,
     color: sub && !current ? 'var(--pw-color-text-muted)' : 'var(--pw-color-text)',
     textDecoration: 'none',
     fontSize: 'var(--pw-font-size-sm)',
-    fontWeight: current || parent ? 600 : 500,
-  })
+    fontWeight: state !== null || parent ? 600 : 500,
+    }
+  }
 
   const caret = (
     <svg
@@ -736,8 +769,9 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
         <a
           href={safeHref(link.href)}
           onClick={handleNavClick(link.href)}
-          style={isActiveLink(link) ? activeLinkTextStyle : linkTextStyle}
-          aria-current={isActiveLink(link) ? 'page' : undefined}
+          style={linkStyleOf(linkState(link))}
+          aria-current={linkState(link) === 'page' ? 'page' : undefined}
+          data-pw-current={linkState(link) ?? undefined}
           data-pw-hit=""
         >
           {link.label}
@@ -781,9 +815,10 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
             }}
             aria-haspopup="menu"
             aria-expanded={open}
-            aria-current={isActiveLink(link) ? 'page' : undefined}
+            aria-current={linkState(link) === 'page' ? 'page' : undefined}
+            data-pw-current={linkState(link) ?? undefined}
             data-pw-hit=""
-            style={{ ...(isActiveLink(link) ? activeLinkTextStyle : linkTextStyle), display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }}
+            style={{ ...linkStyleOf(linkState(link)), display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }}
           >
             {link.label}
             {caret}
@@ -968,10 +1003,11 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
           }}
           aria-haspopup="menu"
           aria-expanded={open}
-          aria-current={isActiveLink(link) ? 'page' : undefined}
+          aria-current={linkState(link) === 'page' ? 'page' : undefined}
+          data-pw-current={linkState(link) ?? undefined}
           data-pw-hit=""
           style={{
-            ...(isActiveLink(link) ? activeLinkTextStyle : linkTextStyle),
+            ...linkStyleOf(linkState(link)),
             display: 'inline-flex',
             alignItems: 'center',
             cursor: 'pointer',
@@ -1157,8 +1193,9 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
             <a
               href={safeHref(link.href)}
               onClick={handleDrawerClick(link.href)}
-              aria-current={sameRoute(link.href, activeHref) ? 'page' : undefined}
-              style={drawerLinkStyle(sameRoute(link.href, activeHref), childLinks.length > 0, false)}
+              aria-current={stateOf(link) === 'page' ? 'page' : undefined}
+              data-pw-current={stateOf(link) ?? undefined}
+              style={drawerLinkStyle(stateOf(link), childLinks.length > 0, false)}
             >
               {link.label}
             </a>
@@ -1167,8 +1204,9 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
                 key={j}
                 href={safeHref(sub.href)}
                 onClick={handleDrawerClick(sub.href)}
-                aria-current={sameRoute(sub.href, activeHref) ? 'page' : undefined}
-                style={drawerLinkStyle(sameRoute(sub.href, activeHref), false, true)}
+                aria-current={stateOf(sub) === 'page' ? 'page' : undefined}
+                data-pw-current={stateOf(sub) ?? undefined}
+                style={drawerLinkStyle(stateOf(sub), false, true)}
               >
                 {sub.label}
               </a>
