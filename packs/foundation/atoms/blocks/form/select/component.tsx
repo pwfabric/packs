@@ -161,7 +161,15 @@ export const SelectBlock: BlockComponent = ({ props, block }) => {
   // A select with a chosen value and no placeholder lists only its options.
   const chosen = typeof defaultValue === 'string' && defaultValue !== '' && options.some((o) => o.value === defaultValue)
   const showEmpty = !multiple && (placeholder.trim() !== '' || !chosen)
-  const remountKey = Array.isArray(defaultValue) ? defaultValue.join('\u0000') : (defaultValue ?? '')
+  // The key also counts how much of the default the options hold: a bound
+  // value that resolves BEFORE its bound options mounted a select with no
+  // matching option (the browser picked another), and options arriving later
+  // did not change the key, so the choice was lost. It remounts once more when
+  // the options come to contain the value, and never on options that only
+  // re-arrive, so a visitor's own choice stays.
+  const wanted = Array.isArray(defaultValue) ? defaultValue : defaultValue ? [defaultValue] : []
+  const present = wanted.filter((v) => options.some((o) => o.value === v)).length
+  const remountKey = `${Array.isArray(defaultValue) ? defaultValue.join('\u0000') : (defaultValue ?? '')}\u0001${present}`
 
   const labelStyle: React.CSSProperties = {
     display: 'block',
