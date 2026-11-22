@@ -11,7 +11,7 @@ three, instead of data hiding inside self-fetching blocks.
 | field | required | meaning |
 |---|---|---|
 | `name` | yes | file stem; the id the composer uses (`page-header`) |
-| `role` | yes | `shell` · `weave` · `band` · `part` — structural (see below) |
+| `role` | yes | `shell` · `weave` · `band` · `part` · `layout` — structural (see below) |
 | `body` | bands, weaves, shells | `flow` · `grid` · `dense` · `split` · `any` |
 | `description` | yes | one line for humans |
 | `provenPattern` | yes | where it was observed or measured, never a guess |
@@ -122,6 +122,10 @@ Gate rules (`rowFindings` in `tools/lib/wiring-rules.mjs`):
   `main` around the page content (`container.landmark: "main"`), `footer` around the legal line,
   which shares the content column's left edge; the nav blocks keep their `<nav>`.
 - **weave** — a body arrangement (`weave-*`) with a `{{BANDS}}` slot.
+- **layout** — the app's layout receipt (`layout-*`): the frame every page is drawn in, written
+  once as `app/layout.receipt.json` (`{"blocks": [<snippet>]}`). It holds exactly one bare page
+  slot `{ "type": "pw:page" }` (no id needed, no props), where each page's blocks go; no other role
+  may hold one. Its navbar and sidebar set no `activeHref`: the engine fills it (engine 3.5).
 
 The gate checks the equivalence both ways: section-rooted ⇔ band.
 

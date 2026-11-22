@@ -101,7 +101,8 @@ for (const [pack, list] of byPack) {
     ;(function walk(nodes) {
       for (const n of nodes ?? []) {
         if (!n || typeof n !== 'object') continue
-        if (typeof n.type === 'string') bodyTypes.add(n.type)
+        // The page slot { "type": "pw:page" } of a layout pattern is the format's, not a block.
+        if (typeof n.type === 'string' && n.type !== 'pw:page') bodyTypes.add(n.type)
         if (Array.isArray(n.children)) walk(n.children)
       }
     })(Array.isArray(json.snippet) ? json.snippet : [json.snippet])

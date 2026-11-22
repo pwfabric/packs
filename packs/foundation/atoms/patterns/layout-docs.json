@@ -1,0 +1,175 @@
+{
+  "name": "layout-docs",
+  "role": "layout",
+  "description": "The app layout of a documentation site: top bar, a sticky sidebar tree beside the page, footer. Written once as app/layout.receipt.json; every page is drawn in its slot.",
+  "knowledge": {
+    "purpose": "The frame every page of a documentation site shares: navigation across the top, the section tree beside the page, the legal line below",
+    "useCases": [
+      "Product documentation",
+      "Handbook or knowledge base",
+      "Course with chapters and lessons"
+    ],
+    "composesWith": [
+      "page-header",
+      "callout",
+      "footer"
+    ],
+    "antiPatterns": [
+      "Repeating the navbar or the footer on a page drawn in this layout: the layout already draws them",
+      "A second page slot: a layout holds exactly one {\"type\": \"pw:page\"}",
+      "Setting activeHref on the layout navbar or sidebar: the engine gives each the current page",
+      "A sidebar of one group with two links: use layout-topbar and in-page links"
+    ],
+    "implementation": "The snippet is the layout receipt's one top-level block: {\"blocks\": [<snippet>]} in app/layout.receipt.json. Each page's top-level blocks replace the bare slot {\"type\": \"pw:page\"}, which carries no id and no props. The layout's blocks stay mounted from page to page. The navbar and the sidebar declare activeHref, so the engine fills it with the current page; the navbar sticks through its block style. On a phone the row stacks: the sidebar sits above the page. Needs engine 3.5."
+  },
+  "mobileCollapse": "The top bar collapses into a drawer; the sidebar stacks above the page, its groups closed except the current one.",
+  "placeholders": {
+    "{{HEADER}}": "top bar — brand name",
+    "{{NAV_LINKS}}": "top-bar links: [{label, href}]",
+    "{{FOOTER}}": "footer copyright line — PLAIN TEXT, one line. The ONLY place the copyright appears: the `footer` band carries link columns and never a copyright. A rich footer (columns, social) does not go here — place the `footer` pattern as the last band",
+    "{{SIDEBAR_TITLE}}": "sidebar heading, e.g. Documentation (it names the sidebar landmark)",
+    "{{SIDEBAR_ITEMS}}": "sidebar tree: [{label, href?, children?: [{label, href}]}], groups with nested pages"
+  },
+  "usesBlocks": [
+    "container",
+    "divider",
+    "navbar",
+    "section",
+    "sidebar",
+    "text"
+  ],
+  "snippet": {
+    "id": "{{ID}}",
+    "type": "container",
+    "props": {
+      "direction": "column",
+      "padding": 0
+    },
+    "layout": {
+      "widthScope": {
+        "xs": "viewport"
+      }
+    },
+    "children": [
+      {
+        "id": "{{ID}}-nav",
+        "type": "navbar",
+        "style": {
+          "position": "sticky",
+          "top": "0",
+          "zIndex": "var(--pw-z-sticky, var(--pw-z-nav))"
+        },
+        "props": {
+          "logoText": "{{HEADER}}",
+          "links": "{{NAV_LINKS}}"
+        },
+        "layout": {
+          "widthScope": {
+            "xs": "viewport"
+          }
+        }
+      },
+      {
+        "id": "{{ID}}-content",
+        "type": "container",
+        "props": {
+          "direction": "row",
+          "gap": 32,
+          "align": "start"
+        },
+        "style": {
+          "width": "100%",
+          "maxWidth": "var(--pw-layout-container-max-width, 1280px)",
+          "marginInline": "auto",
+          "paddingInline": "max(16px, var(--pw-layout-surface-padding, 24px))",
+          "--pw-section-inset": "0px",
+          "boxSizing": "border-box"
+        },
+        "children": [
+          {
+            "id": "{{ID}}-sidebar",
+            "type": "sidebar",
+            "props": {
+              "title": "{{SIDEBAR_TITLE}}",
+              "items": "{{SIDEBAR_ITEMS}}"
+            },
+            "style": {
+              "flex": "0 0 260px",
+              "position": "sticky",
+              "top": "var(--pw-sticky-top-offset, 64px)",
+              "alignSelf": "start",
+              "paddingBlock": "24px"
+            }
+          },
+          {
+            "id": "{{ID}}-main",
+            "type": "container",
+            "props": {
+              "direction": "column",
+              "landmark": "main"
+            },
+            "style": {
+              "flex": "1 1 0",
+              "minWidth": "0"
+            },
+            "children": [
+              {
+                "type": "pw:page"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "{{ID}}-foot",
+        "type": "section",
+        "props": {
+          "paddingY": 40,
+          "gap": 18,
+          "landmark": "footer",
+          "paddingX": 0
+        },
+        "children": [
+          {
+            "id": "{{ID}}-foot-div",
+            "type": "divider",
+            "props": {
+              "spacing": 12
+            }
+          },
+          {
+            "id": "{{ID}}-foot-bot",
+            "type": "container",
+            "props": {
+              "direction": "row",
+              "justify": "between",
+              "gap": 12,
+              "padding": 0
+            },
+            "children": [
+              {
+                "id": "{{ID}}-foot-c",
+                "type": "text",
+                "props": {
+                  "content": "{{FOOTER}}",
+                  "color": "var(--pw-color-text-muted)"
+                },
+                "style": {
+                  "fontSize": "var(--pw-font-size-xs)"
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "width": "100%",
+          "maxWidth": "var(--pw-layout-container-max-width, 1280px)",
+          "marginInline": "auto",
+          "paddingInline": "max(16px, var(--pw-layout-surface-padding, 24px))",
+          "boxSizing": "border-box"
+        }
+      }
+    ]
+  },
+  "layoutOnly": true
+}
