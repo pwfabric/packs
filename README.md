@@ -6,7 +6,7 @@ occasional blocks.
 
 | Pack | Id | Stands on | What it carries | Licence |
 |---|---|---|---|---|
-| `foundation` | `@pwpack/foundation` | — | The core block vocabulary (layout, text, controls, forms, data, feedback, media), the top-bar, bottom-bar and chrome-less shells with their page parts, six reference themes, the icon dictionary, four capabilities and the REST connector. | Apache-2.0 |
+| `foundation` | `@pwpack/foundation` | — | The core block vocabulary (layout, text, controls, forms, data, feedback, media), the top-bar, bottom-bar and chrome-less shells with their page parts, two app layouts (top bar, documentation with a sidebar), six reference themes, the icon dictionary, four capabilities and the REST connector. | Apache-2.0 |
 | `widgets` | `@pwpack/widgets` | foundation | The occasional blocks, kept off the floor so an app that never places them never lists them: rich-text editor, file dropzone, tag input, combobox, slider, chart, month calendar, rating, map, carousel, video, embed, gallery, world clock, tree view, command palette and like button. | Apache-2.0 |
 
 [`pack-map.json`](pack-map.json) is the source of these relations; each
@@ -20,9 +20,9 @@ command line ([`@pwfabric/cli`](https://www.npmjs.com/package/@pwfabric/cli),
 Node 22 or newer):
 
 ```sh
-pwf create my-app --foundation foundation-1.0.0.pwpack
+pwf create my-app --foundation foundation-2.0.0.pwpack
 cd my-app
-pwf add widgets-1.0.0.pwpack      # only when a page places a widgets block
+pwf add widgets-2.0.0.pwpack      # only when a page places a widgets block
 pwf dev
 ```
 

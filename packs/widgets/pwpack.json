@@ -1,17 +1,17 @@
 {
   "id": "@pwpack/widgets",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "formatVersion": "1.0",
   "name": "Widgets",
   "description": "The occasional blocks, kept out of the floor so an app that never places them never lists them: rich-text editor, file dropzone, tag input, combobox, slider, chart, month calendar, rating, map, carousel, video, embed, gallery, world clock, tree view, command palette and like button.",
   "category": "ui-design",
   "engines": {
-    "pwfabric": ">=3.1.0 <4"
+    "pwfabric": ">=3.5.0 <4"
   },
   "requires": [
     {
       "id": "@pwpack/foundation",
-      "range": "^1.0.0"
+      "range": "^2.0.0"
     }
   ],
   "tokens": [
