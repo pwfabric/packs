@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
-import { messageOf, useAppMessages } from '@pwfabric/runtime'
+import { messageOf, useAppMessage, useAppMessages } from '@pwfabric/runtime'
 import type { BlockComponent } from '../../../lib/component-types.js'
 import { HIT_AREA_CSS, listOf, safeHref, safeRenderValue } from '../../../lib/_shared-utils.js'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
@@ -38,6 +38,11 @@ export interface SidebarProps {
   readonly activeHref?: string
   /** Groups open and close (default). false: every group is shown open, with no toggle. */
   readonly collapsible: boolean
+  /**
+   * On a phone (below 768px) the tree folds behind one button, so a long tree
+   * does not sit above every page. Default true; false always shows the tree.
+   */
+  readonly foldOnPhone: boolean
 }
 
 // ============================================================
@@ -49,7 +54,7 @@ export const sidebarDefinition: BlockDefinition = {
   name: 'Sidebar',
   category: 'layout',
   icon: '☰',
-  defaultProps: { items: [], collapsible: true },
+  defaultProps: { items: [], collapsible: true, foldOnPhone: true },
   defaultLayout: { span: { xs: 4, sm: 8, md: 3, lg: 3 } },
   canHaveChildren: false,
 }
@@ -94,6 +99,16 @@ function initiallyOpen(items: readonly SidebarItem[], prefix = ''): string[] {
   })
 }
 
+/**
+ * THE PHONE FOLD, IN CSS. Below 768px (the engine's `md`) a folded tree is
+ * hidden behind its button; from 768px the button is gone and the tree always
+ * shows, whatever the fold state. The first painted frame is right at both
+ * widths: nothing reads the viewport.
+ */
+const SIDEBAR_FOLD_CSS =
+  '@media (max-width: 767.98px) { [data-pw-sidebar-tree][data-pw-folded] { display: none !important; } [data-pw-sidebar-fold] ~ [data-pw-sidebar-title] { display: none !important; } }' +
+  '@media (min-width: 768px) { [data-pw-sidebar-fold] { display: none !important; } }'
+
 /** A phone or touch row is a 44px target. */
 const SIDEBAR_CSS =
   '@media (max-width: 640px), (pointer: coarse) { [data-pw-sidebar-row] { min-height: 44px; } }' +
@@ -131,6 +146,10 @@ export const SidebarBlock: BlockComponent = ({ props, block, context }) => {
   // The toggle beside a group's own link is named in the app's words
   // (ui.tree.expand / ui.tree.collapse, with the group's label).
   const messages = useAppMessages()
+  const foldOnPhone = p.foldOnPhone !== false
+  // The fold button's word: the tree's title, else the app's ui.sidebar.menu.
+  const menuWord = useAppMessage('ui.sidebar.menu', 'Menu')
+  const [unfolded, setUnfolded] = React.useState(false)
 
   const trail = sidebarTrail(items, activeHref)
   const [open, setOpen] = React.useState<Set<string>>(() => new Set([...initiallyOpen(items), ...trail]))
@@ -150,6 +169,9 @@ export const SidebarBlock: BlockComponent = ({ props, block, context }) => {
     })
 
   const onLinkClick = (href: string) => (e: React.MouseEvent<HTMLAnchorElement>): void => {
+    // A layout's sidebar stays mounted from page to page: a link chosen on a
+    // phone folds the tree again for the page it opens.
+    setUnfolded(false)
     if (!inert) return
     e.preventDefault()
     emit({ type: SURFACE_EVENTS.BLOCK_CLICK, surfaceId, blockId: block.id, payload: { href } })
@@ -292,6 +314,7 @@ export const SidebarBlock: BlockComponent = ({ props, block, context }) => {
   )
 
   const titleId = `${block.id}-title`
+  const treeId = `${block.id}-tree`
   const name = navLabel ? { 'aria-label': navLabel } : title ? { 'aria-labelledby': titleId } : {}
   return (
     <nav
@@ -301,13 +324,45 @@ export const SidebarBlock: BlockComponent = ({ props, block, context }) => {
       {...name}
       style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: 0, ...block.style }}
     >
-      <style>{SIDEBAR_CSS + HIT_AREA_CSS}</style>
+      <style>{SIDEBAR_CSS + (foldOnPhone ? SIDEBAR_FOLD_CSS : '') + HIT_AREA_CSS}</style>
+      {foldOnPhone && (
+        <button
+          type="button"
+          data-pw-sidebar-fold=""
+          data-pw-sidebar-toggle=""
+          aria-expanded={unfolded}
+          aria-controls={treeId}
+          onClick={() => setUnfolded((o) => !o)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '8px',
+            width: '100%',
+            minHeight: '44px',
+            padding: '0 12px',
+            border: '1px solid var(--pw-color-border)',
+            borderRadius: 'var(--pw-border-radius-sm, 6px)',
+            background: 'transparent',
+            color: 'var(--pw-color-text)',
+            fontFamily: 'inherit',
+            fontSize: 'var(--pw-font-size-sm)',
+            fontWeight: 600,
+            cursor: 'pointer',
+          }}
+        >
+          <span>{title ?? menuWord}</span>
+          <Chevron open={unfolded} />
+        </button>
+      )}
       {title && (
-        <p id={titleId} style={{ margin: 0, padding: '0 10px', fontSize: 'var(--pw-font-size-sm)', fontWeight: 700, color: 'var(--pw-color-text)' }}>
+        <p id={titleId} data-pw-sidebar-title="" style={{ margin: 0, padding: '0 10px', fontSize: 'var(--pw-font-size-sm)', fontWeight: 700, color: 'var(--pw-color-text)' }}>
           {title}
         </p>
       )}
-      {renderList(items, 0, '')}
+      <div id={treeId} data-pw-sidebar-tree="" data-pw-folded={foldOnPhone && !unfolded ? '' : undefined}>
+        {renderList(items, 0, '')}
+      </div>
     </nav>
   )
 }

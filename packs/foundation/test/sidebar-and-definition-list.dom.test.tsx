@@ -85,7 +85,8 @@ describe('sidebar', () => {
     expect(screen.getByRole('button', { name: 'Guides' }).getAttribute('aria-expanded')).toBe('true')
     cleanup()
     mount(SidebarBlock, 'sb', 'sidebar', { navLabel: 'Docs', items: DOCS, collapsible: false })
-    expect(screen.queryAllByRole('button')).toHaveLength(0)
+    // Only the phone fold's button: no group toggles.
+    expect(screen.queryAllByRole('button').filter((b) => !b.hasAttribute('data-pw-sidebar-fold'))).toHaveLength(0)
     expect(screen.getByRole('link', { name: 'Cloudflare' })).toBeTruthy()
     expect(screen.getByRole('link', { name: 'CLI' })).toBeTruthy()
   })
@@ -98,6 +99,40 @@ describe('sidebar', () => {
     expect(screen.queryByRole('button', { name: 'Odd' })).toBeNull()
     fireEvent.click(screen.getByRole('link', { name: 'Home' }))
     expect(events).toContainEqual(expect.objectContaining({ type: 'block:click', blockId: 'sb', payload: { href: '/' } }))
+  })
+})
+
+describe('sidebar on a phone: one button folds the tree, CSS decides', () => {
+  it('a folded tree behind a named button with aria-expanded and aria-controls', () => {
+    mount(SidebarBlock, 'sb', 'sidebar', { title: 'Documentation', items: DOCS })
+    const fold = screen.getByRole('button', { name: 'Documentation' })
+    expect(fold.getAttribute('type')).toBe('button')
+    expect(fold.getAttribute('aria-expanded')).toBe('false')
+    const tree = document.getElementById(fold.getAttribute('aria-controls') ?? '') as HTMLElement
+    expect(tree.hasAttribute('data-pw-sidebar-tree')).toBe(true)
+    expect(tree.hasAttribute('data-pw-folded')).toBe(true)
+    fireEvent.click(fold)
+    expect(fold.getAttribute('aria-expanded')).toBe('true')
+    expect(tree.hasAttribute('data-pw-folded')).toBe(false)
+    // Choosing a page folds it again (a layout's sidebar stays mounted).
+    fireEvent.click(within(tree).getByRole('link', { name: 'Introduction' }))
+    expect(tree.hasAttribute('data-pw-folded')).toBe(true)
+  })
+
+  it('the fold is CSS only: hidden under 768px when folded, the button gone from 768px', () => {
+    mount(SidebarBlock, 'sb', 'sidebar', { navLabel: 'Docs', items: DOCS })
+    const css = document.querySelector('#sb style')?.textContent ?? ''
+    expect(css).toContain('@media (max-width: 767.98px) { [data-pw-sidebar-tree][data-pw-folded] { display: none !important; }')
+    expect(css).toContain('@media (min-width: 768px) { [data-pw-sidebar-fold] { display: none !important; } }')
+    // No title: the button is named by the app's word, English when unset.
+    expect(screen.getByRole('button', { name: 'Menu' }).hasAttribute('data-pw-sidebar-fold')).toBe(true)
+  })
+
+  it('foldOnPhone: false draws no fold', () => {
+    mount(SidebarBlock, 'sb', 'sidebar', { navLabel: 'Docs', items: DOCS, foldOnPhone: false })
+    expect(document.querySelector('[data-pw-sidebar-fold]')).toBeNull()
+    expect(document.querySelector('[data-pw-folded]')).toBeNull()
+    expect(document.querySelector('#sb style')?.textContent).not.toContain('767.98px')
   })
 })
 

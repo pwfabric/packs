@@ -23,7 +23,7 @@
       "A file or data hierarchy the visitor explores: that is a tree view, not navigation",
       "Hand-written links in a layout.container for the same tree: the sidebar marks the current page and opens its group"
     ],
-    "implementation": "A <nav> landmark (named by title or navLabel) over nested lists. `items` is the tree: each entry is {label, href?, children?, open?}: a link, a group (children), or a page that is also a group. A group without href is a toggle button carrying its label; a group with href is its link with a chevron toggle beside it, named in the app's words (ui.tree.expand / ui.tree.collapse). Toggles carry aria-expanded and aria-controls; a closed group's entries are hidden. `activeHref` is the page in view: its link carries aria-current=\"page\" (the same route matcher as navbar and app-rail) and every group above it opens. `open: true` starts a group open; `collapsible: false` shows every group open with no toggle (group labels become small headings). Each entry's href arrives in the router's form, as the host rewrites href members; in the editor a click reports the destination instead of leaving the page. Everything is reachable with Tab, Enter and Space."
+    "implementation": "A <nav> landmark (named by title or navLabel) over nested lists. `items` is the tree: each entry is {label, href?, children?, open?}: a link, a group (children), or a page that is also a group. A group without href is a toggle button carrying its label; a group with href is its link with a chevron toggle beside it, named in the app's words (ui.tree.expand / ui.tree.collapse). Toggles carry aria-expanded and aria-controls; a closed group's entries are hidden. `activeHref` is the page in view: its link carries aria-current=\"page\" (the same route matcher as navbar and app-rail) and every group above it opens. `open: true` starts a group open; `collapsible: false` shows every group open with no toggle (group labels become small headings). Each entry's href arrives in the router's form, as the host rewrites href members; in the editor a click reports the destination instead of leaving the page. Everything is reachable with Tab, Enter and Space. On a phone (below 768px) the tree folds behind one button with aria-expanded and aria-controls, named by the title or the app word ui.sidebar.menu (English \"Menu\" when unset); CSS decides, so the first frame is right at every width, and choosing a link folds it again. foldOnPhone: false always shows the tree."
   },
   "definition": {
     "props": [
@@ -129,11 +129,22 @@
         },
         "bindable": false,
         "default": true
+      },
+      {
+        "name": "foldOnPhone",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Below 768px the tree folds behind one button (named by the title, else the app word ui.sidebar.menu), so a long tree does not sit above every page. false always shows the tree."
+        },
+        "bindable": false,
+        "default": true
       }
     ],
     "defaultProps": {
       "items": [],
-      "collapsible": true
+      "collapsible": true,
+      "foldOnPhone": true
     },
     "canHaveChildren": false,
     "icon": "☰",
