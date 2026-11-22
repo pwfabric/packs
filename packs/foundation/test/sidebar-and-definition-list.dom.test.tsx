@@ -189,9 +189,31 @@ describe('definition list', () => {
     const css = document.querySelector('#dl style')?.textContent ?? ''
     expect(css).toContain('grid-template-columns: minmax(8rem, max-content) minmax(0, 1fr)')
     expect(css).toContain('@container (max-width: 420px)')
-    expect((document.getElementById('dl') as HTMLElement).style.containerType).toBe('inline-size')
-    const second = document.querySelectorAll('#dl dt')[1] as HTMLElement
-    expect(second.style.borderTop).toContain('1px solid')
+    expect((document.querySelector('#dl [data-pw-dl-box]') as HTMLElement).style.containerType).toBe('inline-size')
+    expect(css).toContain('[data-pw-dl][data-pw-dl-rules] > div + div > dt { border-top: 1px solid var(--pw-color-border); }')
+  })
+
+  it('below 420px columns stack with no rule between a term and its description', () => {
+    mount(DefinitionListBlock, 'dl', 'definition-list', { items, layout: 'columns', dividers: true })
+    // The rules and spacing are CSS, so the narrow query can take them back; nothing inline fights it.
+    const cells = [...document.querySelectorAll<HTMLElement>('#dl dt, #dl dd')]
+    expect(cells.every((c) => c.style.borderTop === '' && c.style.paddingTop === '')).toBe(true)
+    const css = document.querySelector('#dl style')?.textContent ?? ''
+    expect(css).toContain('[data-pw-dl="columns"][data-pw-dl-rules] > div + div > dt + dd { border-top: 1px solid var(--pw-color-border); }')
+    const narrow = css.slice(css.indexOf('@container (max-width: 420px)'))
+    expect(narrow).toContain('[data-pw-dl="columns"][data-pw-dl-rules] > div + div > dt + dd { border-top: 0; }')
+    expect(document.querySelector('#dl dl')?.hasAttribute('data-pw-dl-rules')).toBe(true)
+  })
+
+  it('the size container is an inner full-width box, so the block does not collapse in a parent that does not stretch it', () => {
+    mount(DefinitionListBlock, 'dl', 'definition-list', { items, layout: 'columns' })
+    const root = document.getElementById('dl') as HTMLElement
+    expect(root.style.containerType).toBe('')
+    expect(root.style.width).toBe('100%')
+    const box = root.querySelector('[data-pw-dl-box]') as HTMLElement
+    expect(box.style.containerType).toBe('inline-size')
+    expect(box.style.width).toBe('100%')
+    expect(box.querySelector('dl')).not.toBeNull()
   })
 
   it('draws nothing with no items', () => {
