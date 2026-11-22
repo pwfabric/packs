@@ -5,12 +5,14 @@
  */
 import { describe, it, expect, afterEach } from 'vitest'
 import * as React from 'react'
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen, cleanup, fireEvent } from '@testing-library/react'
 import { BehaviorSurfaceProvider } from '@pwfabric/runtime'
 import { ProseBlock, sanitizeHtml, headingSlug } from '../atoms/blocks/text/prose/component.js'
 import { TableBlock } from '../atoms/blocks/data/table/component.js'
 import { CopyButtonBlock } from '../atoms/blocks/control/copy-button/component.js'
 import { InputBlock } from '../atoms/blocks/form/input/component.js'
+import { CardBlock } from '../atoms/blocks/container/card/component.js'
+import { HeadingBlock } from '../atoms/blocks/text/heading/component.js'
 import { applied } from '../../../tools/test-support/applied-props.js'
 
 afterEach(() => cleanup())
@@ -109,5 +111,76 @@ describe('a visually hidden helper stays inside its own box', () => {
     const label = screen.getByText('Email')
     expect(label.style.position).toBe('absolute')
     expect(containingBox(label)?.getAttribute('data-block-id')).toBe('in')
+  })
+})
+
+describe('card href: the whole card is one link', () => {
+  const title = <h3 id="card-title">Seasonal menu</h3>
+
+  it('a cover link fills the card, named by its first heading, written by appHref', async () => {
+    mount(el(CardBlock, 'c', 'card', { href: '/menu' }, { appHref: hashHref }, <>{title}<p>Spring dishes</p></>))
+    const card = document.getElementById('c') as HTMLElement
+    expect(card.style.position).toBe('relative')
+    const links = card.querySelectorAll('a')
+    expect(links).toHaveLength(1)
+    const cover = links[0] as HTMLAnchorElement
+    expect(cover.getAttribute('href')).toBe('#/menu')
+    expect(cover.style.position).toBe('absolute')
+    expect(cover.style.inset).toMatch(/^0(px)?$/)
+    expect(screen.getByRole('link', { name: 'Seasonal menu' })).toBe(cover)
+  })
+
+  it('hrefLabel names it; a control inside is lifted above the cover', () => {
+    mount(el(CardBlock, 'c', 'card', { href: 'https://example.com', hrefLabel: 'Open the menu' }, {}, <button type="button">Save</button>))
+    expect(screen.getByRole('link', { name: 'Open the menu' }).getAttribute('href')).toBe('https://example.com')
+    expect(document.querySelector('#c style')?.textContent).toContain(':not([data-pw-card-cover]) { position: relative; z-index: 1; }')
+  })
+
+  it('no href (or a bare #, or an unsafe one) draws no link', () => {
+    for (const href of [undefined, '#', 'javascript:alert(1)']) {
+      mount(el(CardBlock, 'c', 'card', href === undefined ? {} : { href }, {}, title))
+      expect(document.querySelector('#c a')).toBeNull()
+      expect((document.getElementById('c') as HTMLElement).style.position).toBe('')
+      cleanup()
+    }
+  })
+
+  it('in the editor a click reports the destination and stays', () => {
+    const { events } = mount(el(CardBlock, 'c', 'card', { href: '/menu' }, { interactionMode: 'inert' }, title))
+    const cover = document.querySelector('#c a') as HTMLAnchorElement
+    const ev = new MouseEvent('click', { bubbles: true, cancelable: true })
+    cover.dispatchEvent(ev)
+    expect(ev.defaultPrevented).toBe(true)
+    expect(events).toContainEqual(expect.objectContaining({ type: 'block:click', blockId: 'c', payload: { href: '/menu' } }))
+  })
+})
+
+describe('heading href and lang', () => {
+  it('the heading holds a link to the page, written by appHref', () => {
+    mount(el(HeadingBlock, 'h', 'heading', { text: 'Launch notes', level: 'h2', href: '/blog/launch' }, { appHref: hashHref }))
+    const h = document.getElementById('h') as HTMLElement
+    expect(h.tagName).toBe('H2')
+    const a = h.querySelector('a') as HTMLAnchorElement
+    expect(a.getAttribute('href')).toBe('#/blog/launch')
+    expect(a.textContent).toBe('Launch notes')
+    expect(screen.getByRole('heading', { name: 'Launch notes' })).toBe(h)
+    // The link's look is not inside the heading.
+    expect(h.querySelector('style')).toBeNull()
+  })
+
+  it('an editor click reports the destination', () => {
+    const { events } = mount(el(HeadingBlock, 'h', 'heading', { text: 'Launch', href: '/blog' }, { interactionMode: 'inert' }))
+    fireEvent.click(screen.getByRole('link', { name: 'Launch' }))
+    expect(events).toContainEqual(expect.objectContaining({ type: 'block:click', payload: { href: '/blog' } }))
+  })
+
+  it('lang is set on the heading element so uppercase follows it', () => {
+    mount(el(HeadingBlock, 'h', 'heading', { text: 'Discover', uppercase: true, lang: 'en' }))
+    const h = document.getElementById('h') as HTMLElement
+    expect(h.getAttribute('lang')).toBe('en')
+    expect(h.style.textTransform).toBe('uppercase')
+    cleanup()
+    mount(el(HeadingBlock, 'h', 'heading', { text: 'Discover', lang: '<x>' }))
+    expect(document.getElementById('h')?.hasAttribute('lang')).toBe(false)
   })
 })

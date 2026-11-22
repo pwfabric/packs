@@ -165,6 +165,24 @@
           "description": "Move keyboard focus to this heading whenever this value changes after the first render — bind it to what the heading announces, e.g. {{state.step}} on a wizard's step heading, so a keyboard or screen-reader visitor lands on the new step's title. The first render never moves focus. Set, the heading is focusable by script (tabIndex -1), not a Tab stop."
         },
         "bindable": true
+      },
+      {
+        "name": "href",
+        "type": "string",
+        "description": "Puts a link inside the heading: an app path (\"/blog/launch\"), a URL or \"#anchor\". The heading text is the link.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "lang",
+        "type": "string",
+        "description": "The language of the heading's text (BCP 47, e.g. \"en\") when it differs from the page's, written as the element's lang so uppercase follows that language's case rules.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
       }
     ],
     "defaultProps": {
