@@ -1175,6 +1175,19 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
     )
   }
 
+  // NO DRAWER WITHOUT CONTENT. A bar with nothing to put in the drawer (no
+  // links, no search, social, info, second wordmark or CTA) draws no menu
+  // button: a phone visitor met a hamburger that opened an empty panel. The
+  // account control stays in the bar either way.
+  const hasDrawer =
+    links.length > 0 ||
+    Boolean(secondaryLogoText) ||
+    showSearch ||
+    socialLinks.length > 0 ||
+    rightInfo.length > 0 ||
+    hasSecondaryCta ||
+    showCTA
+
   /** The narrow form's drawer, open: every destination and tool of the wide bar, stacked. */
   const renderDrawer = (): React.ReactElement => (
     <div
@@ -1327,6 +1340,7 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
       <div data-pw-nav-narrow="" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         {hasAvatar && renderAvatar(32)}
         {renderAccount(true)}
+        {hasDrawer && (
         <button
           type="button"
           ref={menuButtonRef}
@@ -1349,10 +1363,12 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
         >
           {mobileOpen ? '✕' : '☰'}
         </button>
+        )}
       </div>
       {/* The <nav> landmark stays on the page with the drawer closed: a
           screen-reader visitor finds the navigation, and the menu button
           that controls it, by landmark. */}
+      {hasDrawer && (
       <nav
         data-pw-nav-narrow=""
         id={drawerId}
@@ -1361,6 +1377,7 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
       >
         {mobileOpen && renderDrawer()}
       </nav>
+      )}
     </header>
   )
 }

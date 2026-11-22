@@ -69,3 +69,30 @@ describe('navbar: link elements keep their identity', () => {
     host.remove()
   })
 })
+
+describe('navbar: no drawer to open, no menu button', () => {
+  function only(p: Record<string, unknown>): void {
+    const Comp = NavbarBlock as unknown as React.FC<Record<string, unknown>>
+    render(
+      <BehaviorSurfaceProvider surfaceId="t" onEvent={() => {}}>
+        <Comp props={applied('navbar', p)} block={{ id: 'nav', type: 'navbar', props: p, layout: {} }} context={{ interactionMode: 'live' }} />
+      </BehaviorSurfaceProvider>,
+    )
+  }
+
+  it('a bar with no links and nothing else for the drawer draws neither the button nor the drawer; the account stays', () => {
+    only({ logoText: 'Studio', account: { state: 'signed-in', name: 'Ada' } })
+    expect(document.querySelector('button[aria-controls="nav-menu"]')).toBeNull()
+    expect(document.getElementById('nav-menu')).toBeNull()
+    const narrow = document.querySelector('[data-pw-nav-narrow]') as HTMLElement
+    expect(narrow.querySelector('button[aria-haspopup]')).not.toBeNull()
+  })
+
+  it('links, or a tool the drawer carries (search, a CTA), bring the button back', () => {
+    for (const p of [{ links: [{ label: 'Work', href: '/work' }] }, { showSearch: true, searchPlaceholder: 'Search' }, { showCTA: true, ctaLabel: 'Book', ctaHref: '/book' }]) {
+      only({ logoText: 'Studio', ...p })
+      expect(document.querySelector('button[aria-controls="nav-menu"]')).not.toBeNull()
+      cleanup()
+    }
+  })
+})
