@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { HIT_AREA_CSS, ICON_PATHS, inkOn, listOf, safeHref } from '../../../lib/_shared-utils.js'
+import { HIT_AREA_CSS, ICON_PATHS, inkOn, listOf, safeHref, textOf } from '../../../lib/_shared-utils.js'
 import { useAppMessage } from '@pwfabric/runtime'
 
 /** Stacked-card layout for a narrow table (see the render). */
@@ -850,13 +850,13 @@ export const TableBlock: BlockComponent = ({ props, block, context }) => {
                       textAlign: 'inherit',
                     }}
                   >
-                    {col.header}
+                    {textOf(col.header)}
                     <span aria-hidden="true" style={{ marginLeft: 6, opacity: sort?.key === col.key ? 1 : 0.3, fontSize: 'var(--pw-font-size-xs)' }}>
                       {sort?.key === col.key ? (sort.dir === 'asc' ? '▲' : '▼') : '↕'}
                     </span>
                   </button>
                 ) : (
-                  col.header
+                  textOf(col.header)
                 )}
               </th>
             ))}
@@ -909,7 +909,7 @@ export const TableBlock: BlockComponent = ({ props, block, context }) => {
                   {(columns.length > 0 ? columns : [{ key: '__loading', header: '', align: undefined } as unknown as (typeof columns)[number]]).map((col, colIndex) => (
                     // data-label: on a phone a skeleton row is a card of the
                     // same shape as a loaded one.
-                    <td key={col.key} style={cellStyle(col.align)} data-label={col.header}>
+                    <td key={col.key} style={cellStyle(col.align)} data-label={textOf(col.header)}>
                       {i === 0 && colIndex === 0 && (
                         <style>
                           {'@keyframes pw-skeleton-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}'}
@@ -977,7 +977,7 @@ export const TableBlock: BlockComponent = ({ props, block, context }) => {
                   </td>
                 )}
                 {columns.map((col: TableColumnData) => (
-                  <td key={col.key} style={cellStyle(col.align)} data-label={col.header}>
+                  <td key={col.key} style={cellStyle(col.align)} data-label={textOf(col.header)}>
                     {renderCell(col, row, rowIndex)}
                   </td>
                 ))}

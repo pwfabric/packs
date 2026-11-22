@@ -163,9 +163,10 @@
             "required": [
               "key"
             ]
-          }
+          },
+          "description": "Bindable: a header may be an expression, e.g. \"{{t('table.patient')}}\", so column labels follow the app's language."
         },
-        "bindable": false,
+        "bindable": true,
         "default": []
       },
       {
