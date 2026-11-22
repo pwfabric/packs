@@ -109,8 +109,10 @@ const SIDEBAR_FOLD_CSS =
   '@media (max-width: 767.98px) { [data-pw-sidebar-tree][data-pw-folded] { display: none !important; } [data-pw-sidebar-fold] ~ [data-pw-sidebar-title] { display: none !important; } }' +
   '@media (min-width: 768px) { [data-pw-sidebar-fold] { display: none !important; } }'
 
-/** A phone or touch row is a 44px target. */
+/** A phone or touch row is a 44px target. A closed group's list is not drawn. */
 const SIDEBAR_CSS =
+  '[data-pw-sidebar-tree] ul { display: flex; flex-direction: column; gap: 2px; }' +
+  '[data-pw-sidebar-tree] ul[hidden] { display: none !important; }' +
   '@media (max-width: 640px), (pointer: coarse) { [data-pw-sidebar-row] { min-height: 44px; } }' +
   '[data-pw-sidebar-link]:hover { background: color-mix(in srgb, var(--pw-color-text, #09090b) 6%, transparent); }' +
   '[data-pw-sidebar-link]:focus-visible, [data-pw-sidebar-toggle]:focus-visible { outline: var(--pw-focus-ring-width, 2px) solid var(--pw-focus-ring-color, var(--pw-color-primary, #18181b)); outline-offset: -2px; }'
@@ -224,7 +226,9 @@ export const SidebarBlock: BlockComponent = ({ props, block, context }) => {
   }
 
   const renderList = (list: readonly SidebarItem[], depth: number, prefix: string, id?: string, hidden?: boolean): React.ReactElement => (
-    <ul id={id} hidden={hidden} style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
+    // No display on the list itself: an inline display overrides `hidden`, and
+    // every closed group showed open. The stack is drawn by SIDEBAR_CSS.
+    <ul id={id} hidden={hidden} style={{ listStyle: 'none', margin: 0, padding: 0 }}>
       {list.map((item, i) => {
         const key = `${prefix}${i}`
         const label = safeRenderValue(item.label)

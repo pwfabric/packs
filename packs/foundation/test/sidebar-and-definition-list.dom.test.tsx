@@ -5,6 +5,7 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import * as React from 'react'
 import { render, screen, cleanup, fireEvent, within } from '@testing-library/react'
+import { renderToString } from 'react-dom/server'
 import { BehaviorSurfaceProvider } from '@pwfabric/runtime'
 import { SidebarBlock, sidebarTrail } from '../atoms/blocks/layout/sidebar/component.js'
 import { DefinitionListBlock } from '../atoms/blocks/data/definition-list/component.js'
@@ -99,6 +100,35 @@ describe('sidebar', () => {
     expect(screen.queryByRole('button', { name: 'Odd' })).toBeNull()
     fireEvent.click(screen.getByRole('link', { name: 'Home' }))
     expect(events).toContainEqual(expect.objectContaining({ type: 'block:click', blockId: 'sb', payload: { href: '/' } }))
+  })
+})
+
+describe('sidebar: a closed group is not drawn', () => {
+  it('its list is hidden and carries no inline display that would undo hidden', () => {
+    mount(SidebarBlock, 'sb', 'sidebar', { navLabel: 'Docs', items: DOCS })
+    const guides = screen.getByRole('button', { name: 'Guides' })
+    const list = document.getElementById(guides.getAttribute('aria-controls') ?? '') as HTMLElement
+    expect(list.hidden).toBe(true)
+    expect(list.style.display).toBe('')
+    expect(getComputedStyle(list).display).toBe('none')
+    expect(screen.queryByRole('link', { name: 'Install' })).toBeNull()
+    fireEvent.click(guides)
+    expect(getComputedStyle(list).display).not.toBe('none')
+    expect(screen.getByRole('link', { name: 'Install' })).toBeTruthy()
+  })
+
+  it('in the static first frame too: every closed list is hidden, none sets display inline', () => {
+    const Comp = SidebarBlock as unknown as React.FC<Record<string, unknown>>
+    const html = renderToString(
+      <BehaviorSurfaceProvider surfaceId="t" onEvent={() => {}}>
+        <Comp props={applied('sidebar', { navLabel: 'Docs', items: DOCS })} block={{ id: 'sb', type: 'sidebar', props: {}, layout: {} }} context={{ interactionMode: 'live' }} />
+      </BehaviorSurfaceProvider>,
+    )
+    const lists = [...html.matchAll(/<ul[^>]*>/g)].map((m) => m[0])
+    const closed = lists.filter((u) => /\shidden=""/.test(u))
+    expect(closed.length).toBe(3)
+    expect(closed.every((u) => !/display/.test(u))).toBe(true)
+    expect(html).toContain('[data-pw-sidebar-tree] ul[hidden] { display: none !important; }')
   })
 })
 
