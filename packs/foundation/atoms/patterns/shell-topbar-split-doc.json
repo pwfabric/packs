@@ -58,10 +58,14 @@
       {
         "id": "{{ID}}-nav",
         "type": "navbar",
+        "style": {
+          "position": "sticky",
+          "top": "0",
+          "zIndex": "var(--pw-z-sticky, var(--pw-z-nav))"
+        },
         "props": {
           "logoText": "{{HEADER}}",
           "links": "{{NAV_LINKS}}",
-          "sticky": true,
           "activeHref": "{{ACTIVE}}"
         },
         "layout": {

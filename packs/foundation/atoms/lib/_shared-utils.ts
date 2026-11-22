@@ -863,3 +863,14 @@ export function localeUses24h(locale: string | undefined): boolean {
     return false
   }
 }
+
+/**
+ * A `lang` prop as an element's `lang` attribute: a well-formed BCP 47 tag
+ * (`en`, `tr`, `pt-BR`, `zh-Hant`) or nothing. The browser picks case rules
+ * by it, so an English word on a Turkish page uppercases as English.
+ */
+export function langOf(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined
+  const tag = value.trim()
+  return /^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$/.test(tag) ? tag : undefined
+}

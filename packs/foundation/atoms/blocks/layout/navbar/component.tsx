@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { HIT_AREA_CSS, ICON_PATHS, safeHref, listOf, textOf } from '../../../lib/_shared-utils.js'
+import { HIT_AREA_CSS, ICON_PATHS, langOf, safeHref, listOf, textOf } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 import { useAppMessage } from '@pwfabric/runtime'
@@ -21,6 +21,23 @@ import {
 /** On a phone or touch screen the brand link is a REAL 44px-tall box (it was 24–33px). */
 const NAV_BRAND_TOUCH_CSS = '@media (max-width: 640px), (pointer: coarse) { [data-pw-nav-brand] { min-height: 44px; } }'
 
+/**
+ * ONE PAINTED FRAME IS RIGHT AT EVERY WIDTH.
+ *
+ * The bar draws both of its forms — the wide row (links, utility cluster) and
+ * the narrow one (menu button, drawer) — and CSS shows the one that fits. It
+ * used to branch on `context.viewport`, which a static first frame cannot know:
+ * the page painted the phone bar on a desktop (or the reverse) until scripts
+ * ran. The breakpoints are the engine's: below `md` (768px) the bar is narrow;
+ * from `lg` (1024px) the account trigger shows the visitor's name. A form that
+ * is not shown is `display: none`, so it is out of the accessibility tree too.
+ */
+const NAV_FORM_CSS =
+  '@media (max-width: 767.98px) { [data-pw-navbar] { flex-wrap: wrap; } [data-pw-nav-wide] { display: none !important; } }' +
+  '@media (min-width: 768px) { [data-pw-nav-narrow] { display: none !important; } }' +
+  '@media (max-width: 1023.98px) { [data-pw-nav-account-name] { display: none !important; } }' +
+  '@media (min-width: 1024px) { [data-pw-nav-account-named] { padding: 2px 10px 2px 2px !important; } }'
+
 export interface NavbarProps {
   readonly logoText: string
   readonly logoSrc?: string
@@ -33,7 +50,13 @@ export interface NavbarProps {
   readonly links: readonly NavLink[]
   /** href of the page being viewed — its link carries aria-current="page" (same route matcher as app-rail). */
   readonly activeHref?: string
-  readonly sticky: boolean
+  /**
+   * The language of the bar's words (BCP 47, e.g. `en`), written as the
+   * element's `lang`. Set it when the bar's language differs from the page's,
+   * so case rules follow it: an English word on a Turkish page uppercases
+   * with a dotted I otherwise.
+   */
+  readonly lang?: string
   readonly alignment: 'left' | 'center' | 'right'
   readonly showCTA: boolean
   readonly ctaLabel: string
@@ -76,7 +99,6 @@ export const navbarDefinition: BlockDefinition = {
   defaultProps: {
     logoText: '',
     links: [],
-    sticky: false,
     alignment: 'right',
     showCTA: false,
     ctaLabel: '',
@@ -170,7 +192,7 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
   const isActiveLink = (link: NavLinkData): boolean =>
     sameRoute(link.href, activeHref) ||
     (Array.isArray(link.items) && link.items.some((sub) => sameRoute(sub.href, activeHref)))
-  const sticky = p.sticky
+  const lang = langOf(props.lang)
   const alignment = p.alignment
   const ctaLabel = textOf(p.ctaLabel).trim()
   // showCTA with no label draws nothing — never a button reading "Get Started".
@@ -282,7 +304,8 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
     }
   }
 
-  const renderSearch = (): React.ReactElement => (
+  /** The search box; `idSuffix` keeps the drawer's copy's id apart from the bar's. */
+  const renderSearch = (idSuffix: string): React.ReactElement => (
     <form
       role="search"
       onSubmit={submitSearch}
@@ -322,7 +345,7 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
       <input
         type="search"
         name="q"
-        id={`${block.id}-search`}
+        id={`${block.id}-search${idSuffix}`}
         placeholder={searchPlaceholder}
         aria-label={searchPlaceholder}
         // In inert (editor/preview) mode the search box is non-interactive so a
@@ -427,8 +450,6 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
     </span>
   )
 
-  const viewport = context?.viewport ?? 'lg'
-  const isMobile = viewport === 'xs' || viewport === 'sm'
   const [mobileOpen, setMobileOpen] = React.useState(false)
   const menuButtonRef = React.useRef<HTMLButtonElement | null>(null)
   const navRef = React.useRef<HTMLElement | null>(null)
@@ -448,6 +469,19 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
   // A sticky bar covers the top of the page, so an in-page anchor landed UNDER
   // it. The bar publishes its own height as
   // `--pw-sticky-top-offset` and the page scrolls anchors that far short.
+  //
+  // WHETHER THE BAR STICKS IS ITS BLOCK STYLE. `style: {position: 'sticky',
+  // top: 0, zIndex}` is hoisted by the engine to the block's wrapper — the
+  // element that can stick, since the wrapper is exactly as tall as the bar —
+  // so the bar reads the position the page actually gave it (its own root, or
+  // the wrapper around it) rather than a prop of its own.
+  const [sticky, setSticky] = React.useState(false)
+  React.useEffect(() => {
+    const el = navRef.current
+    if (!el || typeof getComputedStyle === 'undefined') return
+    const holders = [el, el.parentElement].filter((n): n is HTMLElement => n instanceof HTMLElement)
+    setSticky(holders.some((n) => { const pos = getComputedStyle(n).position; return pos === 'sticky' || pos === 'fixed' }))
+  })
   React.useEffect(() => {
     if (!sticky || typeof document === 'undefined' || typeof ResizeObserver === 'undefined') return
     const el = navRef.current
@@ -465,7 +499,7 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
   }, [sticky])
   const stickyOffsetCss = (
     <style>
-      {(sticky ? 'html{scroll-padding-top:var(--pw-sticky-top-offset,64px)}' : '') + HIT_AREA_CSS + NAV_BRAND_TOUCH_CSS}
+      {(sticky ? 'html{scroll-padding-top:var(--pw-sticky-top-offset,64px)}' : '') + HIT_AREA_CSS + NAV_BRAND_TOUCH_CSS + NAV_FORM_CSS}
     </style>
   )
   /** A drawer link closes the drawer on the way out. */
@@ -495,7 +529,9 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
         {logoSrc && (
           // Above the fold on every page: loaded eagerly, and its 28px height
           // is reserved (the width follows the picture) so nothing shifts.
-          <img src={logoSrc} alt={logoText} height={28} loading="eager" decoding="async" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} />
+          // Its alt is empty: the brand's name is the text beside it, and an
+          // alt repeating it made a screen reader say the name twice.
+          <img src={logoSrc} alt="" height={28} loading="eager" decoding="async" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} />
         )}
         {logoText}
       </>
@@ -537,9 +573,7 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
     padding: '12px 24px',
     backgroundColor,
     borderBottom: '1px solid var(--pw-color-border)',
-    position: sticky ? 'sticky' : 'relative',
-    top: sticky ? 0 : undefined,
-    zIndex: sticky ? 'var(--pw-z-sticky, var(--pw-z-nav))' : undefined,
+    position: 'relative',
   }
 
   const logoStyle: React.CSSProperties = {
@@ -1034,7 +1068,9 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
    */
   const renderAccount = (compact: boolean): React.ReactNode => {
     if (!account) return null
-    const showName = !compact && (viewport === 'lg' || viewport === 'xl' || viewport === '2xl')
+    // The name beside the avatar is the wide bar's, from `lg` up — CSS decides
+    // (NAV_FORM_CSS), so the first painted frame already has it right.
+    const named = !compact
     return (
       <AccountControl
         account={account}
@@ -1048,11 +1084,12 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
             <button
               ref={ref}
               {...trigger}
+              data-pw-nav-account-named={named ? '' : undefined}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: showName ? '2px 10px 2px 2px' : '2px',
+                padding: '2px',
                 border: 'none',
                 borderRadius: '999px',
                 background: state.open ? 'color-mix(in srgb, currentColor 12%, transparent)' : 'transparent',
@@ -1065,8 +1102,8 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
               }}
             >
               <AccountAvatar account={state.account} size={compact ? 32 : 36} />
-              {showName && (
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {named && (
+                <span data-pw-nav-account-name="" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {state.label}
                 </span>
               )}
@@ -1081,182 +1118,134 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
     )
   }
 
-  if (isMobile) {
-    return (
-      // THE BAR IS THE PAGE'S BANNER; THE LINKS ARE ITS <nav>. The root was a
-      // <nav>, so a shell had a nav landmark but no header — the brand, the
-      // account and the search sat in "navigation".
-      <header
-        ref={navRef as React.Ref<HTMLElement>}
-        id={block.id}
-        data-block-id={block.id}
-        style={{ ...navStyle, flexWrap: 'wrap', gap: '0', ...block.style }}
-        data-block-type="navbar"
-      >
-        {stickyOffsetCss}
+  /** The narrow form's drawer, open: every destination and tool of the wide bar, stacked. */
+  const renderDrawer = (): React.ReactElement => (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        paddingTop: '12px',
+        // 44px rows: the links themselves carry the height, so the
+        // gap between them stays small.
+        gap: '4px',
+        borderTop: '1px solid var(--pw-color-border)',
+        marginTop: '12px',
+      }}
+    >
+      {links.map((link, i) => {
+        const subItems = Array.isArray(link.items) ? link.items : []
+        const megaColumns = Array.isArray(link.megaColumns) ? link.megaColumns : []
+        // A mega-menu flattens to the union of its column items (+ the
+        // feature tile) on touch — no hover surface, so everything is
+        // expanded inline beneath the parent label.
+        const megaItems: NavSubLinkData[] = megaColumns.flatMap((col) =>
+          (Array.isArray(col.items) ? col.items : []).map((mi) => ({
+            label: mi.label,
+            href: mi.href ?? '#',
+          })),
+        )
+        if (link.feature) {
+          megaItems.push({ label: link.feature.title, href: link.feature.href ?? '#' })
+        }
+        // In the drawer a dropdown is expanded inline: the parent label sits
+        // above its indented sub-links (no hover surface on touch). A flat
+        // link is just a single anchor.
+        const childLinks = subItems.length > 0 ? subItems : megaItems
+        return (
+          <React.Fragment key={i}>
+            <a
+              href={safeHref(link.href)}
+              onClick={handleDrawerClick(link.href)}
+              aria-current={sameRoute(link.href, activeHref) ? 'page' : undefined}
+              style={drawerLinkStyle(sameRoute(link.href, activeHref), childLinks.length > 0, false)}
+            >
+              {link.label}
+            </a>
+            {childLinks.map((sub, j) => (
+              <a
+                key={j}
+                href={safeHref(sub.href)}
+                onClick={handleDrawerClick(sub.href)}
+                aria-current={sameRoute(sub.href, activeHref) ? 'page' : undefined}
+                style={drawerLinkStyle(sameRoute(sub.href, activeHref), false, true)}
+              >
+                {sub.label}
+              </a>
+            ))}
+          </React.Fragment>
+        )
+      })}
+      {/* The drawer carries what the wide bar carries: the second wordmark,
+          the search box and the social icons, so a phone visitor reaches
+          them too. */}
+      {secondaryLogoText && renderSecondaryLogo()}
+      {showSearch && renderSearch('-menu')}
+      {socialLinks.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px' }}>
+          {socialLinks.map((item, i) => renderSocial(item, i))}
+        </div>
+      )}
+      {rightInfo.length > 0 && (
         <div
           style={{
             display: 'flex',
+            flexWrap: 'wrap',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            width: '100%',
+            gap: '14px',
+            paddingTop: '4px',
           }}
         >
-          {renderBrand()}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {hasAvatar && renderAvatar(32)}
-            {renderAccount(true)}
-            <button
-              type="button"
-              ref={menuButtonRef}
-              onClick={() => setMobileOpen((o) => !o)}
-              style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: 'var(--pw-font-size-xl)',
-                padding: '4px 8px',
-                // The bar's own ink — the UA default was black on a dark bar.
-                color: 'inherit',
-                fontFamily: 'inherit',
-                minWidth: '44px',
-                minHeight: '44px',
-              }}
-              aria-label={mobileOpen ? closeMenuWord : openMenuWord}
-              aria-expanded={mobileOpen}
-              aria-controls={drawerId}
-            >
-              {mobileOpen ? '✕' : '☰'}
-            </button>
-          </div>
+          {rightInfo.map((item, i) => renderInfoSlot(item, i))}
         </div>
-        {/* The <nav> landmark stays on the page with the drawer closed: a
-            screen-reader visitor finds the navigation, and the menu button
-            that controls it, by landmark. */}
-        <nav id={drawerId} aria-label={drawerLabel} style={mobileOpen ? undefined : { display: 'contents' }}>
-        {mobileOpen && (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
-              paddingTop: '12px',
-              // 44px rows: the links themselves carry the height, so the
-              // gap between them stays small.
-              gap: '4px',
-              borderTop: '1px solid var(--pw-color-border)',
-              marginTop: '12px',
-            }}
-          >
-            {links.map((link, i) => {
-              const subItems = Array.isArray(link.items) ? link.items : []
-              const megaColumns = Array.isArray(link.megaColumns) ? link.megaColumns : []
-              // A mega-menu flattens to the union of its column items (+ the
-              // feature tile) on touch — no hover surface, so everything is
-              // expanded inline beneath the parent label.
-              const megaItems: NavSubLinkData[] = megaColumns.flatMap((col) =>
-                (Array.isArray(col.items) ? col.items : []).map((mi) => ({
-                  label: mi.label,
-                  href: mi.href ?? '#',
-                })),
-              )
-              if (link.feature) {
-                megaItems.push({ label: link.feature.title, href: link.feature.href ?? '#' })
-              }
-              // In the mobile drawer a dropdown is expanded inline: the parent
-              // label sits above its indented sub-links (no hover surface on
-              // touch). A flat link is just a single anchor.
-              const childLinks = subItems.length > 0 ? subItems : megaItems
-              return (
-                <React.Fragment key={i}>
-                  <a
-                    href={safeHref(link.href)}
-                    onClick={handleDrawerClick(link.href)}
-                    aria-current={sameRoute(link.href, activeHref) ? 'page' : undefined}
-                    style={drawerLinkStyle(sameRoute(link.href, activeHref), childLinks.length > 0, false)}
-                  >
-                    {link.label}
-                  </a>
-                  {childLinks.map((sub, j) => (
-                    <a
-                      key={j}
-                      href={safeHref(sub.href)}
-                      onClick={handleDrawerClick(sub.href)}
-                      aria-current={sameRoute(sub.href, activeHref) ? 'page' : undefined}
-                      style={drawerLinkStyle(sameRoute(sub.href, activeHref), false, true)}
-                    >
-                      {sub.label}
-                    </a>
-                  ))}
-                </React.Fragment>
-              )
-            })}
-            {/* The drawer carries what the desktop bar carries: the
-                second wordmark, the search box and the social icons were
-                desktop-only, so a phone visitor could not reach them at all. */}
-            {secondaryLogoText && renderSecondaryLogo()}
-            {showSearch && renderSearch()}
-            {socialLinks.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px' }}>
-                {socialLinks.map((item, i) => renderSocial(item, i))}
-              </div>
-            )}
-            {rightInfo.length > 0 && (
-              <div
-                style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  alignItems: 'center',
-                  gap: '14px',
-                  paddingTop: '4px',
-                }}
-              >
-                {rightInfo.map((item, i) => renderInfoSlot(item, i))}
-              </div>
-            )}
-            {hasSecondaryCta && <GhostCta block={{ textAlign: 'center' }} />}
-            {showCTA && (
-              <a
-                href={safeHref(ctaHref)}
-                onClick={handleDrawerClick(ctaHref)}
-                style={{ ...ctaStyle, textAlign: 'center' }}
-              >
-                {ctaLabel}
-              </a>
-            )}
-          </div>
-        )}
-        </nav>
-      </header>
-    )
-  }
+      )}
+      {hasSecondaryCta && <GhostCta block={{ textAlign: 'center' }} />}
+      {showCTA && (
+        <a
+          href={safeHref(ctaHref)}
+          onClick={handleDrawerClick(ctaHref)}
+          style={{ ...ctaStyle, textAlign: 'center' }}
+        >
+          {ctaLabel}
+        </a>
+      )}
+    </div>
+  )
 
   return (
+    // THE BAR IS THE PAGE'S BANNER; THE LINKS ARE ITS <nav>. The root was a
+    // <nav>, so a shell had a nav landmark but no header — the brand, the
+    // account and the search sat in "navigation".
+    //
+    // Both forms are in the markup; NAV_FORM_CSS shows the wide one from
+    // 768px and the narrow one below it.
     <header
       ref={navRef as React.Ref<HTMLElement>}
       id={block.id}
       data-block-id={block.id}
+      data-pw-navbar=""
+      lang={lang}
       style={{ ...navStyle, ...block.style }}
       data-block-type="navbar"
     >
       {stickyOffsetCss}
       {renderBrand()}
       {links.length > 0 && (
-        <nav aria-label={drawerLabel} style={linksStyle}>
+        <nav data-pw-nav-wide="" aria-label={drawerLabel} style={linksStyle}>
           {links.map((link, i) => (
             <NavLinkItem key={i} link={link} />
           ))}
         </nav>
       )}
       {hasUtility && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: '0 0 auto' }}>
+        <div data-pw-nav-wide="" style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: '0 0 auto' }}>
           {secondaryLogoText && renderSecondaryLogo()}
           {rightInfo.length > 0 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: '0 0 auto' }}>
               {rightInfo.map((item, i) => renderInfoSlot(item, i))}
             </div>
           )}
-          {showSearch && renderSearch()}
+          {showSearch && renderSearch('')}
           {socialLinks.length > 0 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flex: '0 0 auto' }}>
               {socialLinks.map((item, i) => renderSocial(item, i))}
@@ -1272,6 +1261,43 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
           {renderAccount(false)}
         </div>
       )}
+      <div data-pw-nav-narrow="" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {hasAvatar && renderAvatar(32)}
+        {renderAccount(true)}
+        <button
+          type="button"
+          ref={menuButtonRef}
+          onClick={() => setMobileOpen((o) => !o)}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: 'var(--pw-font-size-xl)',
+            padding: '4px 8px',
+            // The bar's own ink — the UA default was black on a dark bar.
+            color: 'inherit',
+            fontFamily: 'inherit',
+            minWidth: '44px',
+            minHeight: '44px',
+          }}
+          aria-label={mobileOpen ? closeMenuWord : openMenuWord}
+          aria-expanded={mobileOpen}
+          aria-controls={drawerId}
+        >
+          {mobileOpen ? '✕' : '☰'}
+        </button>
+      </div>
+      {/* The <nav> landmark stays on the page with the drawer closed: a
+          screen-reader visitor finds the navigation, and the menu button
+          that controls it, by landmark. */}
+      <nav
+        data-pw-nav-narrow=""
+        id={drawerId}
+        aria-label={drawerLabel}
+        style={mobileOpen ? { width: '100%' } : { display: 'contents' }}
+      >
+        {mobileOpen && renderDrawer()}
+      </nav>
     </header>
   )
 }

@@ -122,7 +122,8 @@ describe('navbar: the menu button and the bar landmark are named in the app’s 
         messages: { 'ui.account.menu': 'Konto von {name}' },
       })
     )
-    expect(screen.getByRole('button', { name: 'Konto von Ada' })).toBeTruthy()
+    // One trigger per form of the bar (wide and narrow); CSS shows one.
+    expect(screen.getAllByRole('button', { name: 'Konto von Ada' }).length).toBeGreaterThan(0)
   })
 })
 
