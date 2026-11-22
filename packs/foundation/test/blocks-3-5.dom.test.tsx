@@ -8,6 +8,9 @@ import * as React from 'react'
 import { render, screen, cleanup } from '@testing-library/react'
 import { BehaviorSurfaceProvider } from '@pwfabric/runtime'
 import { ProseBlock, sanitizeHtml, headingSlug } from '../atoms/blocks/text/prose/component.js'
+import { TableBlock } from '../atoms/blocks/data/table/component.js'
+import { CopyButtonBlock } from '../atoms/blocks/control/copy-button/component.js'
+import { InputBlock } from '../atoms/blocks/form/input/component.js'
 import { applied } from '../../../tools/test-support/applied-props.js'
 
 afterEach(() => cleanup())
@@ -65,5 +68,46 @@ describe('prose: headings carry anchor ids', () => {
     expect(sanitizeHtml(`<h2 id="${'a'.repeat(101)}">x</h2>`)).toBe('<h2>x</h2>')
     // Only headings: an id elsewhere is still dropped.
     expect(sanitizeHtml('<p id="x">y</p>')).toBe('<p>y</p>')
+  })
+})
+
+/** The nearest ancestor an absolutely positioned element is placed against (inline styles). */
+function containingBox(node: HTMLElement): HTMLElement | null {
+  for (let p = node.parentElement; p; p = p.parentElement) {
+    if (p.style.position && p.style.position !== 'static') return p
+  }
+  return null
+}
+
+describe('a visually hidden helper stays inside its own box', () => {
+  it('table: the loading caption and the new-tab word are placed against the scroller', () => {
+    mount(el(TableBlock, 't', 'table', { columns: [{ key: 'a', header: 'A' }], data: [], loadingWhen: true, loadingText: 'Loading rows' }))
+    const caption = screen.getByText('Loading rows')
+    expect(caption.style.position).toBe('absolute')
+    const box = containingBox(caption)
+    expect(box?.style.overflowX).toBe('auto')
+    cleanup()
+    mount(
+      el(TableBlock, 't2', 'table', {
+        columns: [{ key: 'url', header: 'Link', type: 'link', newTab: true }],
+        data: [{ url: 'https://example.com' }],
+      }),
+    )
+    const hidden = [...document.querySelectorAll<HTMLElement>('#t2 span')].find((s) => s.style.position === 'absolute')
+    expect(hidden).toBeTruthy()
+    expect(document.getElementById('t2')?.contains(containingBox(hidden!))).toBe(true)
+  })
+
+  it('copy-button: the announced outcome is placed against the button', () => {
+    mount(el(CopyButtonBlock, 'cb', 'copy-button', { value: 'x', label: 'Copy' }))
+    const status = screen.getByRole('status')
+    expect(containingBox(status)?.id).toBe('cb')
+  })
+
+  it('input: a hidden label is placed against the field', () => {
+    mount(el(InputBlock, 'in', 'input', { label: 'Email', hideLabel: true }))
+    const label = screen.getByText('Email')
+    expect(label.style.position).toBe('absolute')
+    expect(containingBox(label)?.getAttribute('data-block-id')).toBe('in')
   })
 })

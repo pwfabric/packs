@@ -367,6 +367,8 @@ export const InputBlock: BlockComponent = ({ props, block }) => {
     <div
       data-block-id={block.id}
       style={{
+        // A hidden label is absolutely positioned: it stays inside the field's box.
+        position: 'relative',
         opacity: disabled ? 0.5 : undefined,
         cursor: disabled ? 'not-allowed' : undefined,
         ...(wholeHidden ? { display: 'none' } : {}),

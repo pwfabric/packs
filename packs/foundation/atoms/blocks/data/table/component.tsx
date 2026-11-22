@@ -786,7 +786,10 @@ export const TableBlock: BlockComponent = ({ props, block, context }) => {
           width (a narrow aside stacks too), not the viewport. Inline cell
           styles are overridden with !important on purpose. */}
       <style>{TABLE_STACK_CSS + HIT_AREA_CSS}</style>
-      <div style={{ overflowX: 'auto', width: '100%', minWidth: 0, maxWidth: '100%', containerType: 'inline-size' }}>
+      {/* position: relative — the visually hidden caption and link helpers are
+          absolutely positioned; without a positioned box here they were placed
+          against the page, outside the scroller, and widened it sideways. */}
+      <div style={{ position: 'relative', overflowX: 'auto', width: '100%', minWidth: 0, maxWidth: '100%', containerType: 'inline-size' }}>
       <table
         style={tableStyle}
         {...(phoneRows ? { 'data-pw-table-rows': '' } : { 'data-pw-table': '' })}
