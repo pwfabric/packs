@@ -3,7 +3,7 @@ import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
-import { CONTROL_BORDER, textOf } from '../../../lib/_shared-utils.js'
+import { CONTROL_BORDER, CONTROL_HEIGHT, textOf } from '../../../lib/_shared-utils.js'
 
 /** The one-line field is a real 44px-tall box at phone width or on a coarse pointer (R3). */
 const INPUT_TOUCH_CSS =
@@ -229,7 +229,8 @@ export const InputBlock: BlockComponent = ({ props, block }) => {
   const inputStyle: React.CSSProperties = {
     width: '100%',
     boxSizing: 'border-box',
-    padding: '10px 12px',
+    // A one-line field is the shared control height; a textarea grows with its rows.
+    ...(isTextarea ? { padding: '10px 12px' } : { height: CONTROL_HEIGHT, padding: '0 12px' }),
     // Reserve horizontal room for any affix icon so the text/placeholder does
     // not slide under the glyph.
     ...(hasLeading ? { paddingLeft: `${ICON_GUTTER}px` } : {}),

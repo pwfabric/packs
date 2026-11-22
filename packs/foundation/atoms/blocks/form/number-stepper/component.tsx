@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { safeRenderValue, ICON_PATHS } from '../../../lib/_shared-utils.js'
+import { CONTROL_HEIGHT, safeRenderValue, ICON_PATHS } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 import { messageOf, useAppMessages } from '@pwfabric/runtime'
@@ -136,7 +136,7 @@ export const NumberStepperBlock: BlockComponent = ({ props, block }) => {
     alignItems: 'center',
     justifyContent: 'center',
     width: '36px',
-    height: '36px',
+    height: '100%',
     border: 'none',
     background: 'transparent',
     color: 'var(--pw-color-text, #09090b)',
@@ -185,6 +185,10 @@ export const NumberStepperBlock: BlockComponent = ({ props, block }) => {
           borderRadius: 'var(--pw-border-radius, 8px)',
           background: 'var(--pw-color-card, #ffffff)',
           overflow: 'hidden',
+          // The shared control height, border included; the buttons and the
+          // field fill it.
+          height: CONTROL_HEIGHT,
+          boxSizing: 'border-box',
         }}
       >
         <button
@@ -227,7 +231,7 @@ export const NumberStepperBlock: BlockComponent = ({ props, block }) => {
           }}
           style={{
             width: '48px',
-            height: '36px',
+            height: '100%',
             border: 'none',
             borderLeft: '1px solid var(--pw-color-border, #e4e4e7)',
             borderRight: '1px solid var(--pw-color-border, #e4e4e7)',

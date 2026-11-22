@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { CONTROL_BORDER, safeRenderValue } from '../../../lib/_shared-utils.js'
+import { CONTROL_BORDER, CONTROL_HEIGHT, safeRenderValue } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 import { useAppMessage, useAppMessages, messageOf } from '@pwfabric/runtime'
@@ -204,7 +204,9 @@ export const DateInputBlock: BlockComponent = ({ props, block, context }) => {
     color: 'var(--pw-color-text)',
   }
   const inputStyle: React.CSSProperties = {
-    padding: '8px 12px',
+    // The shared control height, so the date lines up with a text field and a select.
+    height: CONTROL_HEIGHT,
+    padding: '0 12px',
     // The same control edge as a text input (P4a): the divider colour measured
     // 1.16–1.72:1, so the date field looked fainter than the name field above it.
     border: `1px solid ${CONTROL_BORDER}`,

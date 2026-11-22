@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { safeRenderValue, ICON_PATHS } from '../../../lib/_kit.js'
+import { CONTROL_HEIGHT, safeRenderValue, ICON_PATHS } from '../../../lib/_kit.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 import { useAppMessage } from '@pwfabric/runtime'
@@ -245,7 +245,8 @@ export const ComboboxBlock: BlockComponent = ({ props, block }) => {
             alignItems: 'center',
             gap: 'var(--pw-space-xs, 4px)',
             padding: '0 10px',
-            height: '40px',
+            // The shared single-line control height (foundation's input and select).
+            height: CONTROL_HEIGHT,
             background: 'var(--pw-color-card, #ffffff)',
             border: '1px solid var(--pw-color-border, #e4e4e7)',
             borderRadius: 'var(--pw-border-radius, 8px)',

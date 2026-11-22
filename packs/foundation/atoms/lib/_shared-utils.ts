@@ -131,6 +131,15 @@ export const CONTROL_BORDER =
   'var(--pw-color-control-border, color-mix(in srgb, var(--pw-color-text-muted) 80%, var(--pw-color-border)))'
 
 /**
+ * THE HEIGHT OF A SINGLE-LINE FORM CONTROL, border included: a text or search
+ * input, a select, a date field, a number stepper, a combobox. One value, so a
+ * filter row of a search box and a select lines up (they were 43px and 40px).
+ * A theme may set `--pw-control-height`; on a phone or a touch screen each
+ * control still grows to its 44px target.
+ */
+export const CONTROL_HEIGHT = 'var(--pw-control-height, 40px)'
+
+/**
  * Black or white, whichever reads on `ground` — decided by the ground's own
  * luminance, in CSS.
  *

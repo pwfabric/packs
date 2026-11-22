@@ -6,6 +6,8 @@
 //
 // Regenerate: node tools/apply-pack-map.mjs
 
+export const CONTROL_HEIGHT = 'var(--pw-control-height, 40px)'
+
 export type CSSUnit = number | string | undefined
 
 export const HIT_AREA_CSS =

@@ -3,7 +3,7 @@ import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
-import { CONTROL_BORDER, textOf } from '../../../lib/_shared-utils.js'
+import { CONTROL_BORDER, CONTROL_HEIGHT, textOf } from '../../../lib/_shared-utils.js'
 
 /** The closed select is a real 44px-tall box at phone width or on a coarse pointer (R3). */
 const SELECT_TOUCH_CSS =
@@ -182,7 +182,9 @@ export const SelectBlock: BlockComponent = ({ props, block }) => {
   const selectStyle: React.CSSProperties = {
     width: '100%',
     boxSizing: 'border-box',
-    padding: multiple ? '8px 12px' : '8px 36px 8px 12px',
+    padding: multiple ? '8px 12px' : '0 36px 0 12px',
+    // One line: the shared control height (a multi-select is a list box and keeps its rows).
+    ...(multiple ? {} : { height: CONTROL_HEIGHT }),
     // The control edge and the theme radius.
     border: `1px solid ${CONTROL_BORDER}`,
     borderRadius: 'var(--pw-border-radius)',

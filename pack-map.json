@@ -93,6 +93,7 @@
         "lib/_shared-account-menu.tsx"
       ],
       "kit": [
+        "CONTROL_HEIGHT",
         "CSSUnit",
         "HIT_AREA_CSS",
         "ICON_PATHS",
