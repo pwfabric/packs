@@ -26,6 +26,8 @@ export interface ContainerProps {
   readonly borderRadius?: number | string
   readonly minHeight?: number | string
   readonly maxWidth?: number | string
+  /** With `maxWidth`, centre the box (margin 0 auto). Default true; false leaves its margin alone. */
+  readonly center?: boolean
   /** CSS aspect-ratio ('16/9', '4/3', or a number). */
   readonly aspectRatio?: number | string
   readonly backgroundGradient?: string
@@ -71,7 +73,9 @@ export const ContainerBlock: BlockComponent = ({ props, children, block }) => {
   // container) — without an auto margin it hugs the section's left edge
   // instead, leaving a dead gap on the right. block.style below can still
   // override with an explicit margin/marginLeft/marginRight.
-  const autoCenter = maxWidth !== undefined ? { margin: '0 auto' } : {}
+  // `center: false` opts out: margins hoisted to the block's wrapper could not
+  // undo an auto margin painted on the box itself.
+  const autoCenter = maxWidth !== undefined && props.center !== false ? { margin: '0 auto' } : {}
   const bgColor = props.backgroundColor as string | undefined
   // A container only paints a card/surface-toned background when a receipt
   // explicitly sets one (most containers are transparent layout scaffolding

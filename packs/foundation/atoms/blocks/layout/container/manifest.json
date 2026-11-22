@@ -144,6 +144,16 @@
         "bindable": false
       },
       {
+        "name": "center",
+        "type": "boolean",
+        "description": "With maxWidth set, centre the box in its parent (margin 0 auto). false keeps it at the start edge, or lets the block style place it.",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
         "name": "aspectRatio",
         "type": "number | string",
         "description": "CSS aspect-ratio for the box, e.g. '16/9', '4/3', '1/1', '21/9', '3/2', or a number. Sets the ratio without forcing a fixed height.",

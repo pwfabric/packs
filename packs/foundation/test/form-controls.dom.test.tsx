@@ -533,6 +533,18 @@ describe('grid, container, section', () => {
     expect(c.style.boxSizing).toBe('border-box')
   })
 
+  it('a container with maxWidth is centred unless center is false', () => {
+    mount(el(ContainerBlock, 'c1', 'container', { maxWidth: 720 }))
+    const centred = document.getElementById('c1') as HTMLElement
+    expect(centred.style.maxWidth).toBe('720px')
+    expect(centred.style.margin).toBe('0px auto')
+    cleanup()
+    mount(el(ContainerBlock, 'c2', 'container', { maxWidth: 720, center: false }))
+    const start = document.getElementById('c2') as HTMLElement
+    expect(start.style.maxWidth).toBe('720px')
+    expect(start.style.margin).toBe('')
+  })
+
   it('a section keeps its padding inside its width', () => {
     mount(el(SectionBlock, 's', 'section', {}))
     expect((document.getElementById('s') as HTMLElement).style.boxSizing).toBe('border-box')
