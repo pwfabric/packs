@@ -239,4 +239,37 @@ describe('accordion openAll: a FAQ read top to bottom', () => {
     mount(el(AccordionBlock, 'acc', 'accordion', { items, defaultOpen: ['b'] }))
     expect(screen.getAllByRole('button').map((b) => b.getAttribute('aria-expanded'))).toEqual(['false', 'true'])
   })
+
+  it('an open panel has no height cap: it opens to its content, a long answer is not clipped', () => {
+    const long = 'A long answer. '.repeat(400)
+    mount(el(AccordionBlock, 'acc', 'accordion', { items: [{ id: 'a', title: 'Long', content: long }], openAll: true }))
+    const panel = document.getElementById('acc-panel-a') as HTMLElement
+    expect(panel.style.maxHeight).toBe('')
+    expect(panel.style.display).toBe('grid')
+    expect(panel.style.gridTemplateRows).toBe('1fr')
+    expect(panel.style.transition).toContain('grid-template-rows var(--pw-duration-slow')
+    expect(panel.hasAttribute('inert')).toBe(false)
+    expect(panel.textContent).toBe(long)
+    // Nothing inside caps it either.
+    expect([...panel.querySelectorAll<HTMLElement>('*')].every((n) => n.style.maxHeight === '')).toBe(true)
+  })
+
+  it('closed, the panel folds to 0fr and leaves the keyboard and the accessibility tree', () => {
+    mount(el(AccordionBlock, 'acc', 'accordion', { items }))
+    const panel = document.getElementById('acc-panel-a') as HTMLElement
+    expect(panel.style.gridTemplateRows).toBe('0fr')
+    expect(panel.style.visibility).toBe('hidden')
+    expect(panel.hasAttribute('inert')).toBe(true)
+    fireEvent.click(screen.getAllByRole('button')[0]!)
+    expect(panel.style.gridTemplateRows).toBe('1fr')
+    expect(panel.style.visibility).toBe('visible')
+    expect(panel.hasAttribute('inert')).toBe(false)
+  })
+
+  it('a visitor who asks for less motion gets no transition', () => {
+    mount(el(AccordionBlock, 'acc', 'accordion', { items }))
+    expect(document.querySelector('#acc style')?.textContent).toBe(
+      '@media (prefers-reduced-motion: reduce) { [data-pw-accordion-panel] { transition: none !important; } }',
+    )
+  })
 })

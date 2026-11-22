@@ -3,6 +3,9 @@ import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
 import { MOTION, listOf, safeRenderValue, transitionOf } from '../../../lib/_shared-utils.js'
 
+/** A visitor who asks for less motion gets the panel open and closed at once. */
+const ACCORDION_CSS = '@media (prefers-reduced-motion: reduce) { [data-pw-accordion-panel] { transition: none !important; } }'
+
 // ============================================================
 // PROPS — declared in manifest.json, applied by the runtime
 // ============================================================
@@ -118,12 +121,16 @@ export const AccordionBlock: BlockComponent = ({ props, block }) => {
     transition: `background-color ${MOTION.normal}`,
   })
 
+  // THE PANEL HAS NO HEIGHT CAP. It was a max-height of 500px, which clipped
+  // a long answer. The panel is a one-row grid whose track goes 0fr -> 1fr, so
+  // it opens to its content's own height, whatever that is. It opens at the
+  // theme's slow pace (an entrance, not a flick); closed, it is hidden from
+  // the keyboard and from screen readers once it has finished closing.
   const contentStyle = (isOpen: boolean): React.CSSProperties => ({
-    padding: isOpen ? '12px 16px' : '0 16px',
-    maxHeight: isOpen ? '500px' : '0',
-    overflow: 'hidden',
-    // The panel opens at the theme's slow pace: an entrance, not a flick.
-    transition: transitionOf(['max-height', 'padding'], MOTION.slow),
+    display: 'grid',
+    gridTemplateRows: isOpen ? '1fr' : '0fr',
+    visibility: isOpen ? 'visible' : 'hidden',
+    transition: `${transitionOf(['grid-template-rows'], MOTION.slow)}, visibility 0s linear ${isOpen ? '0s' : 'var(--pw-duration-slow, 400ms)'}`,
     fontSize: 'var(--pw-font-size-base)',
     color: 'var(--pw-color-text-muted-on-card, var(--pw-color-text-muted))',
   })
@@ -139,6 +146,7 @@ export const AccordionBlock: BlockComponent = ({ props, block }) => {
 
   return (
     <div id={block.id} data-block-id={block.id} style={{ ...containerStyle, ...block.style }} data-block-type="accordion">
+      {items.length > 0 && <style>{ACCORDION_CSS}</style>}
       {items.map((item: AccordionItem, index: number) => {
         // `id` is REQUIRED by the manifest, but a receipt that omits it used to
         // produce `…-header-undefined` for every row — duplicate DOM ids, broken
@@ -172,10 +180,13 @@ export const AccordionBlock: BlockComponent = ({ props, block }) => {
               id={panelId}
               role="region"
               aria-labelledby={headerId}
+              data-pw-accordion-panel=""
               style={contentStyle(isOpen)}
-              hidden={!isOpen}
+              inert={!isOpen}
             >
-              {isOpen && safeRenderValue(item.content)}
+              <div style={{ minHeight: 0, overflow: 'hidden' }}>
+                <div style={{ padding: '12px 16px' }}>{safeRenderValue(item.content)}</div>
+              </div>
             </div>
           </div>
         )
