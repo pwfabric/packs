@@ -22,9 +22,12 @@ afterEach(() => cleanup())
 type AnyBlock = React.FC<Record<string, unknown>>
 type Ev = { type: string; blockId?: string; payload?: Record<string, unknown> }
 
-/** The runner's hash rule, as `context.appHref` gives it. */
-const hashHref = (path: string): string =>
-  path.startsWith('/') && !path.startsWith('//') && !path.startsWith('/pwpack/media/') ? `#${path}` : path
+/**
+ * A path-mode router's `context.appHref`. An `href` prop reaches a block
+ * already rewritten by the host (`/app/menu`), so a block that ran it through
+ * appHref again would write `/app/app/menu`.
+ */
+const pathHref = (path: string): string => (path.startsWith('/') && !path.startsWith('//') ? `/app${path}` : path)
 
 function el(
   C: unknown,
@@ -119,14 +122,14 @@ describe('a visually hidden helper stays inside its own box', () => {
 describe('card href: the whole card is one link', () => {
   const title = <h3 id="card-title">Seasonal menu</h3>
 
-  it('a cover link fills the card, named by its first heading, written by appHref', async () => {
-    mount(el(CardBlock, 'c', 'card', { href: '/menu' }, { appHref: hashHref }, <>{title}<p>Spring dishes</p></>))
+  it('a cover link fills the card, named by its first heading, its href as the host wrote it', async () => {
+    mount(el(CardBlock, 'c', 'card', { href: '/app/menu' }, { appHref: pathHref }, <>{title}<p>Spring dishes</p></>))
     const card = document.getElementById('c') as HTMLElement
     expect(card.style.position).toBe('relative')
     const links = card.querySelectorAll('a')
     expect(links).toHaveLength(1)
     const cover = links[0] as HTMLAnchorElement
-    expect(cover.getAttribute('href')).toBe('#/menu')
+    expect(cover.getAttribute('href')).toBe('/app/menu')
     expect(cover.style.position).toBe('absolute')
     expect(cover.style.inset).toMatch(/^0(px)?$/)
     expect(screen.getByRole('link', { name: 'Seasonal menu' })).toBe(cover)
@@ -158,12 +161,12 @@ describe('card href: the whole card is one link', () => {
 })
 
 describe('heading href and lang', () => {
-  it('the heading holds a link to the page, written by appHref', () => {
-    mount(el(HeadingBlock, 'h', 'heading', { text: 'Launch notes', level: 'h2', href: '/blog/launch' }, { appHref: hashHref }))
+  it('the heading holds a link to the page, its href as the host wrote it', () => {
+    mount(el(HeadingBlock, 'h', 'heading', { text: 'Launch notes', level: 'h2', href: '/app/blog/launch' }, { appHref: pathHref }))
     const h = document.getElementById('h') as HTMLElement
     expect(h.tagName).toBe('H2')
     const a = h.querySelector('a') as HTMLAnchorElement
-    expect(a.getAttribute('href')).toBe('#/blog/launch')
+    expect(a.getAttribute('href')).toBe('/app/blog/launch')
     expect(a.textContent).toBe('Launch notes')
     expect(screen.getByRole('heading', { name: 'Launch notes' })).toBe(h)
     // The link's look is not inside the heading.

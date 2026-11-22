@@ -87,7 +87,10 @@ export const CardBlock: BlockComponent = ({ props, children, block, context }) =
   const safe = safeHref(typeof p.href === 'string' && p.href.trim() ? p.href.trim() : undefined)
   // A bare `#` is a placeholder, not a destination.
   const target = safe && safe !== '#' ? safe : undefined
-  const href = target && context?.appHref ? context.appHref(target) : target
+  // An `href` prop reaches the block already in the router's form: the host
+  // rewrites every href prop (and the href of an object in a list prop) before
+  // the block renders, so it is written as given, never through appHref twice.
+  const href = target
   const hrefLabel = typeof p.hrefLabel === 'string' && p.hrefLabel.trim() ? p.hrefLabel.trim() : undefined
   // Unnamed, the link takes the first heading's name once it is on the page.
   const rootRef = React.useRef<HTMLDivElement | null>(null)

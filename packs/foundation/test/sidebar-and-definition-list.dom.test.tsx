@@ -13,7 +13,8 @@ import { applied } from '../../../tools/test-support/applied-props.js'
 afterEach(() => cleanup())
 
 type Ev = { type: string; blockId?: string; payload?: Record<string, unknown> }
-const hashHref = (path: string): string => (path.startsWith('/') && !path.startsWith('//') ? `#${path}` : path)
+/** A path-mode router: the host has already written each entry's href in this form. */
+const pathHref = (path: string): string => (path.startsWith('/') && !path.startsWith('//') ? `/app${path}` : path)
 
 function mount(C: unknown, id: string, type: string, props: Record<string, unknown>, context: Record<string, unknown> = {}): Ev[] {
   const Comp = C as React.FC<Record<string, unknown>>
@@ -39,11 +40,11 @@ const DOCS = [
 ]
 
 describe('sidebar', () => {
-  it('is a named navigation landmark of nested lists; links go through appHref', () => {
-    mount(SidebarBlock, 'sb', 'sidebar', { title: 'Documentation', items: DOCS }, { appHref: hashHref })
+  it('is a named navigation landmark of nested lists; hrefs are written as the host gave them', () => {
+    mount(SidebarBlock, 'sb', 'sidebar', { title: 'Documentation', items: DOCS }, { appHref: pathHref })
     const nav = screen.getByRole('navigation', { name: 'Documentation' })
     expect(nav.id).toBe('sb')
-    expect(within(nav).getByRole('link', { name: 'Introduction' }).getAttribute('href')).toBe('#/')
+    expect(within(nav).getByRole('link', { name: 'Introduction' }).getAttribute('href')).toBe('/')
     expect(nav.querySelectorAll('ul ul').length).toBeGreaterThan(0)
   })
 

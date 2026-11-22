@@ -201,7 +201,8 @@ export const SidebarBlock: BlockComponent = ({ props, block, context }) => {
         const isOpen = !collapsible || open.has(key)
         const safe = safeHref(typeof item.href === 'string' && item.href.trim() ? item.href.trim() : undefined)
         const target = safe && safe !== '#' ? safe : undefined
-        const href = target && context?.appHref ? context.appHref(target) : target
+        // Already in the router's form: the host rewrites the href of each entry.
+        const href = target
         const current = Boolean(target) && sameRoute(item.href, activeHref)
         const listId = `${block.id}-group-${key.replace(/\./g, '-')}`
         const link = href ? (

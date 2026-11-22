@@ -209,7 +209,10 @@ export const HeadingBlock: BlockComponent = ({ props, block, context }) => {
   const content = p.rich ? renderRichText(p.text) : safeRenderValue(p.text)
   const safe = safeHref(typeof p.href === 'string' && p.href.trim() ? p.href.trim() : undefined)
   const target = safe && safe !== '#' ? safe : undefined
-  const href = target && context?.appHref ? context.appHref(target) : target
+  // An `href` prop reaches the block already in the router's form: the host
+  // rewrites every href prop (and the href of an object in a list prop) before
+  // the block renders, so it is written as given, never through appHref twice.
+  const href = target
   const onLinkClick = (e: React.MouseEvent<HTMLAnchorElement>): void => {
     if (context?.interactionMode !== 'inert') return
     e.preventDefault()

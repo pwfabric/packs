@@ -67,7 +67,8 @@ export const OtpInputBlock: BlockComponent = ({ props, block }) => {
   // form's own check (form.form `invalidFields`) reads the visible controls.
   // The words are the app's (`ui.form.code`, with {label} and {n}; each cell's name is `ui.otp.cell`).
   const appWords = useAppMessages()
-  const unfinished = useAppMessage('ui.form.code', '', { label, n: String(length) })
+  // {n} is a number, so a plural message ({n, plural, one {# digit} other {# digits}}) picks its words.
+  const unfinished = useAppMessage('ui.form.code', '', { label, n: length })
   React.useEffect(() => {
     const first = refs.current[0]
     if (!first) return
