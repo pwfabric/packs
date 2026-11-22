@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { CONTROL_BORDER, safeRenderValue } from '../../../lib/_shared-utils.js'
+import { CONTROL_BORDER, controlLabelStyle, safeRenderValue } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 
@@ -75,11 +75,8 @@ export const TextareaBlock: BlockComponent = ({ props, block }) => {
     cursor: props.disabled ? 'not-allowed' : undefined,
     ...block.style,
   }
-  const labelStyle: React.CSSProperties = {
-    fontSize: 'var(--pw-font-size-sm)',
-    fontWeight: 500,
-    color: 'var(--pw-color-text)',
-  }
+  // The one label of every form control.
+  const labelStyle: React.CSSProperties = controlLabelStyle('4px')
   const taStyle: React.CSSProperties = {
     width: '100%',
     padding: '8px 12px',

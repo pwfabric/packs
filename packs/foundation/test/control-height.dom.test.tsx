@@ -14,6 +14,13 @@ import { SelectBlock } from '../atoms/blocks/form/select/component.js'
 import { DateInputBlock } from '../atoms/blocks/form/date-input/component.js'
 import { NumberStepperBlock } from '../atoms/blocks/form/number-stepper/component.js'
 import { ComboboxBlock } from '../../widgets/atoms/blocks/form/combobox/component.js'
+import { SegmentedControlBlock } from '../atoms/blocks/form/segmented-control/component.js'
+import { OtpInputBlock } from '../atoms/blocks/form/otp-input/component.js'
+import { RadioBlock } from '../atoms/blocks/form/radio/component.js'
+import { TextareaBlock } from '../atoms/blocks/form/textarea/component.js'
+import { SliderBlock } from '../../widgets/atoms/blocks/form/slider/component.js'
+import { RichTextEditorBlock } from '../../widgets/atoms/blocks/form/rich-text-editor/component.js'
+import { TagInputBlock } from '../../widgets/atoms/blocks/form/tag-input/component.js'
 import { applied } from '../../../tools/test-support/applied-props.js'
 
 afterEach(() => cleanup())
@@ -118,5 +125,54 @@ describe('every form control has the same label above the same field', () => {
     ]
     expect(shapes).toEqual(shapes.map(() => shapes[0]))
     expect(shapes[0]).toBe(`block|${CONTROL_LABEL_GAP}|var(--pw-control-label-line-height, 20px)|var(--pw-font-size-sm)|||block-level`)
+  })
+})
+
+describe('every labelled form block draws the same label, the same distance above its control', () => {
+  /**
+   * The label's look, and the space between it and the control: its own
+   * bottom margin plus the gap of the column it sits in. A margin written as
+   * calc(<gap> - <column gap>) under a column with that gap IS <gap>.
+   */
+  function labelShape(C: unknown, type: string, props: Record<string, unknown>): string {
+    const Comp = C as React.FC<Record<string, unknown>>
+    render(
+      <BehaviorSurfaceProvider surfaceId="t" onEvent={() => {}}>
+        <Comp props={applied(type, props)} block={{ id: 'c', type, props, layout: {} }} context={{ interactionMode: 'live' }} />
+      </BehaviorSurfaceProvider>,
+    )
+    const root = document.querySelector('[data-block-id="c"]') as HTMLElement
+    const label = [...root.querySelectorAll<HTMLElement>('label, span, legend')].find((n) => n.textContent?.replace(/\s*\*$/, '') === props['label'] || n.textContent === props['groupLabel'])
+    if (!label) throw new Error(`${type}: no label`)
+    // The box that stands above the control: the label, or the row it heads (slider: label + value).
+    const head = label.parentElement === root ? label : (label.parentElement as HTMLElement)
+    const column = head.parentElement as HTMLElement
+    const columnGap = column.style.gap || ''
+    const mb = head.style.marginBottom
+    const space = columnGap ? (mb === `calc(${CONTROL_LABEL_GAP} - ${columnGap})` ? CONTROL_LABEL_GAP : `${mb} + ${columnGap}`) : mb
+    const out = [label.style.display, label.style.lineHeight, label.style.fontSize, label.style.fontWeight, space].join('|')
+    cleanup()
+    return out
+  }
+
+  it('across every labelled form block of both packs', () => {
+    const want = `block|var(--pw-control-label-line-height, 20px)|var(--pw-font-size-sm)|500|${CONTROL_LABEL_GAP}`
+    const shapes: Record<string, string> = {
+      input: labelShape(InputBlock, 'input', { label: 'Name', name: 'n' }),
+      search: labelShape(InputBlock, 'input', { label: 'Search', name: 'q', type: 'search' }),
+      select: labelShape(SelectBlock, 'select', { label: 'Kind', name: 'k', options: ['a'] }),
+      'multi-select': labelShape(SelectBlock, 'select', { label: 'Tags', name: 't', multiple: true, options: ['a'] }),
+      date: labelShape(DateInputBlock, 'date-input', { label: 'Day', name: 'd' }),
+      number: labelShape(NumberStepperBlock, 'number-stepper', { label: 'Guests', name: 'g' }),
+      combobox: labelShape(ComboboxBlock, 'combobox', { label: 'City', name: 'c', options: ['Oslo'] }),
+      'segmented-control': labelShape(SegmentedControlBlock, 'segmented-control', { label: 'View', options: [{ label: 'A', value: 'a' }, { label: 'B', value: 'b' }] }),
+      otp: labelShape(OtpInputBlock, 'otp-input', { label: 'Code', name: 'code' }),
+      radio: labelShape(RadioBlock, 'radio', { groupLabel: 'Size', label: 'Size', name: 's', options: [{ label: 'S', value: 's' }] }),
+      textarea: labelShape(TextareaBlock, 'textarea', { label: 'Notes', name: 'notes' }),
+      slider: labelShape(SliderBlock, 'slider', { label: 'Volume', name: 'v' }),
+      'rich-text-editor': labelShape(RichTextEditorBlock, 'rich-text-editor', { label: 'Body', name: 'b' }),
+      'tag-input': labelShape(TagInputBlock, 'tag-input', { label: 'Topics', name: 'tp' }),
+    }
+    expect(shapes).toEqual(Object.fromEntries(Object.keys(shapes).map((k) => [k, want])))
   })
 })

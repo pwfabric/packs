@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { HIT_AREA_CSS, CONTROL_BORDER, MOTION, safeRenderValue, listOf } from '../../../lib/_shared-utils.js'
+import { HIT_AREA_CSS, CONTROL_BORDER, MOTION, controlLabelStyle, safeRenderValue, listOf } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 
@@ -297,11 +297,8 @@ export const SegmentedControlBlock: BlockComponent = ({ props, block }) => {
       {label && (
         <span
           id={labelId}
-          style={hideLabel ? hidden : {
-            fontSize: 'var(--pw-font-size-sm, 14px)',
-            color: 'var(--pw-color-text, #09090b)',
-            fontWeight: 500,
-          }}
+          // The one label of every form control (it was an inline span, 2px off a text field's).
+          style={hideLabel ? hidden : controlLabelStyle('var(--pw-space-xs, 4px)')}
         >
           {safeRenderValue(label)}
         </span>

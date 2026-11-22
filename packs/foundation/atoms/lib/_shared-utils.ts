@@ -148,6 +148,15 @@ export const CONTROL_HEIGHT = 'var(--pw-control-height, 40px)'
  */
 export const CONTROL_LABEL_GAP = 'var(--pw-control-label-gap, 6px)'
 
+/**
+ * The label style in a column that already spaces its children by
+ * `columnGap`: the label's own margin takes that gap back, so the space under
+ * the label is CONTROL_LABEL_GAP whatever the column does for the rest.
+ */
+export function controlLabelStyle(columnGap?: string): React.CSSProperties {
+  return columnGap ? { ...CONTROL_LABEL_STYLE, marginBottom: `calc(${CONTROL_LABEL_GAP} - ${columnGap})` } : CONTROL_LABEL_STYLE
+}
+
 /** The label style itself: a block, a fixed line height, CONTROL_LABEL_GAP under it. */
 export const CONTROL_LABEL_STYLE: React.CSSProperties = {
   display: 'block',

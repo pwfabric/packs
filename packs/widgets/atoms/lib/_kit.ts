@@ -520,6 +520,10 @@ export const OVERLAY_SCRIM = 'rgba(0,0,0,0.5)'
 
 export const OVERLAY_SCRIM_STRONG = 'rgba(0,0,0,0.85)'
 
+export function controlLabelStyle(columnGap?: string): React.CSSProperties {
+  return columnGap ? { ...CONTROL_LABEL_STYLE, marginBottom: `calc(${CONTROL_LABEL_GAP} - ${columnGap})` } : CONTROL_LABEL_STYLE
+}
+
 export function cssUnit(value: CSSUnit): string | undefined {
   if (value === undefined) return undefined
   if (typeof value === 'number') return `${value}px`

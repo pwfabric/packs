@@ -103,6 +103,7 @@
         "ON_OVERLAY_SCRIM",
         "OVERLAY_SCRIM",
         "OVERLAY_SCRIM_STRONG",
+        "controlLabelStyle",
         "cssUnit",
         "listOf",
         "localeUses24h",

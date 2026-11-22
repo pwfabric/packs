@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { safeRenderValue } from '../../../lib/_shared-utils.js'
+import { controlLabelStyle, safeRenderValue } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 import { messageOf, useAppMessage, useAppMessages } from '@pwfabric/runtime'
@@ -149,13 +149,7 @@ export const OtpInputBlock: BlockComponent = ({ props, block }) => {
         ...block.style,
       }}
     >
-      <span
-        style={{
-          fontSize: 'var(--pw-font-size-sm, 14px)',
-          color: 'var(--pw-color-text, #09090b)',
-          fontWeight: 500,
-        }}
-      >
+      <span style={controlLabelStyle('var(--pw-space-sm, 8px)')}>
         {safeRenderValue(label)}
       </span>
       {/* ONE named value: the cells used to carry
