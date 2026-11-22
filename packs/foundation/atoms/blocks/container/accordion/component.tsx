@@ -18,6 +18,11 @@ export interface AccordionProps {
   readonly items: readonly AccordionItem[]
   readonly allowMultiple: boolean
   readonly defaultOpen?: readonly string[]
+  /**
+   * Every item starts open (a FAQ read top to bottom); each can still be
+   * closed, and opening one never closes another.
+   */
+  readonly openAll?: boolean
   readonly variant: 'default' | 'bordered' | 'separated'
 }
 
@@ -49,9 +54,12 @@ export const AccordionBlock: BlockComponent = ({ props, block }) => {
   // samples reached visitors.
   // A wrong type (an unresolved binding, one record) draws nothing.
   const items = listOf<AccordionItem>(p.items)
-  const allowMultiple = p.allowMultiple
+  const openAll = p.openAll === true
+  const allowMultiple = p.allowMultiple || openAll
   // No default: a value that does not fit is left as written.
-  const defaultOpen = Array.isArray(p.defaultOpen) ? p.defaultOpen : []
+  const defaultOpen = openAll
+    ? items.map((item, index) => item.id ?? String(index))
+    : Array.isArray(p.defaultOpen) ? p.defaultOpen : []
   const variant = p.variant
 
   const [openItems, setOpenItems] = React.useState<Set<string>>(new Set(defaultOpen))

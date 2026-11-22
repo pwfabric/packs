@@ -14,6 +14,7 @@ import { InputBlock } from '../atoms/blocks/form/input/component.js'
 import { CardBlock } from '../atoms/blocks/container/card/component.js'
 import { HeadingBlock } from '../atoms/blocks/text/heading/component.js'
 import { ImageBlock, reservedSize } from '../atoms/blocks/media/image/component.js'
+import { AccordionBlock } from '../atoms/blocks/container/accordion/component.js'
 import { applied } from '../../../tools/test-support/applied-props.js'
 
 afterEach(() => cleanup())
@@ -214,5 +215,28 @@ describe('image: width and height attributes are the picture\'s proportions, wha
     expect(reservedSize(400, undefined, '4:3')).toEqual({ width: 400, height: 300 })
     expect(reservedSize('100%', '240px', '3/2')).toEqual({ width: 360, height: 240 })
     expect(reservedSize('100%', undefined, undefined)).toEqual({})
+  })
+})
+
+describe('accordion openAll: a FAQ read top to bottom', () => {
+  const items = [
+    { id: 'a', title: 'Do you deliver?', content: 'Within the city.' },
+    { id: 'b', title: 'Can I pay by card?', content: 'Yes.' },
+  ]
+
+  it('every item starts open, and closing one leaves the others', () => {
+    mount(el(AccordionBlock, 'acc', 'accordion', { items, openAll: true }))
+    const buttons = screen.getAllByRole('button')
+    expect(buttons.map((b) => b.getAttribute('aria-expanded'))).toEqual(['true', 'true'])
+    expect(screen.getByText('Within the city.')).toBeTruthy()
+    fireEvent.click(buttons[0]!)
+    expect(buttons.map((b) => b.getAttribute('aria-expanded'))).toEqual(['false', 'true'])
+    fireEvent.click(buttons[0]!)
+    expect(buttons.map((b) => b.getAttribute('aria-expanded'))).toEqual(['true', 'true'])
+  })
+
+  it('without it, defaultOpen still decides', () => {
+    mount(el(AccordionBlock, 'acc', 'accordion', { items, defaultOpen: ['b'] }))
+    expect(screen.getAllByRole('button').map((b) => b.getAttribute('aria-expanded'))).toEqual(['false', 'true'])
   })
 })
