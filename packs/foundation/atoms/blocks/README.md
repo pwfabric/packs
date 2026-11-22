@@ -29,7 +29,7 @@ blocks live in `widgets`):
 | `text` | reading | heading, text, prose, alert, code |
 | `media` | pictures and sound | image, gallery, video, embed, carousel, interactive-map |
 | `layout` | arrangement | container, grid, section, split-view, navbar, app-rail, bottom-bar, announcement-bar, sidebar |
-| `control` | one action | button, link, icon, badge, avatar, breadcrumb, divider, dropdown, pagination, copy-button, like-button |
+| `control` | one action | button, link, icon, badge, avatar, breadcrumb, divider, dropdown, pagination, copy-button, like-button, theme-toggle, language-switch |
 | `form` | input | form, input, textarea, select, combobox, checkbox, radio, toggle, slider, date-input, number-stepper, otp-input, tag-input, file-dropzone, rich-text-editor, segmented-control |
 | `data` | data made visible | table, repeater, list, definition-list, chart, progress, rating, skeleton, calendar-month, world-clock |
 | `feedback` | status | toast, spinner, radial-progress |

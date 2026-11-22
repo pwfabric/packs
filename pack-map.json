@@ -54,7 +54,7 @@
   },
   "atomCap": 100,
   "expectTotal": {
-    "blocks": 71,
+    "blocks": 73,
     "patterns": 26,
     "surfaces": 0
   },
@@ -68,7 +68,7 @@
     "foundation": {
       "requires": [],
       "expect": {
-        "blocks": 54,
+        "blocks": 56,
         "patterns": 26
       },
       "license": "Apache-2.0",
