@@ -13,6 +13,7 @@ import { CopyButtonBlock } from '../atoms/blocks/control/copy-button/component.j
 import { InputBlock } from '../atoms/blocks/form/input/component.js'
 import { CardBlock } from '../atoms/blocks/container/card/component.js'
 import { HeadingBlock } from '../atoms/blocks/text/heading/component.js'
+import { ImageBlock, reservedSize } from '../atoms/blocks/media/image/component.js'
 import { applied } from '../../../tools/test-support/applied-props.js'
 
 afterEach(() => cleanup())
@@ -182,5 +183,36 @@ describe('heading href and lang', () => {
     cleanup()
     mount(el(HeadingBlock, 'h', 'heading', { text: 'Discover', lang: '<x>' }))
     expect(document.getElementById('h')?.hasAttribute('lang')).toBe(false)
+  })
+})
+
+describe('image: width and height attributes are the picture\'s proportions, whatever its CSS size', () => {
+  const attrs = (props: Record<string, unknown>): [string | null, string | null, string] => {
+    mount(el(ImageBlock, 'i', 'image', { src: 'https://example.com/a.jpg', alt: 'A', ...props }))
+    const img = document.getElementById('i') as HTMLImageElement
+    const out: [string | null, string | null, string] = [img.getAttribute('width'), img.getAttribute('height'), img.style.width]
+    cleanup()
+    return out
+  }
+
+  it('from the author\'s pixel width and height', () => {
+    expect(attrs({ width: 320, height: 200 })).toEqual(['320', '200', '320px'])
+  })
+
+  it('from aspectRatio when the CSS width is a layout size', () => {
+    expect(attrs({ width: '100%', aspectRatio: '16/9' })).toEqual(['1000', '563', '100%'])
+  })
+
+  it('from aspectRatio when the CSS size is auto (a logo at its natural size)', () => {
+    const [w, h, css] = attrs({ width: 'auto', height: 'auto', aspectRatio: '4/1' })
+    expect([w, h]).toEqual(['1000', '250'])
+    // The inline auto still sizes the picture; the attributes give the ratio only.
+    expect(css).toBe('auto')
+  })
+
+  it('one pixel side and a ratio give the other side', () => {
+    expect(reservedSize(400, undefined, '4:3')).toEqual({ width: 400, height: 300 })
+    expect(reservedSize('100%', '240px', '3/2')).toEqual({ width: 360, height: 240 })
+    expect(reservedSize('100%', undefined, undefined)).toEqual({})
   })
 })

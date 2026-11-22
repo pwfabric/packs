@@ -130,9 +130,18 @@ export const imageDefinition: BlockDefinition = {
 
 /**
  * The width/height ATTRIBUTES that reserve the picture's box before it loads
- * (the browser maps them to an aspect ratio), so the layout does not shift:
- * from a numeric width AND height, else from `aspectRatio` ("16/9", "4:3",
- * "1.5"). CSS still sizes the image; nothing is written when neither is known.
+ * (the browser maps them to an aspect ratio), so the layout does not shift.
+ *
+ * They are the picture's proportions, not its drawn size — CSS sizes the
+ * image (an inline `width`/`height`, even `auto`, wins over the attributes) —
+ * so they are written whatever the CSS size is:
+ *
+ * - a pixel width AND height (`320`, `"320px"`) as given;
+ * - one pixel side and `aspectRatio` ("16/9", "4:3", "1.5"): the other side
+ *   from the ratio;
+ * - `aspectRatio` alone: a 1000px-wide box of that ratio;
+ * - nothing when neither is known (a `100%` width is a layout size, not a
+ *   proportion).
  */
 export function reservedSize(width: unknown, height: unknown, aspectRatio: unknown): { width?: number; height?: number } {
   const num = (v: unknown): number | undefined => {
@@ -145,7 +154,11 @@ export function reservedSize(width: unknown, height: unknown, aspectRatio: unkno
   if (typeof aspectRatio === 'string' || typeof aspectRatio === 'number') {
     const parts = String(aspectRatio).split(/[/:]/).map((x) => parseFloat(x.trim()))
     const ratio = parts.length === 2 ? (parts[0] ?? NaN) / (parts[1] ?? NaN) : parts[0] ?? NaN
-    if (Number.isFinite(ratio) && ratio > 0) return { width: 1000, height: Math.round(1000 / ratio) }
+    if (Number.isFinite(ratio) && ratio > 0) {
+      if (w !== undefined) return { width: Math.round(w), height: Math.round(w / ratio) }
+      if (h !== undefined) return { width: Math.round(h * ratio), height: Math.round(h) }
+      return { width: 1000, height: Math.round(1000 / ratio) }
+    }
   }
   return {}
 }
@@ -258,11 +271,8 @@ export const ImageBlock: BlockComponent = ({ props, block, context }) => {
       src={src}
       alt={textOf(p.alt)}
       style={style}
-      {...(style.width === 'auto' && style.height === 'auto'
-        ? // An unsized width AND height (a logo at its natural size): only real
-          // numbers may be written, or a ratio-derived 1000px would be drawn.
-          reservedSize(p.width, p.height, undefined)
-        : reservedSize(p.width, p.height, aspectRatio))}
+      // The proportions, always: the inline style above sizes the picture.
+      {...reservedSize(p.width, p.height, aspectRatio)}
       loading={priority ? 'eager' : p.loading}
       {...(priority ? { fetchPriority: 'high' as const } : {})}
       decoding="async"
