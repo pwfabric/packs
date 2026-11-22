@@ -56,7 +56,16 @@ const ALLOWED_TAGS = new Set([
 ])
 
 // Per-tag attribute allowlist. href/src are sanitized for protocol separately.
+// A heading keeps an `id` (an in-page anchor: `#getting-started`) when it is a
+// plain name, see HEADING_ID.
+const HEADING_ATTRS: ReadonlySet<string> = new Set(['id'])
 const ALLOWED_ATTRS: Record<string, ReadonlySet<string>> = {
+  h1: HEADING_ATTRS,
+  h2: HEADING_ATTRS,
+  h3: HEADING_ATTRS,
+  h4: HEADING_ATTRS,
+  h5: HEADING_ATTRS,
+  h6: HEADING_ATTRS,
   a: new Set(['href', 'title', 'rel', 'target']),
   img: new Set(['src', 'alt', 'title', 'width', 'height']),
   td: new Set(['colspan', 'rowspan']),
@@ -75,6 +84,32 @@ function decodeRefs(value: string): string {
     .replace(/&colon;/gi, ':')
     .replace(/&(tab|newline);/gi, '')
     .replace(/&amp;/gi, '&')
+}
+
+/**
+ * A heading id the sanitizer keeps: letters, digits, `-` and `_`, starting
+ * with a letter or digit, at most 100 characters. Nothing that could be a
+ * selector, a URL or markup, and never empty.
+ */
+const HEADING_ID = /^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$/
+
+/**
+ * The anchor name of a heading's text: lower case, accents dropped (`ş` → `s`,
+ * the dotless `ı` → `i`), every other run of characters one `-`. "Kurulum ve
+ * İlk Adım" is `kurulum-ve-ilk-adim`; text with no letter or digit is `section`.
+ */
+export function headingSlug(text: string): string {
+  const slug = text
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/ı/g, 'i')
+    .replace(/ß/g, 'ss')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80)
+    .replace(/-+$/, '')
+  return slug || 'section'
 }
 
 /** Escape a value for a double-quoted HTML attribute. */
@@ -216,6 +251,7 @@ export function sanitizeHtml(html: string, appHref?: (path: string) => string): 
       if (name.startsWith('on') || !allowed.has(name) || kept.some((k) => k.startsWith(`${name}=`))) continue
       let v: string | null = decodeAttr(value)
       if (name === 'href' || name === 'src') v = safeUrl(v)
+      if (name === 'id' && v !== null && !HEADING_ID.test(v)) v = null
       if (v == null) continue
       if (name === 'href' && startName === 'a' && appHref) v = appHref(v)
       if (name === 'target' && v === '_blank') blank = true
@@ -293,6 +329,20 @@ function inlineMd(s: string): string {
 function markdownToHtml(md: string): string {
   const lines = md.replace(/\r\n/g, '\n').split('\n')
   const out: string[] = []
+  // Every heading gets an anchor id from its text, unique within the block:
+  // a second "Options" is `options-2`.
+  const used = new Set<string>()
+  const headingId = (text: string): string => {
+    const plain = text
+      .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+      .replace(/[`*_]/g, '')
+    const base = headingSlug(plain)
+    let id = base
+    for (let n = 2; used.has(id); n++) id = `${base}-${n}`
+    used.add(id)
+    return id
+  }
   let i = 0
   let listType: 'ul' | 'ol' | null = null
   const closeList = (): void => {
@@ -339,7 +389,8 @@ function markdownToHtml(md: string): string {
       // `string | undefined`, and they cannot be reached.
       const hashes = h[1] ?? '#'
       const level = hashes.length
-      out.push(`<h${level}>${inlineMd(escapeHtml(h[2] ?? ''))}</h${level}>`)
+      const text = h[2] ?? ''
+      out.push(`<h${level} id="${headingId(text)}">${inlineMd(escapeHtml(text))}</h${level}>`)
       i++
       continue
     }
