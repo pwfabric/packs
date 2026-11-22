@@ -6,6 +6,20 @@
 //
 // Regenerate: node tools/apply-pack-map.mjs
 
+export const CONTROL_HEIGHT = 'var(--pw-control-height, 40px)'
+
+export const CONTROL_LABEL_GAP = 'var(--pw-control-label-gap, 6px)'
+
+export const CONTROL_LABEL_STYLE: React.CSSProperties = {
+  display: 'block',
+  margin: 0,
+  marginBottom: CONTROL_LABEL_GAP,
+  fontSize: 'var(--pw-font-size-sm)',
+  fontWeight: 500,
+  lineHeight: 'var(--pw-control-label-line-height, 20px)',
+  color: 'var(--pw-color-text)',
+}
+
 export type CSSUnit = number | string | undefined
 
 export const HIT_AREA_CSS =
@@ -505,6 +519,10 @@ export const ON_OVERLAY_SCRIM = '#ffffff'
 export const OVERLAY_SCRIM = 'rgba(0,0,0,0.5)'
 
 export const OVERLAY_SCRIM_STRONG = 'rgba(0,0,0,0.85)'
+
+export function controlLabelStyle(columnGap?: string): React.CSSProperties {
+  return columnGap ? { ...CONTROL_LABEL_STYLE, marginBottom: `calc(${CONTROL_LABEL_GAP} - ${columnGap})` } : CONTROL_LABEL_STYLE
+}
 
 export function cssUnit(value: CSSUnit): string | undefined {
   if (value === undefined) return undefined

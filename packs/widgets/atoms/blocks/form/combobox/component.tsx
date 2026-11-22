@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { safeRenderValue, ICON_PATHS } from '../../../lib/_kit.js'
+import { CONTROL_HEIGHT, CONTROL_LABEL_STYLE, safeRenderValue, ICON_PATHS } from '../../../lib/_kit.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 import { useAppMessage } from '@pwfabric/runtime'
@@ -218,19 +218,13 @@ export const ComboboxBlock: BlockComponent = ({ props, block }) => {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: 'var(--pw-space-xs, 4px)',
+        // No gap of its own: the label's CONTROL_LABEL_STYLE spaces it from the field.
         width: '100%',
         ...block.style,
       }}
     >
       {label && (
-        <span
-          style={{
-            fontSize: 'var(--pw-font-size-sm, 14px)',
-            color: 'var(--pw-color-text, #09090b)',
-            fontWeight: 500,
-          }}
-        >
+        <span style={CONTROL_LABEL_STYLE}>
           {safeRenderValue(label)}
         </span>
       )}
@@ -245,7 +239,8 @@ export const ComboboxBlock: BlockComponent = ({ props, block }) => {
             alignItems: 'center',
             gap: 'var(--pw-space-xs, 4px)',
             padding: '0 10px',
-            height: '40px',
+            // The shared single-line control height (foundation's input and select).
+            height: CONTROL_HEIGHT,
             background: 'var(--pw-color-card, #ffffff)',
             border: '1px solid var(--pw-color-border, #e4e4e7)',
             borderRadius: 'var(--pw-border-radius, 8px)',

@@ -1,7 +1,7 @@
 {
   "id": "form.select",
   "kind": "block",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "category": "form",
   "name": "select",
   "state": "stable",

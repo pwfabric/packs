@@ -3,6 +3,7 @@ import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
+import { controlLabelStyle } from '../../../lib/_kit.js'
 
 // Props — declared in manifest.json, applied by the runtime.
 export interface RichTextEditorProps {
@@ -213,7 +214,8 @@ export const RichTextEditorBlock: BlockComponent = ({ props, context, block }) =
       {label && (
         <span
           id={labelId}
-          style={{ fontSize: 'var(--pw-font-size-sm, 14px)', fontWeight: 500, color: 'var(--pw-color-text, #09090b)' }}
+          // The one label of every form control.
+          style={controlLabelStyle('var(--pw-space-xs, 4px)')}
         >
           {label}
         </span>

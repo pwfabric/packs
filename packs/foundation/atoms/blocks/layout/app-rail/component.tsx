@@ -8,6 +8,7 @@ import {
   placeAccountInBar,
   firstWord,
   readAccount,
+  routeState,
   sameRoute,
   useBottomBarHeightVar,
   type AccountInfo,
@@ -32,6 +33,8 @@ export interface AppRailItem {
   readonly label: string
   readonly href?: string
   readonly icon?: string
+  /** `prefix`: also marks the section on every page below href. Default exact. */
+  readonly match?: 'exact' | 'prefix'
 }
 
 export interface AppRailProps {
@@ -103,13 +106,15 @@ function RailIcon({ name }: { name: string }): React.ReactElement {
 
 function RailItem({
   item,
-  active,
+  state,
   showLabels,
 }: {
   item: AppRailProps['items'][number]
-  active: boolean
+  /** `page`: the page in view (aria-current); `section`: a `match: "prefix"` item above it (a lighter mark). */
+  state: 'page' | 'section' | null
   showLabels: boolean
 }): React.ReactElement {
+  const active = state === 'page'
   const href = safeHref(item.href)
   const style: React.CSSProperties = {
     display: 'flex',
@@ -126,11 +131,13 @@ function RailItem({
     // Text on the card is ink, never the brand fill: --pw-color-primary as text
     // can fall to about 2:1 on a mid-lightness brand. The active background is a tint
     // of the brand, so it differs from the card it sits on.
-    color: active ? 'var(--pw-color-primary-ink, #18181b)' : 'var(--pw-color-text-muted, #71717a)',
+    color: state !== null ? 'var(--pw-color-primary-ink, #18181b)' : 'var(--pw-color-text-muted, #71717a)',
     backgroundColor: active
       ? 'color-mix(in srgb, var(--pw-color-primary, #18181b) 12%, var(--pw-color-card, #ffffff))'
-      : 'transparent',
-    fontWeight: active ? 600 : 400,
+      : state === 'section'
+        ? 'color-mix(in srgb, var(--pw-color-primary, #18181b) 6%, var(--pw-color-card, #ffffff))'
+        : 'transparent',
+    fontWeight: active ? 600 : state === 'section' ? 500 : 400,
   }
   const body = (
     <>
@@ -150,6 +157,7 @@ function RailItem({
       href={href}
       style={style}
       aria-current={active ? 'page' : undefined}
+      data-pw-current={state ?? undefined}
       // With labels hidden the icon is the only affordance, so the accessible
       // name has to come from somewhere — the label still exists, it just moves
       // from the DOM to the attribute.
@@ -223,7 +231,7 @@ function AppRailAsBottomBar({
     bottom: 0,
     zIndex: 'var(--pw-z-sticky, 150)' as unknown as number,
   }
-  const itemStyle = (active: boolean): React.CSSProperties => ({
+  const itemStyle = (state: 'page' | 'section' | null): React.CSSProperties => ({
     flex: '1 1 0',
     display: 'flex',
     flexDirection: 'column',
@@ -234,8 +242,10 @@ function AppRailAsBottomBar({
     padding: '6px 4px',
     textDecoration: 'none',
     fontSize: 'var(--pw-font-size-xs, 12px)',
-    fontWeight: active ? 600 : 400,
-    color: active ? 'var(--pw-color-primary-ink, #18181b)' : 'var(--pw-color-text-muted, #71717a)',
+    // The page in view is bold ink; the section a `match: "prefix"` item
+    // marks is ink at a medium weight.
+    fontWeight: state === 'page' ? 600 : state === 'section' ? 500 : 400,
+    color: state !== null ? 'var(--pw-color-primary-ink, #18181b)' : 'var(--pw-color-text-muted, #71717a)',
   })
   return (
     // The outer element takes no room. A rail sits FIRST in its shell's body
@@ -253,7 +263,7 @@ function AppRailAsBottomBar({
       <nav style={barStyle} aria-label={ariaLabel}>
         {shown.map((item, i) => {
           const href = safeHref(item.href)
-          const active = sameRoute(item.href, activeHref)
+          const state = routeState(item.href, activeHref, item.match)
           const body = (
             <>
               {item.icon ? <RailIcon name={item.icon} /> : null}
@@ -263,11 +273,11 @@ function AppRailAsBottomBar({
             </>
           )
           return href ? (
-            <a key={`${item.label}-${i}`} href={href} style={itemStyle(active)} aria-current={active ? 'page' : undefined}>
+            <a key={`${item.label}-${i}`} href={href} style={itemStyle(state)} aria-current={state === 'page' ? 'page' : undefined} data-pw-current={state ?? undefined}>
               {body}
             </a>
           ) : (
-            <span key={`${item.label}-${i}`} style={itemStyle(active)}>
+            <span key={`${item.label}-${i}`} style={itemStyle(state)}>
               {body}
             </span>
           )
@@ -288,7 +298,7 @@ function AppRailAsBottomBar({
                   {...trigger}
                   aria-current={active ? 'page' : undefined}
                   style={{
-                    ...itemStyle(active || state.open),
+                    ...itemStyle(active || state.open ? 'page' : null),
                     border: 'none',
                     background: 'transparent',
                     fontFamily: 'inherit',
@@ -373,7 +383,7 @@ export const AppRailBlock: BlockComponent = ({ props, block, context }) => {
           <RailItem
             key={`${item.label}-${i}`}
             item={item}
-            active={sameRoute(item.href, activeHref)}
+            state={routeState(item.href, activeHref, item.match)}
             showLabels={showLabels}
           />
         ))}
@@ -383,7 +393,7 @@ export const AppRailBlock: BlockComponent = ({ props, block, context }) => {
               <RailItem
                 key={`f-${item.label}-${i}`}
                 item={item}
-                active={sameRoute(item.href, activeHref)}
+                state={routeState(item.href, activeHref, item.match)}
                 showLabels={showLabels}
               />
             ))}

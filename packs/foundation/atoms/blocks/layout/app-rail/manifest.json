@@ -1,7 +1,7 @@
 {
   "id": "layout.app-rail",
   "kind": "block",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "category": "layout",
   "name": "app-rail",
   "state": "experimental",
@@ -44,6 +44,14 @@
               },
               "icon": {
                 "type": "string"
+              },
+              "match": {
+                "type": "string",
+                "enum": [
+                  "exact",
+                  "prefix"
+                ],
+                "description": "exact (default): current only on its own address. prefix: also marks the section on every page below it (\"/guides\" on \"/guides/records\"); aria-current=\"page\" stays on the exact page."
               }
             },
             "required": [
@@ -71,6 +79,14 @@
               },
               "icon": {
                 "type": "string"
+              },
+              "match": {
+                "type": "string",
+                "enum": [
+                  "exact",
+                  "prefix"
+                ],
+                "description": "exact (default): current only on its own address. prefix: also marks the section on every page below it (\"/guides\" on \"/guides/records\"); aria-current=\"page\" stays on the exact page."
               }
             },
             "required": [

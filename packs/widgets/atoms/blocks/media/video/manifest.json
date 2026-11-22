@@ -1,7 +1,7 @@
 {
   "id": "media.video",
   "kind": "block",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "category": "media",
   "name": "video",
   "state": "stable",
@@ -97,6 +97,30 @@
           "type": "string"
         },
         "bindable": true
+      },
+      {
+        "name": "preload",
+        "type": "'none' | 'metadata' | 'auto'",
+        "description": "How much the browser loads before play: metadata (size, length, first frame), none (nothing until play) or auto.",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "none",
+            "metadata",
+            "auto"
+          ]
+        },
+        "bindable": false,
+        "default": "metadata"
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "description": "The video's accessible name, e.g. \"Product tour, 2 minutes\".",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
       }
     ],
     "defaultProps": {
@@ -105,7 +129,8 @@
       "controls": true,
       "loop": false,
       "muted": false,
-      "aspectRatio": "16/9"
+      "aspectRatio": "16/9",
+      "preload": "metadata"
     },
     "canHaveChildren": false,
     "icon": "▶",

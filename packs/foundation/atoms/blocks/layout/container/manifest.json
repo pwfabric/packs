@@ -1,7 +1,7 @@
 {
   "id": "layout.container",
   "kind": "block",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "category": "layout",
   "name": "container",
   "state": "stable",
@@ -23,7 +23,7 @@
       "Section-level page banding — use layout.section for full-bleed regions",
       "Nesting containers many levels deep just to add margin — flatten the tree"
     ],
-    "implementation": "Further anti-patterns:\n- Creating an empty container then filling it in a later step — add the container WITH its children inline in one step (an empty + filled pair renders a blank duplicate)\n\nFurther use cases:\n- Split a screen area into balanced left/right or top/bottom regions\n\nStacking law: on xs a row with two or more non-intrinsic children is drawn as a column; set keepRow: true only for ratio compositions where the side-by-side proportion is the design (mosaics, poster grids)."
+    "implementation": "Further anti-patterns:\n- Creating an empty container then filling it in a later step — add the container WITH its children inline in one step (an empty + filled pair renders a blank duplicate)\n\nFurther use cases:\n- Split a screen area into balanced left/right or top/bottom regions\n\nStacking law: on xs a row with two or more non-intrinsic children is drawn as a column; set keepRow: true only for ratio compositions where the side-by-side proportion is the design (mosaics, poster grids).\n\nBreakpoint maps: direction, gap, padding, align, justify, wrap, maxWidth and minHeight may each be written as a breakpoint map ({\"xs\": \"column\", \"md\": \"row\"}); the engine (3.5) resolves it mobile first for the width the page is drawn at, before the container reads it, and the static first paint carries each breakpoint’s value. A breakpoint named above the one drawn leaves the prop at its default there."
   },
   "definition": {
     "props": [
@@ -37,7 +37,8 @@
             "column",
             "row-reverse",
             "column-reverse"
-          ]
+          ],
+          "description": "How the children flow: column (default) or row, and their reversed forms. May be a breakpoint map, resolved mobile first for the width the page is drawn at (engine 3.5): {\"xs\": \"column\", \"md\": \"row\"} stacks on a phone and sits side by side from 768px."
         },
         "bindable": false,
         "default": "column"
@@ -50,7 +51,7 @@
             "number",
             "string"
           ],
-          "description": "Space between children: a number of pixels or a CSS length. Unset → the theme base spacing."
+          "description": "Space between children: a number of pixels or a CSS length. Unset → the theme base spacing. May be a breakpoint map, resolved mobile first for the width the page is drawn at (engine 3.5): e.g. {\"xs\": 8, \"lg\": 24}."
         },
         "bindable": false
       },
@@ -58,10 +59,10 @@
         "name": "padding",
         "type": "number",
         "jsonSchema": {
-          "type": "number"
+          "type": "number",
+          "description": "Inner padding in px. Defaults to 16 when the container paints a ground or border, to 0 when it only arranges — a pure layout container adds no space of its own. May be a breakpoint map, resolved mobile first for the width the page is drawn at (engine 3.5): e.g. {\"xs\": 8, \"lg\": 24}."
         },
-        "bindable": false,
-        "description": "Inner padding in px. Defaults to 16 when the container paints a ground or border, to 0 when it only arranges — a pure layout container adds no space of its own."
+        "bindable": false
       },
       {
         "name": "align",
@@ -74,7 +75,8 @@
             "end",
             "stretch",
             "baseline"
-          ]
+          ],
+          "description": "Cross-axis alignment of the children. May be a breakpoint map, resolved mobile first for the width the page is drawn at (engine 3.5): e.g. {\"xs\": \"start\", \"md\": \"center\"}."
         },
         "bindable": false
       },
@@ -90,7 +92,8 @@
             "between",
             "around",
             "evenly"
-          ]
+          ],
+          "description": "Main-axis distribution of the children. May be a breakpoint map, resolved mobile first for the width the page is drawn at (engine 3.5): e.g. {\"xs\": \"start\", \"md\": \"center\"}."
         },
         "bindable": false
       },
@@ -98,7 +101,8 @@
         "name": "wrap",
         "type": "boolean",
         "jsonSchema": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "A row wraps its children onto more lines instead of shrinking them. May be a breakpoint map, resolved mobile first for the width the page is drawn at (engine 3.5): e.g. {\"xs\": true, \"lg\": false}."
         },
         "bindable": false
       },
@@ -128,7 +132,8 @@
           "type": [
             "number",
             "string"
-          ]
+          ],
+          "description": "The box at least this tall: px or a CSS length. May be a breakpoint map, resolved mobile first for the width the page is drawn at (engine 3.5): e.g. {\"xs\": 240, \"lg\": 480}."
         },
         "bindable": false
       },
@@ -139,9 +144,20 @@
           "type": [
             "number",
             "string"
-          ]
+          ],
+          "description": "The box at most this wide: px or a CSS length. May be a breakpoint map, resolved mobile first for the width the page is drawn at (engine 3.5): e.g. {\"xs\": \"100%\", \"lg\": 960}."
         },
         "bindable": false
+      },
+      {
+        "name": "center",
+        "type": "boolean",
+        "description": "With maxWidth set, centre the box in its parent (margin 0 auto). false keeps it at the start edge, or lets the block style place it.",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
       },
       {
         "name": "aspectRatio",

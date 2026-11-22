@@ -47,15 +47,15 @@
   ],
   "floor": "foundation",
   "defaults": {
-    "engines": ">=3.1.0 <4",
+    "engines": ">=3.5.0 <4",
     "tokens": [
       "--pw-color-primary-ink"
     ]
   },
   "atomCap": 100,
   "expectTotal": {
-    "blocks": 69,
-    "patterns": 26,
+    "blocks": 73,
+    "patterns": 28,
     "surfaces": 0
   },
   "rules": {
@@ -68,13 +68,13 @@
     "foundation": {
       "requires": [],
       "expect": {
-        "blocks": 52,
-        "patterns": 26
+        "blocks": 56,
+        "patterns": 28
       },
       "license": "Apache-2.0",
       "listing": {
         "name": "Foundation",
-        "description": "The ground floor every app stands on: the core block vocabulary (layout, text, controls, forms, data, feedback, media), the top-bar, bottom-bar and chrome-less shells with their page parts, six themes, each with its own dark mode (zinc, midnight, paper, linen, slate, ember), the icon dictionary, four capabilities and the REST connector.",
+        "description": "The ground floor every app stands on: the core block vocabulary (layout, text, controls, forms, data, feedback, media), the top-bar, bottom-bar and chrome-less shells with their page parts, two app layouts (top bar, documentation with a sidebar), six themes, each with its own dark mode (zinc, midnight, paper, linen, slate, ember), the icon dictionary, four capabilities and the REST connector.",
         "category": "ui-design"
       }
     },
@@ -93,6 +93,9 @@
         "lib/_shared-account-menu.tsx"
       ],
       "kit": [
+        "CONTROL_HEIGHT",
+        "CONTROL_LABEL_GAP",
+        "CONTROL_LABEL_STYLE",
         "CSSUnit",
         "HIT_AREA_CSS",
         "ICON_PATHS",
@@ -100,6 +103,7 @@
         "ON_OVERLAY_SCRIM",
         "OVERLAY_SCRIM",
         "OVERLAY_SCRIM_STRONG",
+        "controlLabelStyle",
         "cssUnit",
         "listOf",
         "localeUses24h",

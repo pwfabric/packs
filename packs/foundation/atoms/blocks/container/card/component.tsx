@@ -1,7 +1,19 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { MOTION, cssUnit, transitionOf } from '../../../lib/_shared-utils.js'
+import { SURFACE_EVENTS } from '@pwfabric/contracts'
+import { MOTION, cssUnit, safeHref, transitionOf } from '../../../lib/_shared-utils.js'
+import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
+
+/**
+ * A linked card is one link (the stretched-link pattern): a cover anchor fills
+ * the card, so a click anywhere opens it and the keyboard stops on it once.
+ * A control placed inside the card (a button, its own link) is lifted above
+ * the cover and still works on its own.
+ */
+const CARD_LINK_CSS =
+  '[data-pw-card-link] :is(a, button, input, select, textarea, summary, [tabindex]):not([data-pw-card-cover]) { position: relative; z-index: 1; }' +
+  '[data-pw-card-cover]:focus-visible { outline: 2px solid var(--pw-color-focus, var(--pw-color-primary)); outline-offset: 2px; }'
 
 // ============================================================
 // PROPS — declared in manifest.json, applied by the runtime
@@ -33,6 +45,13 @@ export interface CardProps {
   readonly aspectRatio?: number | string
   readonly align?: 'start' | 'center' | 'end' | 'stretch'
   readonly textAlign?: 'left' | 'center' | 'right'
+  /** Where the whole card goes: an app path (`/menu`), a URL or `#anchor`. */
+  readonly href?: string
+  /**
+   * The link's accessible name. Unset, the card's first heading names it (and
+   * with no heading, the card's own text).
+   */
+  readonly hrefLabel?: string
 }
 
 // ============================================================
@@ -61,8 +80,26 @@ export const cardDefinition: BlockDefinition = {
 // COMPONENT
 // ============================================================
 
-export const CardBlock: BlockComponent = ({ props, children, block }) => {
+export const CardBlock: BlockComponent = ({ props, children, block, context }) => {
   const p = props as unknown as CardProps
+  const { emit } = useSurfaceEvents()
+  const surfaceId = useSurfaceId()
+  const safe = safeHref(typeof p.href === 'string' && p.href.trim() ? p.href.trim() : undefined)
+  // A bare `#` is a placeholder, not a destination.
+  const target = safe && safe !== '#' ? safe : undefined
+  // An `href` prop reaches the block already in the router's form: the host
+  // rewrites every href prop (and the href of an object in a list prop) before
+  // the block renders, so it is written as given, never through appHref twice.
+  const href = target
+  const hrefLabel = typeof p.hrefLabel === 'string' && p.hrefLabel.trim() ? p.hrefLabel.trim() : undefined
+  // Unnamed, the link takes the first heading's name once it is on the page.
+  const rootRef = React.useRef<HTMLDivElement | null>(null)
+  const [labelledBy, setLabelledBy] = React.useState<string | undefined>(undefined)
+  React.useEffect(() => {
+    if (!href || hrefLabel) return
+    const heading = rootRef.current?.querySelector<HTMLElement>('h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]')
+    setLabelledBy(heading?.id || undefined)
+  })
   // Elevation ramp from the theme (--pw-shadow-*) with the prior literals as
   // fallbacks so cards re-skin elevation in one place.
   const shadowMap: Record<string, string> = {
@@ -122,10 +159,33 @@ export const CardBlock: BlockComponent = ({ props, children, block }) => {
     // Motion tokens: a hover lift or shadow change (from the host or a
     // linked card) follows the theme's pace and springs on its bounce easing.
     transition: `${transitionOf(['box-shadow', 'border-color', 'background-color'], MOTION.normal)}, transform ${MOTION.spring}`,
+    ...(href ? { position: 'relative' as const } : {}),
     ...block.style,
   }
+  if (!href) {
+    return (
+      <div id={block.id} data-block-id={block.id} style={style} data-block-type="card">
+        {children}
+      </div>
+    )
+  }
+  const onClick = (e: React.MouseEvent<HTMLAnchorElement>): void => {
+    // In the editor a click reports the destination instead of leaving the page.
+    if (context?.interactionMode !== 'inert') return
+    e.preventDefault()
+    emit({ type: SURFACE_EVENTS.BLOCK_CLICK, surfaceId, blockId: block.id, payload: { href: target ?? null } })
+  }
   return (
-    <div id={block.id} data-block-id={block.id} style={style} data-block-type="card">
+    <div ref={rootRef} id={block.id} data-block-id={block.id} style={style} data-block-type="card" data-pw-card-link="">
+      <style>{CARD_LINK_CSS}</style>
+      <a
+        href={href}
+        data-pw-card-cover=""
+        aria-label={hrefLabel}
+        aria-labelledby={hrefLabel ? undefined : (labelledBy ?? block.id)}
+        onClick={onClick}
+        style={{ position: 'absolute', inset: 0, zIndex: 0, borderRadius: 'inherit' }}
+      />
       {children}
     </div>
   )

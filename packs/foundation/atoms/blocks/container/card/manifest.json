@@ -1,7 +1,7 @@
 {
   "id": "container.card",
   "kind": "block",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "category": "container",
   "name": "card",
   "state": "stable",
@@ -157,6 +157,24 @@
           ]
         },
         "bindable": false
+      },
+      {
+        "name": "href",
+        "type": "string",
+        "description": "Makes the whole card one link: an app path (\"/menu\"), a URL or \"#anchor\". A click anywhere on the card opens it; the keyboard stops on it once; buttons and links placed inside still work on their own.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "hrefLabel",
+        "type": "string",
+        "description": "The card link's accessible name. Unset, the card's first heading names it.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
       }
     ],
     "defaultProps": {

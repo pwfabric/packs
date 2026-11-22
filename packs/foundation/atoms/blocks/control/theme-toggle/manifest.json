@@ -1,0 +1,61 @@
+{
+  "id": "control.theme-toggle",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "control",
+  "name": "theme-toggle",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Lets the visitor choose light, dark or the device scheme for the whole app; the choice is kept for their next visit.",
+    "useCases": [
+      "A light/dark switch in the top bar",
+      "Appearance setting on an account or settings page",
+      "Footer control on a documentation site"
+    ],
+    "composesWith": [
+      "layout.navbar",
+      "layout.container",
+      "layout.section"
+    ],
+    "antiPatterns": [
+      "Two theme toggles on one page",
+      "Switching the theme of one section: it sets the whole app",
+      "Writing the choice into state or a form: the host keeps it"
+    ],
+    "implementation": "A group of three radios (Light, Dark, System; System can be left out with showSystem: false) styled as one segmented control, with the words from the app (ui.colorScheme, ui.colorScheme.light / .dark / .system; English when the app sets none). It reads context.colorScheme and calls context.setColorScheme; the host stores the choice and applies it before the first paint. The first frame and the hydrating render say \"system\", so the first render never depends on the stored choice. showLabels: false draws icons only, the words staying the accessible names of the radios. In the editor it shows the current scheme and does not switch. Needs engine 3.5."
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "showSystem",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Offer System (follow the device) beside Light and Dark."
+        },
+        "bindable": false,
+        "default": true
+      },
+      {
+        "name": "showLabels",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Write each choice beside its icon. false: icons only; the words stay the accessible names."
+        },
+        "bindable": false,
+        "default": true
+      }
+    ],
+    "defaultProps": {
+      "showSystem": true,
+      "showLabels": true
+    },
+    "canHaveChildren": false,
+    "icon": "◐",
+    "traits": []
+  },
+  "tags": [
+    "tier:structure"
+  ]
+}

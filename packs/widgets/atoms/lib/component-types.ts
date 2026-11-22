@@ -79,6 +79,22 @@ export interface BlockComponentContext {
    * path as given.
    */
   readonly appHref?: (path: string) => string
+  /**
+   * The visitor's colour scheme: `light`, `dark`, or `system` when none is
+   * chosen. `system` in the first frame and the hydrating render (the build
+   * knows no visitor); the stored choice arrives in the update right after.
+   * Read here, never from storage. Engine 3.5.
+   */
+  readonly colorScheme?: 'light' | 'dark' | 'system'
+  /** Records the visitor's colour scheme; a host without a store ignores it. Engine 3.5. */
+  readonly setColorScheme?: (scheme: 'light' | 'dark' | 'system') => void
+  /** The app's locales in order (`[locale]` for a single-language app). Engine 3.5. */
+  readonly locales?: readonly string[]
+  /**
+   * The current page's address in every locale, `{ <lang>: address }`, written
+   * as a link to it is (`<base>de/preise/`). Engine 3.5.
+   */
+  readonly alternates?: Readonly<Record<string, string>>
 }
 
 // ============================================================

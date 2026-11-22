@@ -1,0 +1,75 @@
+{
+  "id": "control.language-switch",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "control",
+  "name": "language-switch",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Links to the same page in each of the app languages, each named in its own language, the current one marked.",
+    "useCases": [
+      "Language links in the top bar of a site in several languages",
+      "Language row in the footer",
+      "Language choice on a documentation page"
+    ],
+    "composesWith": [
+      "layout.navbar",
+      "layout.container",
+      "layout.section"
+    ],
+    "antiPatterns": [
+      "Links written by hand to another locale home page: the switch keeps the visitor on the same page",
+      "A select or dropdown that navigates on change",
+      "Placing it in a single-language app: it draws nothing there"
+    ],
+    "implementation": "A <nav> (named by the app word ui.language; English when unset) of links built from context.locales (order) and context.alternates (the current page address in each locale, written as a link to it is, so used as given). Each link carries hreflang and lang of its language and is named in that language (Deutsch, Türkçe) unless labels names it; the current locale (context.locale) carries aria-current=\"page\". With fewer than two locales the block draws nothing. separator: rule draws a thin rule between links. In the editor a click reports the address instead of leaving. Needs engine 3.5."
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "labels",
+        "type": "{ [lang]: string }",
+        "jsonSchema": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "The name shown for a locale, e.g. {\"de\": \"DE\"}. Unset, each language is named in itself."
+        },
+        "bindable": false
+      },
+      {
+        "name": "separator",
+        "type": "\"none\" | \"rule\"",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "none",
+            "rule"
+          ],
+          "description": "Between the links: a gap, or a thin rule."
+        },
+        "bindable": false,
+        "default": "none"
+      },
+      {
+        "name": "color",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "The links' colour, e.g. var(--pw-color-text-on-primary). Unset, they take the colour around them."
+        },
+        "bindable": false
+      }
+    ],
+    "defaultProps": {
+      "separator": "none"
+    },
+    "canHaveChildren": false,
+    "icon": "⇄",
+    "traits": []
+  },
+  "tags": [
+    "tier:structure"
+  ]
+}

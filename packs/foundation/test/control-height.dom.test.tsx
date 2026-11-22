@@ -1,0 +1,178 @@
+/**
+ * Every single-line form control has ONE height, border included, so a filter
+ * row of a search box and a select lines up (they measured 43px and 40px).
+ * jsdom draws no layout, so the box is read from what decides it: the same
+ * height value on a border-box element, with nothing that would add to it.
+ */
+import { describe, it, expect, afterEach } from 'vitest'
+import * as React from 'react'
+import { render, cleanup } from '@testing-library/react'
+import { BehaviorSurfaceProvider } from '@pwfabric/runtime'
+import { CONTROL_HEIGHT, CONTROL_LABEL_GAP } from '../atoms/lib/_shared-utils.js'
+import { InputBlock } from '../atoms/blocks/form/input/component.js'
+import { SelectBlock } from '../atoms/blocks/form/select/component.js'
+import { DateInputBlock } from '../atoms/blocks/form/date-input/component.js'
+import { NumberStepperBlock } from '../atoms/blocks/form/number-stepper/component.js'
+import { ComboboxBlock } from '../../widgets/atoms/blocks/form/combobox/component.js'
+import { SegmentedControlBlock } from '../atoms/blocks/form/segmented-control/component.js'
+import { OtpInputBlock } from '../atoms/blocks/form/otp-input/component.js'
+import { RadioBlock } from '../atoms/blocks/form/radio/component.js'
+import { TextareaBlock } from '../atoms/blocks/form/textarea/component.js'
+import { SliderBlock } from '../../widgets/atoms/blocks/form/slider/component.js'
+import { RichTextEditorBlock } from '../../widgets/atoms/blocks/form/rich-text-editor/component.js'
+import { TagInputBlock } from '../../widgets/atoms/blocks/form/tag-input/component.js'
+import { applied } from '../../../tools/test-support/applied-props.js'
+
+afterEach(() => cleanup())
+
+function box(C: unknown, type: string, props: Record<string, unknown>, pick: (root: HTMLElement) => HTMLElement | null): HTMLElement {
+  const Comp = C as React.FC<Record<string, unknown>>
+  const { container } = render(
+    <BehaviorSurfaceProvider surfaceId="t" onEvent={() => {}}>
+      <Comp props={applied(type, props)} block={{ id: 'c', type, props, layout: {} }} context={{ interactionMode: 'live' }} />
+    </BehaviorSurfaceProvider>,
+  )
+  const el = pick(container)
+  if (!el) throw new Error(`${type}: no control`)
+  return el
+}
+
+const outer = (el: HTMLElement): string => {
+  const s = getComputedStyle(el)
+  // A border-box element is exactly its height: padding and border sit inside it.
+  return `${el.style.height}|${s.boxSizing}`
+}
+
+describe('single-line form controls share one height', () => {
+  const controls: [string, () => HTMLElement][] = [
+    ['input text', () => box(InputBlock, 'input', { label: 'Name', name: 'n' }, (r) => r.querySelector('input'))],
+    ['input search', () => box(InputBlock, 'input', { label: 'Search', name: 'q', type: 'search' }, (r) => r.querySelector('input'))],
+    ['select', () => box(SelectBlock, 'select', { label: 'Kind', name: 'k', options: ['a', 'b'] }, (r) => r.querySelector('select'))],
+    ['date-input', () => box(DateInputBlock, 'date-input', { label: 'Day', name: 'd' }, (r) => r.querySelector('input'))],
+    ['number-stepper', () => box(NumberStepperBlock, 'number-stepper', { label: 'Guests', name: 'g' }, (r) => r.querySelector('[data-pw-step-field]')?.parentElement ?? null)],
+    ['combobox', () => box(ComboboxBlock, 'combobox', { label: 'City', name: 'c', options: ['Oslo'] }, (r) => r.querySelector('[data-pw-combo-frame]'))],
+  ]
+
+  it.each(controls)('%s is the shared control height, border-box', (_name, get) => {
+    const el = get()
+    expect(el.style.height).toBe(CONTROL_HEIGHT)
+    expect(getComputedStyle(el).boxSizing).toBe('border-box')
+    // No vertical padding beyond what fits inside the height.
+    expect(['', '0px'].includes(el.style.paddingTop)).toBe(true)
+    cleanup()
+  })
+
+  it('so a search box and a select in one row have the same box', () => {
+    const search = outer(controls[1]![1]())
+    cleanup()
+    const select = outer(controls[2]![1]())
+    expect(search).toBe(select)
+  })
+
+  it('a textarea and a multi-select keep their own height (they are not one line)', () => {
+    const ta = box(InputBlock, 'input', { label: 'Notes', name: 'n', type: 'textarea' }, (r) => r.querySelector('textarea'))
+    expect(ta.style.height).toBe('')
+    cleanup()
+    const multi = box(SelectBlock, 'select', { label: 'Tags', name: 't', multiple: true, options: ['a'] }, (r) => r.querySelector('select'))
+    expect(multi.style.height).toBe('')
+  })
+})
+
+/**
+ * Whether the field is a block-level box (no text line around it, so no
+ * descender gap under it): block, flex or grid, or an inline box that a flex
+ * parent blockifies.
+ */
+function blockLevel(el: HTMLElement): string {
+  const d = getComputedStyle(el).display
+  const parent = el.parentElement ? getComputedStyle(el.parentElement).display : ''
+  const level = ['block', 'flex', 'grid'].includes(d) || (d.startsWith('inline-') && /flex|grid/.test(parent)) ? 'block-level' : `inline (${d})`
+  return level
+}
+
+describe('every form control has the same label above the same field', () => {
+  /** The label, the gap under it, and everything between it and the control's box. */
+  function structure(C: unknown, type: string, props: Record<string, unknown>, pick: (root: HTMLElement) => HTMLElement | null): string {
+    const field = box(C, type, props, pick)
+    const root = document.querySelector('[data-block-id="c"]') as HTMLElement
+    const label = [...root.querySelectorAll<HTMLElement>('label, span')].find((n) => n.textContent === props['label'])
+    if (!label) throw new Error(`${type}: no label`)
+    const rootGap = root.style.gap || root.style.rowGap || ''
+    // Every element from the root down to the field: none adds a margin or padding above it.
+    const between: string[] = []
+    for (let n: HTMLElement | null = field.parentElement; n && n !== root; n = n.parentElement) between.push(`${n.style.marginTop}${n.style.paddingTop}`)
+    const out = [
+      label.style.display,
+      label.style.marginBottom,
+      label.style.lineHeight,
+      label.style.fontSize,
+      rootGap,
+      between.join(''),
+      blockLevel(field),
+    ].join('|')
+    cleanup()
+    return out
+  }
+
+  it('input, search, select, date, number and combobox match', () => {
+    const shapes = [
+      structure(InputBlock, 'input', { label: 'Name', name: 'n' }, (r) => r.querySelector('input')),
+      structure(InputBlock, 'input', { label: 'Search', name: 'q', type: 'search' }, (r) => r.querySelector('input')),
+      structure(SelectBlock, 'select', { label: 'Kind', name: 'k', options: ['a'] }, (r) => r.querySelector('select')),
+      structure(DateInputBlock, 'date-input', { label: 'Day', name: 'd' }, (r) => r.querySelector('input')),
+      structure(NumberStepperBlock, 'number-stepper', { label: 'Guests', name: 'g' }, (r) => r.querySelector('[data-pw-step-field]')?.parentElement ?? null),
+      structure(ComboboxBlock, 'combobox', { label: 'City', name: 'c', options: ['Oslo'] }, (r) => r.querySelector('[data-pw-combo-frame]')),
+    ]
+    expect(shapes).toEqual(shapes.map(() => shapes[0]))
+    expect(shapes[0]).toBe(`block|${CONTROL_LABEL_GAP}|var(--pw-control-label-line-height, 20px)|var(--pw-font-size-sm)|||block-level`)
+  })
+})
+
+describe('every labelled form block draws the same label, the same distance above its control', () => {
+  /**
+   * The label's look, and the space between it and the control: its own
+   * bottom margin plus the gap of the column it sits in. A margin written as
+   * calc(<gap> - <column gap>) under a column with that gap IS <gap>.
+   */
+  function labelShape(C: unknown, type: string, props: Record<string, unknown>): string {
+    const Comp = C as React.FC<Record<string, unknown>>
+    render(
+      <BehaviorSurfaceProvider surfaceId="t" onEvent={() => {}}>
+        <Comp props={applied(type, props)} block={{ id: 'c', type, props, layout: {} }} context={{ interactionMode: 'live' }} />
+      </BehaviorSurfaceProvider>,
+    )
+    const root = document.querySelector('[data-block-id="c"]') as HTMLElement
+    const label = [...root.querySelectorAll<HTMLElement>('label, span, legend')].find((n) => n.textContent?.replace(/\s*\*$/, '') === props['label'] || n.textContent === props['groupLabel'])
+    if (!label) throw new Error(`${type}: no label`)
+    // The box that stands above the control: the label, or the row it heads (slider: label + value).
+    const head = label.parentElement === root ? label : (label.parentElement as HTMLElement)
+    const column = head.parentElement as HTMLElement
+    const columnGap = column.style.gap || ''
+    const mb = head.style.marginBottom
+    const space = columnGap ? (mb === `calc(${CONTROL_LABEL_GAP} - ${columnGap})` ? CONTROL_LABEL_GAP : `${mb} + ${columnGap}`) : mb
+    const out = [label.style.display, label.style.lineHeight, label.style.fontSize, label.style.fontWeight, space].join('|')
+    cleanup()
+    return out
+  }
+
+  it('across every labelled form block of both packs', () => {
+    const want = `block|var(--pw-control-label-line-height, 20px)|var(--pw-font-size-sm)|500|${CONTROL_LABEL_GAP}`
+    const shapes: Record<string, string> = {
+      input: labelShape(InputBlock, 'input', { label: 'Name', name: 'n' }),
+      search: labelShape(InputBlock, 'input', { label: 'Search', name: 'q', type: 'search' }),
+      select: labelShape(SelectBlock, 'select', { label: 'Kind', name: 'k', options: ['a'] }),
+      'multi-select': labelShape(SelectBlock, 'select', { label: 'Tags', name: 't', multiple: true, options: ['a'] }),
+      date: labelShape(DateInputBlock, 'date-input', { label: 'Day', name: 'd' }),
+      number: labelShape(NumberStepperBlock, 'number-stepper', { label: 'Guests', name: 'g' }),
+      combobox: labelShape(ComboboxBlock, 'combobox', { label: 'City', name: 'c', options: ['Oslo'] }),
+      'segmented-control': labelShape(SegmentedControlBlock, 'segmented-control', { label: 'View', options: [{ label: 'A', value: 'a' }, { label: 'B', value: 'b' }] }),
+      otp: labelShape(OtpInputBlock, 'otp-input', { label: 'Code', name: 'code' }),
+      radio: labelShape(RadioBlock, 'radio', { groupLabel: 'Size', label: 'Size', name: 's', options: [{ label: 'S', value: 's' }] }),
+      textarea: labelShape(TextareaBlock, 'textarea', { label: 'Notes', name: 'notes' }),
+      slider: labelShape(SliderBlock, 'slider', { label: 'Volume', name: 'v' }),
+      'rich-text-editor': labelShape(RichTextEditorBlock, 'rich-text-editor', { label: 'Body', name: 'b' }),
+      'tag-input': labelShape(TagInputBlock, 'tag-input', { label: 'Topics', name: 'tp' }),
+    }
+    expect(shapes).toEqual(Object.fromEntries(Object.keys(shapes).map((k) => [k, want])))
+  })
+})

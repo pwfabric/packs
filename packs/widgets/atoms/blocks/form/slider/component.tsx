@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { safeRenderValue } from '../../../lib/_kit.js'
+import { CONTROL_LABEL_GAP, CONTROL_LABEL_STYLE, safeRenderValue } from '../../../lib/_kit.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 
@@ -100,16 +100,13 @@ export const SliderBlock: BlockComponent = ({ props, block }) => {
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: 'var(--pw-space-sm, 8px)',
+          // The head row (label + value) stands where every control's label
+          // does: CONTROL_LABEL_GAP above the track, the column's gap taken back.
+          marginBottom: `calc(${CONTROL_LABEL_GAP} - var(--pw-space-xs, 4px))`,
         }}
       >
         {label ? (
-          <span
-            style={{
-              fontSize: 'var(--pw-font-size-sm, 14px)',
-              color: 'var(--pw-color-text, #09090b)',
-              fontWeight: 500,
-            }}
-          >
+          <span style={{ ...CONTROL_LABEL_STYLE, marginBottom: 0 }}>
             {safeRenderValue(label)}
           </span>
         ) : (

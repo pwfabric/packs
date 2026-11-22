@@ -2,7 +2,7 @@ import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
-import { listOf, textOf } from '../../../lib/_shared-utils.js'
+import { controlLabelStyle, listOf, textOf } from '../../../lib/_shared-utils.js'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 
 // ============================================================
@@ -104,13 +104,8 @@ export const RadioBlock: BlockComponent = ({ props, block }) => {
     gap: '8px',
   }
 
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    marginBottom: '8px',
-    fontSize: 'var(--pw-font-size-sm)',
-    fontWeight: 500,
-    color: labelColor,
-  }
+  // The one label of every form control; the group keeps its own ink.
+  const labelStyle: React.CSSProperties = { ...controlLabelStyle('8px'), color: labelColor }
 
   const optionsStyle: React.CSSProperties = {
     display: 'flex',

@@ -1,0 +1,104 @@
+{
+  "id": "data.definition-list",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "data",
+  "name": "definition-list",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Terms and what they mean, as a real <dl>: a glossary, a spec sheet, the key facts of a record (term, then one or more descriptions).",
+    "useCases": [
+      "Glossary of terms on a documentation page",
+      "Product spec sheet: Weight 1.2 kg, Battery 12 hours",
+      "Key facts of an order or a booking: Date, Guests, Table"
+    ],
+    "composesWith": [
+      "container.card",
+      "layout.container",
+      "text.heading",
+      "layout.section"
+    ],
+    "antiPatterns": [
+      "Rows with several comparable columns: use data.table",
+      "Questions with answers the visitor opens one by one: use container.accordion (openAll for a list read top to bottom)",
+      "A plain list of items with no terms: use data.list"
+    ],
+    "implementation": "`items` is a list of {term, description}; a description may be a string or a list of strings (several <dd> under one term). layout \"stacked\" puts each description under its term; \"columns\" puts the term beside its description in a two-column grid that stacks below 420px of the block's own width. `dividers` draws a rule between pairs. Each pair is wrapped in a <div>, which is valid inside <dl>. Items without a term are skipped; with no items the block draws nothing."
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "items",
+        "type": "[{term, description: string | string[]}]",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "term": {
+                "type": "string"
+              },
+              "description": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              }
+            },
+            "required": [
+              "term",
+              "description"
+            ]
+          },
+          "description": "The pairs: a term and its description (or several descriptions)."
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "layout",
+        "type": "'stacked' | 'columns'",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "stacked",
+            "columns"
+          ],
+          "description": "stacked: each description under its term. columns: the term beside its description; stacks on a narrow box."
+        },
+        "bindable": false,
+        "default": "stacked"
+      },
+      {
+        "name": "dividers",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "A rule between the pairs."
+        },
+        "bindable": false,
+        "default": false
+      }
+    ],
+    "defaultProps": {
+      "items": [],
+      "layout": "stacked",
+      "dividers": false
+    },
+    "canHaveChildren": false,
+    "icon": "≔",
+    "traits": [
+      "modal-content"
+    ]
+  },
+  "tags": [
+    "tier:content"
+  ]
+}

@@ -140,6 +140,9 @@ export const CopyButtonBlock: BlockComponent = ({ props, block, context }) => {
         cursor: 'pointer',
         lineHeight: 1.2,
         transition: 'color var(--pw-duration-fast, 150ms)',
+        // The announced outcome is an absolutely positioned helper: it stays
+        // inside the button, not against some far ancestor.
+        position: 'relative',
         ...block.style,
       }}
     >

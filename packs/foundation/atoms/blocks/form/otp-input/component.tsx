@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { safeRenderValue } from '../../../lib/_shared-utils.js'
+import { controlLabelStyle, safeRenderValue } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 import { messageOf, useAppMessage, useAppMessages } from '@pwfabric/runtime'
@@ -67,7 +67,8 @@ export const OtpInputBlock: BlockComponent = ({ props, block }) => {
   // form's own check (form.form `invalidFields`) reads the visible controls.
   // The words are the app's (`ui.form.code`, with {label} and {n}; each cell's name is `ui.otp.cell`).
   const appWords = useAppMessages()
-  const unfinished = useAppMessage('ui.form.code', '', { label, n: String(length) })
+  // {n} is a number, so a plural message ({n, plural, one {# digit} other {# digits}}) picks its words.
+  const unfinished = useAppMessage('ui.form.code', '', { label, n: length })
   React.useEffect(() => {
     const first = refs.current[0]
     if (!first) return
@@ -148,13 +149,7 @@ export const OtpInputBlock: BlockComponent = ({ props, block }) => {
         ...block.style,
       }}
     >
-      <span
-        style={{
-          fontSize: 'var(--pw-font-size-sm, 14px)',
-          color: 'var(--pw-color-text, #09090b)',
-          fontWeight: 500,
-        }}
-      >
+      <span style={controlLabelStyle('var(--pw-space-sm, 8px)')}>
         {safeRenderValue(label)}
       </span>
       {/* ONE named value: the cells used to carry

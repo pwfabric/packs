@@ -1,7 +1,7 @@
 {
   "id": "form.number-stepper",
   "kind": "block",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "category": "form",
   "name": "number-stepper",
   "state": "stable",

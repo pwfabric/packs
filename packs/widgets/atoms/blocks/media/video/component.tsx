@@ -34,6 +34,13 @@ export interface VideoProps {
   // Colon forms are normalised to the CSS `/` form for the native aspect-ratio.
   readonly aspectRatio: number | string
   readonly caption?: string
+  /**
+   * How much the browser loads before play: `metadata` (the default: size,
+   * length and first frame), `none` (nothing until play) or `auto`.
+   */
+  readonly preload: 'none' | 'metadata' | 'auto'
+  /** The video's accessible name ("Product tour, 2 minutes"). */
+  readonly label?: string
 }
 
 // ============================================================
@@ -52,6 +59,7 @@ export const videoDefinition: BlockDefinition = {
     loop: false,
     muted: false,
     aspectRatio: '16/9',
+    preload: 'metadata',
   },
   defaultLayout: { span: { xs: 4, sm: 8, md: 8, lg: 12 } },
   canHaveChildren: false,
@@ -73,6 +81,8 @@ export const VideoBlock: BlockComponent = ({ props, block, context }) => {
   // ('16:9') and any custom string ('21/9', '3/2') or number all map to `/`.
   const rawAspect = String(p.aspectRatio)
   const aspectRatio = rawAspect.includes(':') ? rawAspect.replace(':', '/') : rawAspect
+  const preload = p.preload === 'none' || p.preload === 'auto' ? p.preload : 'metadata'
+  const label = textOf(p.label).trim() || undefined
 
   const wrapperStyle: React.CSSProperties = {
     position: 'relative',
@@ -110,6 +120,8 @@ export const VideoBlock: BlockComponent = ({ props, block, context }) => {
             muted={muted}
             playsInline={autoplay || undefined}
             poster={typeof p.poster === 'string' ? p.poster : undefined}
+            preload={preload}
+            aria-label={label}
           />
         ) : (
           <div

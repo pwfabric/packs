@@ -1,7 +1,7 @@
 {
   "id": "layout.navbar",
   "kind": "block",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "category": "layout",
   "name": "navbar",
   "state": "stable",
@@ -24,7 +24,7 @@
       "Multiple navbars on the same surface",
       "Authoring `account` in a receipt or pattern — the runner injects the real visitor; a hand-written one is a fake session"
     ],
-    "implementation": "Top-of-page navigation bar with logo, link list, and an optional right-aligned utility cluster (search box, social icons, an optional ghost/text secondary CTA followed by the primary CTA, avatar) plus a second co-brand wordmark — sticky-capable. Each link may carry EITHER a flat dropdown submenu (items: [{label, href}]) OR a multi-column mega-panel (megaColumns: [{heading?, items: [{label, href?, icon?, description?}]}] plus an optional trailing feature tile {title, description?, href?, icon?}). The cluster can also lead with a free info-slot (rightInfo: [{label?, value, icon?}]) of small muted non-interactive status text (e.g. weather '24°C London', currency 'USDTRY 27.01'), rendered before search/CTA. The secondary CTA pairs a ghost 'Log In' with a primary 'Get Started'.\n\nFurther use cases:\n- Sticky navbar that follows on scroll for long pages\n- Corporate intranet / portal top bar with search, social icons, and a co-branded second wordmark\n- Product/solutions mega-menu: a top-level link opening a wide multi-column panel of grouped destinations plus a highlighted feature tile\n- Portal header with a free info-slot showing live status (weather, exchange rate, server time) before the search box\n\nAccount control: when the runner injects `account`, the decorative avatar is replaced by the shared account menu (blocks/_shared-account-menu.tsx) — a WAI-ARIA menu button (aria-haspopup/expanded, arrow keys, Escape returns focus, outside press closes) opening a card with name + email, Profile (profileHref), `links`, a divider and Sign out. Signed out it renders a \"Sign in\" button. Sign in/out are emitted as block:click with payload.action {type: \"auth:signIn\" | \"auth:signOut\"}; the runner handles them (inert renders report the click without the action). `avatarName`/`avatarSrc` still work for static mock-ups without an account."
+    "implementation": "Top-of-page navigation bar with logo, link list, and an optional right-aligned utility cluster (search box, social icons, an optional ghost/text secondary CTA followed by the primary CTA, avatar) plus a second co-brand wordmark — sticky-capable: to keep it at the top while the page scrolls, give the block `style: {position: \"sticky\", top: \"0\", zIndex: \"var(--pw-z-sticky, var(--pw-z-nav))\"}` (the engine places these on the block’s wrapper, the element that can stick; the bar then publishes its height so in-page anchors land below it). One painted frame is right at every width: CSS shows the wide row from 768px and the menu button with its drawer below it. Each link may carry EITHER a flat dropdown submenu (items: [{label, href}]) OR a multi-column mega-panel (megaColumns: [{heading?, items: [{label, href?, icon?, description?}]}] plus an optional trailing feature tile {title, description?, href?, icon?}). The cluster can also lead with a free info-slot (rightInfo: [{label?, value, icon?}]) of small muted non-interactive status text (e.g. weather '24°C London', currency 'USDTRY 27.01'), rendered before search/CTA. The secondary CTA pairs a ghost 'Log In' with a primary 'Get Started'.\n\nFurther use cases:\n- Sticky navbar that follows on scroll for long pages\n- Corporate intranet / portal top bar with search, social icons, and a co-branded second wordmark\n- Product/solutions mega-menu: a top-level link opening a wide multi-column panel of grouped destinations plus a highlighted feature tile\n- Portal header with a free info-slot showing live status (weather, exchange rate, server time) before the search box\n\nAccount control: when the runner injects `account`, the decorative avatar is replaced by the shared account menu (blocks/_shared-account-menu.tsx) — a WAI-ARIA menu button (aria-haspopup/expanded, arrow keys, Escape returns focus, outside press closes) opening a card with name + email, Profile (profileHref), `links`, a divider and Sign out. Signed out it renders a \"Sign in\" button. Sign in/out are emitted as block:click with payload.action {type: \"auth:signIn\" | \"auth:signOut\"}; the runner handles them (inert renders report the click without the action). `avatarName`/`avatarSrc` still work for static mock-ups without an account."
   },
   "definition": {
     "props": [
@@ -69,6 +69,14 @@
                     },
                     "href": {
                       "type": "string"
+                    },
+                    "match": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "prefix"
+                      ],
+                      "description": "exact (default): current only on its own address. prefix: also marks the section on every page below it (\"/guides\" on \"/guides/records\"); aria-current=\"page\" stays on the exact page."
                     }
                   },
                   "required": [
@@ -131,6 +139,14 @@
                 "required": [
                   "title"
                 ]
+              },
+              "match": {
+                "type": "string",
+                "enum": [
+                  "exact",
+                  "prefix"
+                ],
+                "description": "exact (default): current only on its own address. prefix: also marks the section on every page below it (\"/guides\" on \"/guides/records\"); aria-current=\"page\" stays on the exact page."
               }
             },
             "required": [
@@ -152,13 +168,13 @@
         "bindable": true
       },
       {
-        "name": "sticky",
-        "type": "boolean",
+        "name": "lang",
+        "type": "string",
         "jsonSchema": {
-          "type": "boolean"
+          "type": "string",
+          "description": "The language of the bar’s words (BCP 47, e.g. \"en\") when it differs from the page’s, written as the element’s lang so uppercase text follows that language’s case rules."
         },
-        "bindable": false,
-        "default": false
+        "bindable": false
       },
       {
         "name": "alignment",
@@ -396,7 +412,6 @@
     "defaultProps": {
       "logoText": "",
       "links": [],
-      "sticky": false,
       "alignment": "right",
       "showCTA": false,
       "ctaLabel": "",

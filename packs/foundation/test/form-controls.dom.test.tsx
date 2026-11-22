@@ -19,7 +19,7 @@
  */
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import * as React from 'react'
-import { render, screen, cleanup, fireEvent, act } from '@testing-library/react'
+import { render, screen, cleanup, fireEvent, act, within } from '@testing-library/react'
 import { BehaviorSurfaceProvider } from '@pwfabric/runtime'
 import { tint, safeFrameSrc, safeHref, CONTROL_BORDER } from '../atoms/lib/_shared-utils.js'
 import { FormBlock, collectFormValues } from '../atoms/blocks/form/form/component.js'
@@ -398,13 +398,14 @@ describe('navbar', () => {
     expect(button.getAttribute('type')).toBe('button')
     expect(button.getAttribute('aria-expanded')).toBe('false')
     expect(button.style.color).toBe('inherit')
+    const drawer = document.getElementById(button.getAttribute('aria-controls') ?? '') as HTMLElement
     await act(async () => fireEvent.click(button))
     expect(button.getAttribute('aria-expanded')).toBe('true')
-    await act(async () => fireEvent.click(screen.getByText('About us')))
-    expect(screen.queryByText('About us')).toBeNull()
+    await act(async () => fireEvent.click(within(drawer).getByText('About us')))
+    expect(within(drawer).queryByText('About us')).toBeNull()
     await act(async () => fireEvent.click(button))
     await act(async () => fireEvent.keyDown(document, { key: 'Escape' }))
-    expect(screen.queryByText('About us')).toBeNull()
+    expect(within(drawer).queryByText('About us')).toBeNull()
     expect(document.activeElement).toBe(button)
   })
 
@@ -412,7 +413,11 @@ describe('navbar', () => {
     mount(el(NavbarBlock, 'nav', 'navbar', { logoText: 'Balance', showSearch: true, searchPlaceholder: 'Search' }, undefined, PHONE, { style: { marginTop: '9px' } }))
     expect((document.getElementById('nav') as HTMLElement).style.marginTop).toBe('9px')
     await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Open menu' })))
-    expect(screen.getByRole('search')).toBeTruthy()
+    const drawer = document.getElementById('nav-menu') as HTMLElement
+    expect(within(drawer).getByRole('search')).toBeTruthy()
+    // The bar's box and the drawer's are two fields: their ids differ.
+    const ids = [...document.querySelectorAll('input[type="search"]')].map((i) => i.id)
+    expect(new Set(ids).size).toBe(ids.length)
   })
 
   it('search answers Enter with an event and a state write', async () => {
@@ -432,9 +437,60 @@ describe('navbar', () => {
     expect(document.querySelector('a[href="#"]')).toBeNull()
   })
 
-  it('a sticky bar publishes its height for anchor scrolling', () => {
-    mount(el(NavbarBlock, 'nav', 'navbar', { logoText: 'Balance', sticky: true }))
-    expect(document.querySelector('style')?.textContent).toContain('scroll-padding-top')
+  it('a bar made sticky by its block style publishes its height for anchor scrolling', async () => {
+    const sticky = { position: 'sticky', top: '0', zIndex: 'var(--pw-z-sticky, var(--pw-z-nav))' }
+    await act(async () => {
+      mount(el(NavbarBlock, 'nav', 'navbar', { logoText: 'Balance' }, undefined, undefined, { style: sticky }))
+    })
+    expect(document.querySelector('#nav style')?.textContent).toContain('scroll-padding-top')
+  })
+
+  it('the position is the block style\'s: the bar sets none of its own', () => {
+    mount(el(NavbarBlock, 'nav', 'navbar', { logoText: 'Balance' }))
+    const bar = document.getElementById('nav') as HTMLElement
+    expect(bar.style.position).toBe('relative')
+    expect(bar.style.top).toBe('')
+    expect(bar.style.zIndex).toBe('')
+    expect(document.querySelector('#nav style')?.textContent).not.toContain('scroll-padding-top')
+  })
+
+  it('one frame for every width: both forms are drawn, CSS picks one, viewport is not read', () => {
+    const props = { logoText: 'Balance', links, showCTA: true, ctaLabel: 'Join', account: { state: 'signed-in', name: 'Ada' } }
+    const phone = mount(el(NavbarBlock, 'nav', 'navbar', props, undefined, PHONE)).container.innerHTML
+    cleanup()
+    const desk = mount(el(NavbarBlock, 'nav', 'navbar', props, undefined, { interactionMode: 'live', viewport: 'xl' })).container.innerHTML
+    // React's own ids (useId) count per render; everything else is the same markup.
+    const ids = (html: string): string => html.replace(/(«|:|_)r_?[0-9a-z]+_?(»|:|_)/g, 'ID')
+    expect(ids(desk)).toBe(ids(phone))
+    const css = document.querySelector('#nav style')?.textContent ?? ''
+    expect(css).toContain('@media (max-width: 767.98px)')
+    expect(css).toMatch(/\[data-pw-nav-wide\] \{ display: none !important; \}/)
+    expect(css).toMatch(/@media \(min-width: 768px\) \{ \[data-pw-nav-narrow\] \{ display: none !important; \} \}/)
+    expect(css).toContain('[data-pw-nav-account-name] { display: none !important; }')
+    // The wide row: links + the utility cluster; the narrow form: the menu button + drawer.
+    const wide = [...document.querySelectorAll('[data-pw-nav-wide]')]
+    expect(wide.some((n) => n.tagName === 'NAV' && n.textContent?.includes('About us'))).toBe(true)
+    expect(wide.some((n) => n.textContent?.includes('Join'))).toBe(true)
+    const narrow = [...document.querySelectorAll('[data-pw-nav-narrow]')]
+    expect(narrow.some((n) => n.querySelector('button[aria-controls="nav-menu"]'))).toBe(true)
+    expect(narrow.some((n) => n.id === 'nav-menu')).toBe(true)
+    // The account name beside the avatar belongs to the wide bar only.
+    expect(document.querySelectorAll('[data-pw-nav-account-name]')).toHaveLength(1)
+  })
+
+  it('lang is written on the bar; a malformed one is not', () => {
+    mount(el(NavbarBlock, 'nav', 'navbar', { logoText: 'Discover', lang: 'en' }))
+    expect(document.getElementById('nav')?.getAttribute('lang')).toBe('en')
+    cleanup()
+    mount(el(NavbarBlock, 'nav', 'navbar', { logoText: 'Discover', lang: 'en" onclick="x' }))
+    expect(document.getElementById('nav')?.hasAttribute('lang')).toBe(false)
+  })
+
+  it('the logo picture is decorative when the name is written beside it', () => {
+    mount(el(NavbarBlock, 'nav', 'navbar', { logoText: 'Balance', logoSrc: '/logo.svg', logoHref: '/' }))
+    const img = document.querySelector('#nav img') as HTMLImageElement
+    expect(img.getAttribute('alt')).toBe('')
+    expect(screen.getByRole('link', { name: 'Balance' })).toBeTruthy()
   })
 
   it('desktop links wrap instead of overflowing at md', () => {
@@ -475,6 +531,18 @@ describe('grid, container, section', () => {
     expect(c.style.borderWidth).toBe('2px')
     expect(c.style.borderStyle).toBe('solid')
     expect(c.style.boxSizing).toBe('border-box')
+  })
+
+  it('a container with maxWidth is centred unless center is false', () => {
+    mount(el(ContainerBlock, 'c1', 'container', { maxWidth: 720 }))
+    const centred = document.getElementById('c1') as HTMLElement
+    expect(centred.style.maxWidth).toBe('720px')
+    expect(centred.style.margin).toBe('0px auto')
+    cleanup()
+    mount(el(ContainerBlock, 'c2', 'container', { maxWidth: 720, center: false }))
+    const start = document.getElementById('c2') as HTMLElement
+    expect(start.style.maxWidth).toBe('720px')
+    expect(start.style.margin).toBe('')
   })
 
   it('a section keeps its padding inside its width', () => {

@@ -1,7 +1,13 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { safeRenderValue, gradientCSS } from '../../../lib/_shared-utils.js'
+import { SURFACE_EVENTS } from '@pwfabric/contracts'
+import { safeRenderValue, gradientCSS, langOf, safeHref } from '../../../lib/_shared-utils.js'
+import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
+
+/** A heading's link reads as the heading; the underline comes on hover and focus. */
+const HEADING_LINK_CSS =
+  '[data-pw-heading-link] { color: inherit; text-decoration: none; } [data-pw-heading-link]:hover, [data-pw-heading-link]:focus-visible { text-decoration: underline; text-underline-offset: 0.15em; }'
 
 // ============================================================
 // PROPS — declared in manifest.json, applied by the runtime
@@ -42,6 +48,14 @@ export interface HeadingProps {
   readonly rich: boolean
   /** Move focus here whenever this value changes after the first render (a step number, a page key). */
   readonly focusOn?: unknown
+  /** A link inside the heading: an app path (`/blog/launch`), a URL or `#anchor`. */
+  readonly href?: string
+  /**
+   * The language of the heading's text (BCP 47, `en`), written as the element's
+   * `lang` so `uppercase` follows that language's case rules: an English word
+   * on a Turkish page keeps its dotless I.
+   */
+  readonly lang?: string
 }
 
 // ============================================================
@@ -89,8 +103,10 @@ function renderRichText(text: string): React.ReactNode {
   })
 }
 
-export const HeadingBlock: BlockComponent = ({ props, block }) => {
+export const HeadingBlock: BlockComponent = ({ props, block, context }) => {
   const p = props as unknown as HeadingProps
+  const { emit } = useSurfaceEvents()
+  const surfaceId = useSurfaceId()
   // FOCUS ON CHANGE (`focusOn`): a wizard's step heading takes focus when the
   // step changes, so a keyboard or screen-reader visitor lands on the new
   // step's title instead of on a button that no longer exists. The first
@@ -190,19 +206,40 @@ export const HeadingBlock: BlockComponent = ({ props, block }) => {
     ...block.style,
   }
 
+  const content = p.rich ? renderRichText(p.text) : safeRenderValue(p.text)
+  const safe = safeHref(typeof p.href === 'string' && p.href.trim() ? p.href.trim() : undefined)
+  const target = safe && safe !== '#' ? safe : undefined
+  // An `href` prop reaches the block already in the router's form: the host
+  // rewrites every href prop (and the href of an object in a list prop) before
+  // the block renders, so it is written as given, never through appHref twice.
+  const href = target
+  const onLinkClick = (e: React.MouseEvent<HTMLAnchorElement>): void => {
+    if (context?.interactionMode !== 'inert') return
+    e.preventDefault()
+    emit({ type: SURFACE_EVENTS.BLOCK_CLICK, surfaceId, blockId: block.id, payload: { href: target ?? null } })
+  }
   const headingEl = (
     <Tag
       id={block.id}
       data-block-id={block.id}
       style={style}
       data-block-type="heading"
+      lang={langOf(p.lang)}
       {...(p.focusOn !== undefined ? { ref, tabIndex: -1 } : {})}
     >
-      {p.rich ? renderRichText(p.text) : safeRenderValue(p.text)}
+      {href ? (
+        <a href={href} data-pw-heading-link="" onClick={onLinkClick}>
+          {content}
+        </a>
+      ) : (
+        content
+      )}
     </Tag>
   )
 
-  if (!p.accentBar) return headingEl
+  // The link's look is a sibling style, not inside the heading (phrasing content only).
+  const linkCss = href ? <style>{HEADING_LINK_CSS}</style> : null
+  if (!p.accentBar) return linkCss ? <>{linkCss}{headingEl}</> : headingEl
 
   // Signature motif: gold vertical bar, pinned to the reference's secondary-
   // container token (not --pw-color-primary) so the motif's color stays fixed
@@ -224,6 +261,7 @@ export const HeadingBlock: BlockComponent = ({ props, block }) => {
           flexShrink: 0,
         }}
       />
+      {linkCss}
       {React.cloneElement(headingEl, { id: undefined })}
     </div>
   )

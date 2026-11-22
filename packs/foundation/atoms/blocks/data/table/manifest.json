@@ -1,7 +1,7 @@
 {
   "id": "data.table",
   "kind": "block",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "category": "data",
   "name": "table",
   "state": "stable",
@@ -163,9 +163,10 @@
             "required": [
               "key"
             ]
-          }
+          },
+          "description": "Bindable: a header may be an expression, e.g. \"{{t('table.patient')}}\", so column labels follow the app's language."
         },
-        "bindable": false,
+        "bindable": true,
         "default": []
       },
       {

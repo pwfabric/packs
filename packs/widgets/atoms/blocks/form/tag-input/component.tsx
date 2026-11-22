@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { HIT_AREA_CSS, safeRenderValue } from '../../../lib/_kit.js'
+import { HIT_AREA_CSS, controlLabelStyle, safeRenderValue } from '../../../lib/_kit.js'
 
 /**
  * At phone width or on a coarse pointer the remove × is a REAL 44×44 box (R3
@@ -149,11 +149,8 @@ export const TagInputBlock: BlockComponent = ({ props, block }) => {
     cursor: disabled ? 'not-allowed' : undefined,
     ...block.style,
   }
-  const labelStyle: React.CSSProperties = {
-    fontSize: 'var(--pw-font-size-sm)',
-    fontWeight: 500,
-    color: 'var(--pw-color-text)',
-  }
+  // The one label of every form control.
+  const labelStyle: React.CSSProperties = controlLabelStyle('4px')
   const fieldStyle: React.CSSProperties = {
     display: 'flex',
     flexWrap: 'wrap' as const,

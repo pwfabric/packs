@@ -131,6 +131,44 @@ export const CONTROL_BORDER =
   'var(--pw-color-control-border, color-mix(in srgb, var(--pw-color-text-muted) 80%, var(--pw-color-border)))'
 
 /**
+ * THE HEIGHT OF A SINGLE-LINE FORM CONTROL, border included: a text or search
+ * input, a select, a date field, a number stepper, a combobox. One value, so a
+ * filter row of a search box and a select lines up (they were 43px and 40px).
+ * A theme may set `--pw-control-height`; on a phone or a touch screen each
+ * control still grows to its 44px target.
+ */
+export const CONTROL_HEIGHT = 'var(--pw-control-height, 40px)'
+
+/**
+ * THE LABEL ABOVE A FORM CONTROL: one style for every control, so a row of
+ * controls has its fields on one line. The label is a block with a fixed line
+ * height and one gap under it (`--pw-control-label-gap`); the control's own
+ * wrapper adds no gap of its own. Different label spacing left a select 2px
+ * above a search box beside it.
+ */
+export const CONTROL_LABEL_GAP = 'var(--pw-control-label-gap, 6px)'
+
+/**
+ * The label style in a column that already spaces its children by
+ * `columnGap`: the label's own margin takes that gap back, so the space under
+ * the label is CONTROL_LABEL_GAP whatever the column does for the rest.
+ */
+export function controlLabelStyle(columnGap?: string): React.CSSProperties {
+  return columnGap ? { ...CONTROL_LABEL_STYLE, marginBottom: `calc(${CONTROL_LABEL_GAP} - ${columnGap})` } : CONTROL_LABEL_STYLE
+}
+
+/** The label style itself: a block, a fixed line height, CONTROL_LABEL_GAP under it. */
+export const CONTROL_LABEL_STYLE: React.CSSProperties = {
+  display: 'block',
+  margin: 0,
+  marginBottom: CONTROL_LABEL_GAP,
+  fontSize: 'var(--pw-font-size-sm)',
+  fontWeight: 500,
+  lineHeight: 'var(--pw-control-label-line-height, 20px)',
+  color: 'var(--pw-color-text)',
+}
+
+/**
  * Black or white, whichever reads on `ground` — decided by the ground's own
  * luminance, in CSS.
  *
@@ -862,4 +900,15 @@ export function localeUses24h(locale: string | undefined): boolean {
   } catch {
     return false
   }
+}
+
+/**
+ * A `lang` prop as an element's `lang` attribute: a well-formed BCP 47 tag
+ * (`en`, `tr`, `pt-BR`, `zh-Hant`) or nothing. The browser picks case rules
+ * by it, so an English word on a Turkish page uppercases as English.
+ */
+export function langOf(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined
+  const tag = value.trim()
+  return /^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$/.test(tag) ? tag : undefined
 }

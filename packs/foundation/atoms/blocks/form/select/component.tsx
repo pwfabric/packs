@@ -3,7 +3,7 @@ import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
-import { CONTROL_BORDER, textOf } from '../../../lib/_shared-utils.js'
+import { CONTROL_BORDER, CONTROL_HEIGHT, CONTROL_LABEL_STYLE, textOf } from '../../../lib/_shared-utils.js'
 
 /** The closed select is a real 44px-tall box at phone width or on a coarse pointer (R3). */
 const SELECT_TOUCH_CSS =
@@ -161,20 +161,27 @@ export const SelectBlock: BlockComponent = ({ props, block }) => {
   // A select with a chosen value and no placeholder lists only its options.
   const chosen = typeof defaultValue === 'string' && defaultValue !== '' && options.some((o) => o.value === defaultValue)
   const showEmpty = !multiple && (placeholder.trim() !== '' || !chosen)
-  const remountKey = Array.isArray(defaultValue) ? defaultValue.join('\u0000') : (defaultValue ?? '')
+  // The key also counts how much of the default the options hold: a bound
+  // value that resolves BEFORE its bound options mounted a select with no
+  // matching option (the browser picked another), and options arriving later
+  // did not change the key, so the choice was lost. It remounts once more when
+  // the options come to contain the value, and never on options that only
+  // re-arrive, so a visitor's own choice stays.
+  const wanted = Array.isArray(defaultValue) ? defaultValue : defaultValue ? [defaultValue] : []
+  const present = wanted.filter((v) => options.some((o) => o.value === v)).length
+  const remountKey = `${Array.isArray(defaultValue) ? defaultValue.join('\u0000') : (defaultValue ?? '')}\u0001${present}`
 
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    marginBottom: '6px',
-    fontSize: 'var(--pw-font-size-sm)',
-    fontWeight: 500,
-    color: 'var(--pw-color-text)',
-  }
+  // The one label style of every form control (CONTROL_LABEL_STYLE).
+  const labelStyle: React.CSSProperties = CONTROL_LABEL_STYLE
 
   const selectStyle: React.CSSProperties = {
+    // A block: an inline select sits on a text line and gains the line's descender gap.
+    display: 'block',
     width: '100%',
     boxSizing: 'border-box',
-    padding: multiple ? '8px 12px' : '8px 36px 8px 12px',
+    padding: multiple ? '8px 12px' : '0 36px 0 12px',
+    // One line: the shared control height (a multi-select is a list box and keeps its rows).
+    ...(multiple ? {} : { height: CONTROL_HEIGHT }),
     // The control edge and the theme radius.
     border: `1px solid ${CONTROL_BORDER}`,
     borderRadius: 'var(--pw-border-radius)',

@@ -1,7 +1,7 @@
 {
   "id": "container.accordion",
   "kind": "block",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "category": "container",
   "name": "accordion",
   "state": "stable",
@@ -76,6 +76,16 @@
           }
         },
         "bindable": false
+      },
+      {
+        "name": "openAll",
+        "type": "boolean",
+        "description": "Every item starts open (a FAQ read top to bottom). Each can still be closed; opening one never closes another. Wins over defaultOpen.",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
       },
       {
         "name": "variant",

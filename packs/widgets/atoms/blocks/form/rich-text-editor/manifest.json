@@ -1,7 +1,7 @@
 {
   "id": "form.rich-text-editor",
   "kind": "block",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "category": "form",
   "name": "rich-text-editor",
   "state": "experimental",

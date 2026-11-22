@@ -408,10 +408,29 @@ function checkValue(file, path, block, prop, value) {
   })
 }
 
+/**
+ * THE PAGE SLOT. An app layout (receipt §4) holds exactly one bare
+ * `{ "type": "pw:page" }` where each page's blocks go. `pw:` types are the
+ * format's own, never a block: the slot is not looked up in the catalogue and
+ * not listed in `usesBlocks`; it carries `type` and at most an `id`.
+ */
+const PAGE_SLOT_TYPE = 'pw:page'
+
+function countPageSlots(node) {
+  if (!node || typeof node !== 'object') return 0
+  return (node.type === PAGE_SLOT_TYPE ? 1 : 0) + (node.children ?? []).reduce((n, c) => n + countPageSlots(c), 0)
+}
+
 function walk(file, node, path, used) {
   if (!node || typeof node !== 'object') return
   const type = node.type
   if (!type) return fail(file, `${path} has no "type"`)
+  if (type === PAGE_SLOT_TYPE) {
+    const extra = Object.keys(node).filter((k) => k !== 'type' && k !== 'id')
+    if (extra.length) fail(file, `${path} is the page slot and carries ${extra.join(', ')}: it carries "type" and at most an "id"`)
+    return
+  }
+  if (String(type).startsWith('pw:')) return fail(file, `${path} uses "${type}": the pw: prefix is the format's, and its only block node is the page slot "${PAGE_SLOT_TYPE}"`)
   used.add(type)
   COVERED.add(type)
 
@@ -459,7 +478,7 @@ function walk(file, node, path, used) {
   ;(node.children ?? []).forEach((child, i) => walk(file, child, `${path}.children[${i}]`, used))
 }
 
-const PATTERN_ROLES = ['shell', 'weave', 'band', 'part']
+const PATTERN_ROLES = ['shell', 'weave', 'band', 'part', 'layout']
 
 /**
  * A SLOT is where content lands — the empty `children` array a shell or weave
@@ -521,6 +540,16 @@ function checkRole(file, p) {
   }
   if (p.role === 'part' && root === 'section') {
     fail(file, 'role is "part" but the snippet is rooted in "section" — a section IS a page slab, so this is a band')
+  }
+  // layout — the app's layout receipt (receipt §4): the frame every page is
+  //          drawn in. Its slot is not a placeholder but the one page slot
+  //          { "type": "pw:page" }, exactly once, and nowhere else.
+  const pageSlots = countPageSlots(p.snippet)
+  if (p.role === 'layout' && pageSlots !== 1) {
+    fail(file, `role is "layout" but the snippet holds ${pageSlots} page slots — a layout holds exactly one { "type": "${PAGE_SLOT_TYPE}" }`)
+  }
+  if (p.role !== 'layout' && pageSlots > 0) {
+    fail(file, `the snippet holds the page slot "${PAGE_SLOT_TYPE}" but its role is "${p.role}" — only a layout pattern has a page slot`)
   }
   if (p.role === 'shell') {
     const slots = Object.keys(p.placeholders ?? {}).filter((k) => SLOT_NAME.test(k))
