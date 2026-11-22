@@ -1,0 +1,129 @@
+{
+  "id": "layout.sidebar",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "layout",
+  "name": "sidebar",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "Side navigation for a documentation site or an app section: a tree of links and collapsible groups held in its own props, with the page in view marked.",
+    "useCases": [
+      "Documentation sidebar: groups of pages with nested sub-pages",
+      "Settings or admin section navigation beside the content",
+      "Handbook or course outline with chapters and lessons"
+    ],
+    "composesWith": [
+      "layout.split-view",
+      "layout.grid",
+      "layout.container",
+      "layout.navbar"
+    ],
+    "antiPatterns": [
+      "The site's top navigation: use layout.navbar",
+      "A file or data hierarchy the visitor explores: that is a tree view, not navigation",
+      "Hand-written links in a layout.container for the same tree: the sidebar marks the current page and opens its group"
+    ],
+    "implementation": "A <nav> landmark (named by title or navLabel) over nested lists. `items` is the tree: each entry is {label, href?, children?, open?}: a link, a group (children), or a page that is also a group. A group without href is a toggle button carrying its label; a group with href is its link with a chevron toggle beside it, named in the app's words (ui.tree.expand / ui.tree.collapse). Toggles carry aria-expanded and aria-controls; a closed group's entries are hidden. `activeHref` is the page in view: its link carries aria-current=\"page\" (the same route matcher as navbar and app-rail) and every group above it opens. `open: true` starts a group open; `collapsible: false` shows every group open with no toggle (group labels become small headings). Links are written through the app's router (context.appHref); in the editor a click reports the destination instead of leaving the page. Everything is reachable with Tab, Enter and Space."
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "items",
+        "type": "[{label, href?, open?, children?: [{label, href?, open?, children?}]}]",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "href": {
+                "type": "string"
+              },
+              "open": {
+                "type": "boolean"
+              },
+              "children": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "label": {
+                      "type": "string"
+                    },
+                    "href": {
+                      "type": "string"
+                    },
+                    "open": {
+                      "type": "boolean"
+                    },
+                    "children": {
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "label"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "label"
+            ]
+          },
+          "description": "The tree. An entry with children is a group; with href it is also a page. Deeper levels take the same shape."
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "A heading over the tree (\"Documentation\"); it names the navigation landmark too."
+        },
+        "bindable": true
+      },
+      {
+        "name": "navLabel",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "The navigation landmark's name when there is no title, or a different one."
+        },
+        "bindable": true
+      },
+      {
+        "name": "activeHref",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "The page in view: its link is marked current and the groups above it open."
+        },
+        "bindable": true
+      },
+      {
+        "name": "collapsible",
+        "type": "boolean",
+        "jsonSchema": {
+          "type": "boolean",
+          "description": "Groups open and close (default). false shows every group open, with no toggle."
+        },
+        "bindable": false,
+        "default": true
+      }
+    ],
+    "defaultProps": {
+      "items": [],
+      "collapsible": true
+    },
+    "canHaveChildren": false,
+    "icon": "☰",
+    "traits": []
+  },
+  "tags": [
+    "tier:structure"
+  ]
+}
