@@ -51,6 +51,15 @@
         },
         "bindable": false,
         "default": "none"
+      },
+      {
+        "name": "color",
+        "type": "string",
+        "jsonSchema": {
+          "type": "string",
+          "description": "The links' colour, e.g. var(--pw-color-text-on-primary). Unset, they take the colour around them."
+        },
+        "bindable": false
       }
     ],
     "defaultProps": {

@@ -99,6 +99,15 @@ describe('language-switch', () => {
     expect(autonym('tr')).toBe('Türkçe')
   })
 
+  it('the links take the colour around them (a dark bar), or the color prop', () => {
+    const ctx = { locale: 'en', locales: ['en', 'de'], alternates }
+    render(tree(LanguageSwitchBlock, 'ls', 'language-switch', {}, ctx))
+    expect(screen.getAllByRole('link').map((a) => a.style.color)).toEqual(['inherit', 'inherit'])
+    cleanup()
+    render(tree(LanguageSwitchBlock, 'ls', 'language-switch', { color: 'var(--pw-color-text-on-primary)' }, ctx))
+    expect(screen.getAllByRole('link').every((a) => a.style.color === 'var(--pw-color-text-on-primary)')).toBe(true)
+  })
+
   it('one locale, or no alternates: nothing to switch to, nothing drawn', () => {
     const { container } = render(tree(LanguageSwitchBlock, 'ls', 'language-switch', {}, { locale: 'en', locales: ['en'], alternates: { en: '/' } }))
     expect(container.textContent).toBe('')

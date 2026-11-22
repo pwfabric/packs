@@ -19,6 +19,11 @@ export interface LanguageSwitchProps {
   readonly labels?: Readonly<Record<string, string>>
   /** Between the links: a gap (default) or a thin rule. */
   readonly separator: 'none' | 'rule'
+  /**
+   * The links' colour. Unset, they take the colour around them, so the
+   * switch reads on a dark bar as on a light page.
+   */
+  readonly color?: string
 }
 
 // ============================================================
@@ -111,11 +116,13 @@ export const LanguageSwitchBlock: BlockComponent = ({ props, block, context }) =
                 aria-current={isCurrent ? 'page' : undefined}
                 onClick={onClick(e.href)}
                 style={{
-                  color: 'var(--pw-color-text)',
+                  // The surrounding ink by default: a fixed text token was
+                  // dark-on-dark inside a primary-painted bar.
+                  color: typeof p.color === 'string' && p.color.trim() ? p.color : 'inherit',
                   fontSize: 'var(--pw-font-size-sm)',
                   fontWeight: isCurrent ? 600 : 400,
                   textDecoration: isCurrent ? 'underline' : 'none',
-                  textDecorationColor: 'var(--pw-color-primary)',
+                  textDecorationColor: 'currentColor',
                   textUnderlineOffset: '4px',
                 }}
               >
