@@ -163,6 +163,398 @@ interface NavInfoSlotData {
   icon?: string
 }
 
+/** What a nav link takes from the bar: its current state and style, and the bar's handlers. */
+interface NavLinkKit {
+  readonly state: 'page' | 'section' | null
+  readonly style: React.CSSProperties
+  readonly onNavClick: (href: string) => (e: React.MouseEvent<HTMLAnchorElement>) => void
+  /** A menu header's click: in the editor it is reported as a navigation. */
+  readonly reportClick: (href: string) => void
+  readonly caret: React.ReactElement
+  readonly renderInlineIcon: (name: string, dim: number) => React.ReactElement
+}
+
+/**
+ * A top-level nav link. When it carries `items`, it renders a ▾ caret and a
+ * dropdown panel (white card, shadow, theme tokens) that opens on hover and on
+ * focus-within (keyboard) — and toggles on click as a fallback. Submenu links
+ * navigate natively in live mode; in inert (editor/preview) mode the same
+ * `handleNavClick` suppresses navigation and emits a `navigate` event, exactly
+ * like the flat links. The menu still OPENS on hover in inert so a preview can
+ * show it. Flat links (no items) render a plain anchor with NO caret.
+ *
+ * Defined at module scope, never inside the bar's render: a component made in
+ * render is a new type each render, so React drew every link afresh (and
+ * hydration repainted the links the first frame had drawn). What it needs
+ * from the bar arrives as `kit`.
+ */
+const NavLinkItem: React.FC<{ link: NavLinkData; kit: NavLinkKit }> = ({ link, kit }) => {
+  const items = Array.isArray(link.items) ? link.items : []
+  const megaColumns = Array.isArray(link.megaColumns) ? link.megaColumns : []
+  const feature = link.feature
+  // A mega-panel takes precedence over a flat list when columns (or a lone
+  // feature tile) are present.
+  const hasMega = megaColumns.length > 0 || Boolean(feature)
+  const hasItems = items.length > 0
+  const hasDropdown = hasMega || hasItems
+  const [open, setOpen] = React.useState(false)
+
+  // Hover-gap fix: the panel sits 8px below the trigger (marginTop), so the
+  // cursor crosses a transparent gap on its way from the trigger down to a
+  // submenu item — during that transit it's over neither element and the
+  // container's mouseleave fires, closing the menu before it can be clicked.
+  // A short close-delay bridges the gap: mouseleave SCHEDULES a close, and
+  // re-entering (the panel is a DOM descendant, so entering it re-fires the
+  // container's mouseenter) CANCELS it. Only a real exit lets it close.
+  const closeTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  const openMenu = (): void => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current)
+      closeTimer.current = null
+    }
+    setOpen(true)
+  }
+  const scheduleClose = (): void => {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+    closeTimer.current = setTimeout(() => setOpen(false), 180)
+  }
+  React.useEffect(
+    () => () => {
+      if (closeTimer.current) clearTimeout(closeTimer.current)
+    },
+    []
+  )
+
+  if (!hasDropdown) {
+    return (
+      <a
+        href={safeHref(link.href)}
+        onClick={kit.onNavClick(link.href)}
+        style={kit.style}
+        aria-current={kit.state === 'page' ? 'page' : undefined}
+        data-pw-current={kit.state ?? undefined}
+        data-pw-hit=""
+      >
+        {link.label}
+      </a>
+    )
+  }
+
+  // ── Mega-panel branch ────────────────────────────────────────────────
+  // A wide, multi-column card: each column is an optional heading over rich
+  // icon+label+description rows, with an optional trailing feature tile. Same
+  // open/close + ARIA + inert-safe posture as the flat dropdown below.
+  if (hasMega) {
+    const megaRowStyle: React.CSSProperties = {
+      display: 'flex',
+      alignItems: 'flex-start',
+      gap: '10px',
+      padding: '8px 10px',
+      borderRadius: '8px',
+      color: 'var(--pw-color-text)',
+      textDecoration: 'none',
+    }
+    return (
+      <div
+        style={{ position: 'relative', display: 'inline-flex' }}
+        onMouseEnter={openMenu}
+        onMouseLeave={scheduleClose}
+      >
+        <a
+          href={safeHref(link.href)}
+          onClick={(e) => {
+            e.preventDefault()
+            kit.reportClick(link.href)
+            setOpen((o) => !o)
+          }}
+          aria-haspopup="menu"
+          aria-expanded={open}
+          aria-current={kit.state === 'page' ? 'page' : undefined}
+          data-pw-current={kit.state ?? undefined}
+          data-pw-hit=""
+          style={{ ...kit.style, display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }}
+        >
+          {link.label}
+          {kit.caret}
+        </a>
+        <div
+          role="menu"
+          style={{
+            // The panel paints CARD inside the nav scope, where
+            // --pw-color-text was re-pointed to text-on-primary (a light ink
+            // on primary-painted navbars). Re-point back to the on-card
+            // chain with a HARD fallback — the card-style self-referencing
+            // fallback would cycle here and inherit the nav's light ink →
+            // white-on-white submenu (a measured hover bug).
+            ['--pw-color-text' as string]: 'var(--pw-color-text-on-card, #09090b)',
+            ['--pw-color-text-muted' as string]: 'var(--pw-color-text-muted-on-card, #71717a)',
+            position: 'absolute',
+            top: '100%',
+            // Anchor under the trigger's left edge (same convention as the flat
+            // dropdown). Mega-panels are wide, so place them on links toward the
+            // start of the bar to avoid running off the right edge.
+            left: 0,
+            marginTop: '8px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            // Never wider than the viewport: 200px columns + a 220px feature
+            // tile ran off the right edge on a laptop.
+            maxWidth: 'min(720px, calc(100vw - 32px))',
+            gap: '24px',
+            padding: '20px',
+            backgroundColor: 'var(--pw-color-card)',
+            border: '1px solid var(--pw-color-border)',
+            borderRadius: '12px',
+            boxShadow: 'var(--pw-shadow-lg)',
+            zIndex: 'var(--pw-z-dropdown)',
+            opacity: open ? 1 : 0,
+            visibility: open ? 'visible' : 'hidden',
+            pointerEvents: open ? 'auto' : 'none',
+            transition: 'opacity .12s ease',
+          }}
+        >
+          {megaColumns.map((col, ci) => (
+            <div
+              key={ci}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2px',
+                minWidth: '200px',
+              }}
+            >
+              {col.heading && (
+                <div
+                  style={{
+                    fontSize: 'var(--pw-font-size-xs)',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    color: 'var(--pw-color-text-muted)',
+                    padding: '4px 10px 8px',
+                  }}
+                >
+                  {col.heading}
+                </div>
+              )}
+              {(Array.isArray(col.items) ? col.items : []).map((mi, mj) => {
+                const href = safeHref(mi.href) ?? '#'
+                return (
+                  <a
+                    key={mj}
+                    href={href}
+                    role="menuitem"
+                    onClick={kit.onNavClick(href)}
+                    style={megaRowStyle}
+                  >
+                    {mi.icon && (
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          color: 'var(--pw-color-primary-ink, #18181b)',
+                          marginTop: '2px',
+                          flex: '0 0 auto',
+                        }}
+                      >
+                        {kit.renderInlineIcon(mi.icon, 18)}
+                      </span>
+                    )}
+                    <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <span
+                        style={{
+                          fontSize: 'var(--pw-font-size-sm)',
+                          fontWeight: 600,
+                          color: 'var(--pw-color-text)',
+                        }}
+                      >
+                        {mi.label}
+                      </span>
+                      {mi.description && (
+                        <span
+                          style={{
+                            fontSize: 'var(--pw-font-size-xs)',
+                            color: 'var(--pw-color-text-muted)',
+                            lineHeight: 1.35,
+                          }}
+                        >
+                          {mi.description}
+                        </span>
+                      )}
+                    </span>
+                  </a>
+                )
+              })}
+            </div>
+          ))}
+          {feature && (
+            <a
+              href={safeHref(feature.href) ?? '#'}
+              role="menuitem"
+              onClick={kit.onNavClick(feature.href ?? '#')}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                width: '220px',
+                padding: '16px',
+                borderRadius: '10px',
+                textDecoration: 'none',
+                // A fixed black alpha is INVISIBLE on a dark bar — this file's own
+                // note (below) says the same about the removed shadow.
+                // Derived from the text colour, it works in both themes.
+                backgroundColor: 'color-mix(in srgb, var(--pw-color-text, #09090b) 6%, transparent)',
+                alignSelf: 'stretch',
+              }}
+            >
+              {feature.icon && (
+                <span style={{ display: 'inline-flex', color: 'var(--pw-color-primary-ink, #18181b)' }}>
+                  {kit.renderInlineIcon(feature.icon, 24)}
+                </span>
+              )}
+              <span
+                style={{
+                  fontSize: 'var(--pw-font-size-sm)',
+                  fontWeight: 700,
+                  color: 'var(--pw-color-text)',
+                }}
+              >
+                {feature.title}
+              </span>
+              {feature.description && (
+                <span
+                  style={{
+                    fontSize: 'var(--pw-font-size-xs)',
+                    color: 'var(--pw-color-text-muted)',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {feature.description}
+                </span>
+              )}
+            </a>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div
+      style={{ position: 'relative', display: 'inline-flex' }}
+      onMouseEnter={openMenu}
+      onMouseLeave={scheduleClose}
+    >
+      <a
+        href={safeHref(link.href)}
+        onClick={(e) => {
+          // The parent anchor toggles the menu rather than navigating: a link
+          // with children is a menu header, not a destination.
+          e.preventDefault()
+          kit.reportClick(link.href)
+          setOpen((o) => !o)
+        }}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-current={kit.state === 'page' ? 'page' : undefined}
+        data-pw-current={kit.state ?? undefined}
+        data-pw-hit=""
+        style={{
+          ...kit.style,
+          display: 'inline-flex',
+          alignItems: 'center',
+          cursor: 'pointer',
+        }}
+      >
+        {link.label}
+        {kit.caret}
+      </a>
+      <div
+        role="menu"
+        // Kept in the DOM so a preview can assert the submenu exists even when
+        // not hovered; visibility is driven by open-state.
+        style={{
+          // Card-painting panel inside the nav's re-pointed text scope —
+          // hard-fallback on-card chain (see mega panel note above).
+          ['--pw-color-text' as string]: 'var(--pw-color-text-on-card, #09090b)',
+          ['--pw-color-text-muted' as string]: 'var(--pw-color-text-muted-on-card, #71717a)',
+          position: 'absolute',
+          top: '100%',
+          left: 0,
+          marginTop: '8px',
+          minWidth: '180px',
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '6px',
+          backgroundColor: 'var(--pw-color-card)',
+          border: '1px solid var(--pw-color-border)',
+          borderRadius: '8px',
+          boxShadow: 'var(--pw-shadow-lg)',
+          zIndex: 'var(--pw-z-dropdown)',
+          opacity: open ? 1 : 0,
+          visibility: open ? 'visible' : 'hidden',
+          pointerEvents: open ? 'auto' : 'none',
+          transition: 'opacity .12s ease',
+        }}
+      >
+        {items.map((sub, j) => (
+          <a
+            key={j}
+            href={safeHref(sub.href)}
+            role="menuitem"
+            onClick={kit.onNavClick(sub.href)}
+            style={{
+              display: 'block',
+              padding: '8px 12px',
+              borderRadius: '6px',
+              color: 'var(--pw-color-text)',
+              textDecoration: 'none',
+              fontSize: 'var(--pw-font-size-sm)',
+              fontWeight: 500,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {sub.label}
+          </a>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/**
+ * The ghost CTA: a transparent text button with a subtle hover tint. Driven by
+ * hover state because inline styles can't express `:hover`. In inert
+ * (editor/preview) mode `handleNavClick` suppresses real navigation and emits a
+ * `navigate` event — same posture as the primary CTA and the links. Module
+ * scope, like NavLinkItem: a component made in render is redrawn every render.
+ */
+const GhostCta: React.FC<{
+  href: string
+  label: string | undefined
+  baseStyle: React.CSSProperties
+  onNavClick: (href: string) => (e: React.MouseEvent<HTMLAnchorElement>) => void
+  extra?: React.CSSProperties
+}> = ({ href, label, baseStyle, onNavClick, extra }) => {
+  const [hover, setHover] = React.useState(false)
+  return (
+    <a
+      href={safeHref(href)}
+      onClick={onNavClick(href)}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        ...baseStyle,
+        // currentColor-based tint: visible on light AND primary-dark navbars
+        // (the old rgba(0,0,0,.05) vanished on a dark bar).
+        backgroundColor: hover ? 'color-mix(in srgb, currentColor 12%, transparent)' : 'transparent',
+        ...extra,
+      }}
+    >
+      {label}
+    </a>
+  )
+}
+
 export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
   // The bar's own words are the app's (ui.menu.*, ui.nav.main, ui.avatar.user).
   const openMenuWord = useAppMessage('ui.menu.open', '')
@@ -559,6 +951,13 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
     )
   }
 
+  /** A menu header was clicked: in the editor it is reported as a navigation (the click itself only toggles). */
+  const reportClick = (href: string): void => {
+    if (context?.interactionMode === 'inert') {
+      emit({ type: SURFACE_EVENTS.BLOCK_CLICK, surfaceId, blockId: block.id, payload: { href } })
+    }
+  }
+
   const handleNavClick = (href: string) => (e: React.MouseEvent<HTMLAnchorElement>): void => {
     if (context?.interactionMode === 'inert') {
       e.preventDefault()
@@ -719,384 +1118,6 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
   )
 
   /**
-   * A top-level nav link. When it carries `items`, it renders a ▾ caret and a
-   * dropdown panel (white card, shadow, theme tokens) that opens on hover and on
-   * focus-within (keyboard) — and toggles on click as a fallback. Submenu links
-   * navigate natively in live mode; in inert (editor/preview) mode the same
-   * `handleNavClick` suppresses navigation and emits a `navigate` event, exactly
-   * like the flat links. The menu still OPENS on hover in inert so a preview can
-   * show it. Flat links (no items) render a plain anchor with NO caret.
-   */
-  const NavLinkItem: React.FC<{ link: NavLinkData }> = ({ link }) => {
-    const items = Array.isArray(link.items) ? link.items : []
-    const megaColumns = Array.isArray(link.megaColumns) ? link.megaColumns : []
-    const feature = link.feature
-    // A mega-panel takes precedence over a flat list when columns (or a lone
-    // feature tile) are present.
-    const hasMega = megaColumns.length > 0 || Boolean(feature)
-    const hasItems = items.length > 0
-    const hasDropdown = hasMega || hasItems
-    const [open, setOpen] = React.useState(false)
-
-    // Hover-gap fix: the panel sits 8px below the trigger (marginTop), so the
-    // cursor crosses a transparent gap on its way from the trigger down to a
-    // submenu item — during that transit it's over neither element and the
-    // container's mouseleave fires, closing the menu before it can be clicked.
-    // A short close-delay bridges the gap: mouseleave SCHEDULES a close, and
-    // re-entering (the panel is a DOM descendant, so entering it re-fires the
-    // container's mouseenter) CANCELS it. Only a real exit lets it close.
-    const closeTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
-    const openMenu = (): void => {
-      if (closeTimer.current) {
-        clearTimeout(closeTimer.current)
-        closeTimer.current = null
-      }
-      setOpen(true)
-    }
-    const scheduleClose = (): void => {
-      if (closeTimer.current) clearTimeout(closeTimer.current)
-      closeTimer.current = setTimeout(() => setOpen(false), 180)
-    }
-    React.useEffect(
-      () => () => {
-        if (closeTimer.current) clearTimeout(closeTimer.current)
-      },
-      []
-    )
-
-    if (!hasDropdown) {
-      return (
-        <a
-          href={safeHref(link.href)}
-          onClick={handleNavClick(link.href)}
-          style={linkStyleOf(linkState(link))}
-          aria-current={linkState(link) === 'page' ? 'page' : undefined}
-          data-pw-current={linkState(link) ?? undefined}
-          data-pw-hit=""
-        >
-          {link.label}
-        </a>
-      )
-    }
-
-    // ── Mega-panel branch ────────────────────────────────────────────────
-    // A wide, multi-column card: each column is an optional heading over rich
-    // icon+label+description rows, with an optional trailing feature tile. Same
-    // open/close + ARIA + inert-safe posture as the flat dropdown below.
-    if (hasMega) {
-      const megaRowStyle: React.CSSProperties = {
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: '10px',
-        padding: '8px 10px',
-        borderRadius: '8px',
-        color: 'var(--pw-color-text)',
-        textDecoration: 'none',
-      }
-      return (
-        <div
-          style={{ position: 'relative', display: 'inline-flex' }}
-          onMouseEnter={openMenu}
-          onMouseLeave={scheduleClose}
-        >
-          <a
-            href={safeHref(link.href)}
-            onClick={(e) => {
-              e.preventDefault()
-              if (context?.interactionMode === 'inert') {
-                emit({
-                  type: SURFACE_EVENTS.BLOCK_CLICK,
-                  surfaceId,
-                  blockId: block.id,
-                  payload: { href: link.href },
-                })
-              }
-              setOpen((o) => !o)
-            }}
-            aria-haspopup="menu"
-            aria-expanded={open}
-            aria-current={linkState(link) === 'page' ? 'page' : undefined}
-            data-pw-current={linkState(link) ?? undefined}
-            data-pw-hit=""
-            style={{ ...linkStyleOf(linkState(link)), display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }}
-          >
-            {link.label}
-            {caret}
-          </a>
-          <div
-            role="menu"
-            style={{
-              // The panel paints CARD inside the nav scope, where
-              // --pw-color-text was re-pointed to text-on-primary (a light ink
-              // on primary-painted navbars). Re-point back to the on-card
-              // chain with a HARD fallback — the card-style self-referencing
-              // fallback would cycle here and inherit the nav's light ink →
-              // white-on-white submenu (a measured hover bug).
-              ['--pw-color-text' as string]: 'var(--pw-color-text-on-card, #09090b)',
-              ['--pw-color-text-muted' as string]: 'var(--pw-color-text-muted-on-card, #71717a)',
-              position: 'absolute',
-              top: '100%',
-              // Anchor under the trigger's left edge (same convention as the flat
-              // dropdown). Mega-panels are wide, so place them on links toward the
-              // start of the bar to avoid running off the right edge.
-              left: 0,
-              marginTop: '8px',
-              display: 'flex',
-              flexWrap: 'wrap',
-              // Never wider than the viewport: 200px columns + a 220px feature
-              // tile ran off the right edge on a laptop.
-              maxWidth: 'min(720px, calc(100vw - 32px))',
-              gap: '24px',
-              padding: '20px',
-              backgroundColor: 'var(--pw-color-card)',
-              border: '1px solid var(--pw-color-border)',
-              borderRadius: '12px',
-              boxShadow: 'var(--pw-shadow-lg)',
-              zIndex: 'var(--pw-z-dropdown)',
-              opacity: open ? 1 : 0,
-              visibility: open ? 'visible' : 'hidden',
-              pointerEvents: open ? 'auto' : 'none',
-              transition: 'opacity .12s ease',
-            }}
-          >
-            {megaColumns.map((col, ci) => (
-              <div
-                key={ci}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '2px',
-                  minWidth: '200px',
-                }}
-              >
-                {col.heading && (
-                  <div
-                    style={{
-                      fontSize: 'var(--pw-font-size-xs)',
-                      fontWeight: 700,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.04em',
-                      color: 'var(--pw-color-text-muted)',
-                      padding: '4px 10px 8px',
-                    }}
-                  >
-                    {col.heading}
-                  </div>
-                )}
-                {(Array.isArray(col.items) ? col.items : []).map((mi, mj) => {
-                  const href = safeHref(mi.href) ?? '#'
-                  return (
-                    <a
-                      key={mj}
-                      href={href}
-                      role="menuitem"
-                      onClick={handleNavClick(href)}
-                      style={megaRowStyle}
-                    >
-                      {mi.icon && (
-                        <span
-                          style={{
-                            display: 'inline-flex',
-                            color: 'var(--pw-color-primary-ink, #18181b)',
-                            marginTop: '2px',
-                            flex: '0 0 auto',
-                          }}
-                        >
-                          {renderInlineIcon(mi.icon, 18)}
-                        </span>
-                      )}
-                      <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <span
-                          style={{
-                            fontSize: 'var(--pw-font-size-sm)',
-                            fontWeight: 600,
-                            color: 'var(--pw-color-text)',
-                          }}
-                        >
-                          {mi.label}
-                        </span>
-                        {mi.description && (
-                          <span
-                            style={{
-                              fontSize: 'var(--pw-font-size-xs)',
-                              color: 'var(--pw-color-text-muted)',
-                              lineHeight: 1.35,
-                            }}
-                          >
-                            {mi.description}
-                          </span>
-                        )}
-                      </span>
-                    </a>
-                  )
-                })}
-              </div>
-            ))}
-            {feature && (
-              <a
-                href={safeHref(feature.href) ?? '#'}
-                role="menuitem"
-                onClick={handleNavClick(feature.href ?? '#')}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '8px',
-                  width: '220px',
-                  padding: '16px',
-                  borderRadius: '10px',
-                  textDecoration: 'none',
-                  // A fixed black alpha is INVISIBLE on a dark bar — this file's own
-                  // note (below) says the same about the removed shadow.
-                  // Derived from the text colour, it works in both themes.
-                  backgroundColor: 'color-mix(in srgb, var(--pw-color-text, #09090b) 6%, transparent)',
-                  alignSelf: 'stretch',
-                }}
-              >
-                {feature.icon && (
-                  <span style={{ display: 'inline-flex', color: 'var(--pw-color-primary-ink, #18181b)' }}>
-                    {renderInlineIcon(feature.icon, 24)}
-                  </span>
-                )}
-                <span
-                  style={{
-                    fontSize: 'var(--pw-font-size-sm)',
-                    fontWeight: 700,
-                    color: 'var(--pw-color-text)',
-                  }}
-                >
-                  {feature.title}
-                </span>
-                {feature.description && (
-                  <span
-                    style={{
-                      fontSize: 'var(--pw-font-size-xs)',
-                      color: 'var(--pw-color-text-muted)',
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    {feature.description}
-                  </span>
-                )}
-              </a>
-            )}
-          </div>
-        </div>
-      )
-    }
-
-    return (
-      <div
-        style={{ position: 'relative', display: 'inline-flex' }}
-        onMouseEnter={openMenu}
-        onMouseLeave={scheduleClose}
-      >
-        <a
-          href={safeHref(link.href)}
-          onClick={(e) => {
-            // The parent anchor toggles the menu rather than navigating: a link
-            // with children is a menu header, not a destination.
-            e.preventDefault()
-            if (context?.interactionMode === 'inert') {
-              emit({ type: SURFACE_EVENTS.BLOCK_CLICK, surfaceId, blockId: block.id, payload: { href: link.href } })
-            }
-            setOpen((o) => !o)
-          }}
-          aria-haspopup="menu"
-          aria-expanded={open}
-          aria-current={linkState(link) === 'page' ? 'page' : undefined}
-          data-pw-current={linkState(link) ?? undefined}
-          data-pw-hit=""
-          style={{
-            ...linkStyleOf(linkState(link)),
-            display: 'inline-flex',
-            alignItems: 'center',
-            cursor: 'pointer',
-          }}
-        >
-          {link.label}
-          {caret}
-        </a>
-        <div
-          role="menu"
-          // Kept in the DOM so a preview can assert the submenu exists even when
-          // not hovered; visibility is driven by open-state.
-          style={{
-            // Card-painting panel inside the nav's re-pointed text scope —
-            // hard-fallback on-card chain (see mega panel note above).
-            ['--pw-color-text' as string]: 'var(--pw-color-text-on-card, #09090b)',
-            ['--pw-color-text-muted' as string]: 'var(--pw-color-text-muted-on-card, #71717a)',
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            marginTop: '8px',
-            minWidth: '180px',
-            display: 'flex',
-            flexDirection: 'column',
-            padding: '6px',
-            backgroundColor: 'var(--pw-color-card)',
-            border: '1px solid var(--pw-color-border)',
-            borderRadius: '8px',
-            boxShadow: 'var(--pw-shadow-lg)',
-            zIndex: 'var(--pw-z-dropdown)',
-            opacity: open ? 1 : 0,
-            visibility: open ? 'visible' : 'hidden',
-            pointerEvents: open ? 'auto' : 'none',
-            transition: 'opacity .12s ease',
-          }}
-        >
-          {items.map((sub, j) => (
-            <a
-              key={j}
-              href={safeHref(sub.href)}
-              role="menuitem"
-              onClick={handleNavClick(sub.href)}
-              style={{
-                display: 'block',
-                padding: '8px 12px',
-                borderRadius: '6px',
-                color: 'var(--pw-color-text)',
-                textDecoration: 'none',
-                fontSize: 'var(--pw-font-size-sm)',
-                fontWeight: 500,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {sub.label}
-            </a>
-          ))}
-        </div>
-      </div>
-    )
-  }
-
-  /**
-   * The ghost CTA: a transparent text button with a subtle hover tint. Driven by
-   * hover state because inline styles can't express `:hover`. In inert
-   * (editor/preview) mode `handleNavClick` suppresses real navigation and emits a
-   * `navigate` event — same posture as the primary CTA and the links.
-   */
-  const GhostCta: React.FC<{ block?: React.CSSProperties }> = ({ block: extra }) => {
-    const [hover, setHover] = React.useState(false)
-    return (
-      <a
-        href={safeHref(secondaryCtaHref)}
-        onClick={handleNavClick(secondaryCtaHref)}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-        style={{
-          ...ghostCtaStyle,
-          // currentColor-based tint: visible on light AND primary-dark navbars
-          // (the old rgba(0,0,0,.05) vanished on a dark bar).
-          backgroundColor: hover ? 'color-mix(in srgb, currentColor 12%, transparent)' : 'transparent',
-          ...extra,
-        }}
-      >
-        {secondaryCtaLabel}
-      </a>
-    )
-  }
-
-  /**
    * The account control: an avatar menu button (with the name beside it on a
    * wide screen) or, signed out, a "Sign in" button. The menu itself — ARIA,
    * keyboard, dismissal, the two auth actions — is the shared one every shell
@@ -1237,7 +1258,7 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
           {rightInfo.map((item, i) => renderInfoSlot(item, i))}
         </div>
       )}
-      {hasSecondaryCta && <GhostCta block={{ textAlign: 'center' }} />}
+      {hasSecondaryCta && <GhostCta href={secondaryCtaHref} label={secondaryCtaLabel} baseStyle={ghostCtaStyle} onNavClick={handleNavClick} extra={{ textAlign: 'center' }} />}
       {showCTA && (
         <a
           href={safeHref(ctaHref)}
@@ -1271,7 +1292,11 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
       {links.length > 0 && (
         <nav data-pw-nav-wide="" aria-label={drawerLabel} style={linksStyle}>
           {links.map((link, i) => (
-            <NavLinkItem key={i} link={link} />
+            <NavLinkItem
+              key={i}
+              link={link}
+              kit={{ state: linkState(link), style: linkStyleOf(linkState(link)), onNavClick: handleNavClick, reportClick, caret, renderInlineIcon }}
+            />
           ))}
         </nav>
       )}
@@ -1289,7 +1314,7 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
               {socialLinks.map((item, i) => renderSocial(item, i))}
             </div>
           )}
-          {hasSecondaryCta && <GhostCta />}
+          {hasSecondaryCta && <GhostCta href={secondaryCtaHref} label={secondaryCtaLabel} baseStyle={ghostCtaStyle} onNavClick={handleNavClick} />}
           {showCTA && (
             <a href={safeHref(ctaHref)} style={ctaStyle} onClick={handleNavClick(ctaHref)}>
               {ctaLabel}
