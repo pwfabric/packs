@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { CONTROL_HEIGHT, safeRenderValue, ICON_PATHS } from '../../../lib/_shared-utils.js'
+import { CONTROL_HEIGHT, CONTROL_LABEL_STYLE, safeRenderValue, ICON_PATHS } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 import { messageOf, useAppMessages } from '@pwfabric/runtime'
@@ -156,7 +156,7 @@ export const NumberStepperBlock: BlockComponent = ({ props, block }) => {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: 'var(--pw-space-xs, 4px)',
+        // No gap of its own: the label's CONTROL_LABEL_STYLE spaces it from the field.
         width: 'max-content',
         maxWidth: '100%',
         opacity: disabled ? 0.5 : undefined,
@@ -164,13 +164,7 @@ export const NumberStepperBlock: BlockComponent = ({ props, block }) => {
       }}
     >
       {label ? (
-        <span
-          style={{
-            fontSize: 'var(--pw-font-size-sm, 14px)',
-            color: 'var(--pw-color-text, #09090b)',
-            fontWeight: 500,
-          }}
-        >
+        <span style={CONTROL_LABEL_STYLE}>
           {label}
         </span>
       ) : null}

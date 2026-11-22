@@ -140,6 +140,26 @@ export const CONTROL_BORDER =
 export const CONTROL_HEIGHT = 'var(--pw-control-height, 40px)'
 
 /**
+ * THE LABEL ABOVE A FORM CONTROL: one style for every control, so a row of
+ * controls has its fields on one line. The label is a block with a fixed line
+ * height and one gap under it (`--pw-control-label-gap`); the control's own
+ * wrapper adds no gap of its own. Different label spacing left a select 2px
+ * above a search box beside it.
+ */
+export const CONTROL_LABEL_GAP = 'var(--pw-control-label-gap, 6px)'
+
+/** The label style itself: a block, a fixed line height, CONTROL_LABEL_GAP under it. */
+export const CONTROL_LABEL_STYLE: React.CSSProperties = {
+  display: 'block',
+  margin: 0,
+  marginBottom: CONTROL_LABEL_GAP,
+  fontSize: 'var(--pw-font-size-sm)',
+  fontWeight: 500,
+  lineHeight: 'var(--pw-control-label-line-height, 20px)',
+  color: 'var(--pw-color-text)',
+}
+
+/**
  * Black or white, whichever reads on `ground` — decided by the ground's own
  * luminance, in CSS.
  *

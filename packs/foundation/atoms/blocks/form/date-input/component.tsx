@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { CONTROL_BORDER, CONTROL_HEIGHT, safeRenderValue } from '../../../lib/_shared-utils.js'
+import { CONTROL_BORDER, CONTROL_HEIGHT, CONTROL_LABEL_STYLE, safeRenderValue } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 import { useAppMessage, useAppMessages, messageOf } from '@pwfabric/runtime'
@@ -192,19 +192,17 @@ export const DateInputBlock: BlockComponent = ({ props, block, context }) => {
   const wrapperStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
-    gap: '4px',
+    // No gap of its own: the label's CONTROL_LABEL_STYLE spaces it from the field.
     position: 'relative',
     opacity: disabled ? 0.5 : undefined,
     cursor: disabled ? 'not-allowed' : undefined,
     ...block.style,
   }
-  const labelStyle: React.CSSProperties = {
-    fontSize: 'var(--pw-font-size-sm)',
-    fontWeight: 500,
-    color: 'var(--pw-color-text)',
-  }
+  // The one label style of every form control.
+  const labelStyle: React.CSSProperties = CONTROL_LABEL_STYLE
   const inputStyle: React.CSSProperties = {
     // The shared control height, so the date lines up with a text field and a select.
+    display: 'block',
     height: CONTROL_HEIGHT,
     padding: '0 12px',
     // The same control edge as a text input (P4a): the divider colour measured

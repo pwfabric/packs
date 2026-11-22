@@ -3,7 +3,7 @@ import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
-import { CONTROL_BORDER, CONTROL_HEIGHT, textOf } from '../../../lib/_shared-utils.js'
+import { CONTROL_BORDER, CONTROL_HEIGHT, CONTROL_LABEL_STYLE, textOf } from '../../../lib/_shared-utils.js'
 
 /** The one-line field is a real 44px-tall box at phone width or on a coarse pointer (R3). */
 const INPUT_TOUCH_CSS =
@@ -227,6 +227,8 @@ export const InputBlock: BlockComponent = ({ props, block }) => {
   const ICON_GUTTER = 36 // icon box + symmetric padding so text never overlaps
 
   const inputStyle: React.CSSProperties = {
+    // A block: an inline field sits on a text line and gains the line's descender gap.
+    display: 'block',
     width: '100%',
     boxSizing: 'border-box',
     // A one-line field is the shared control height; a textarea grows with its rows.
@@ -255,13 +257,8 @@ export const InputBlock: BlockComponent = ({ props, block }) => {
     ...block.style,
   }
 
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    marginBottom: '6px',
-    fontSize: 'var(--pw-font-size-sm)',
-    fontWeight: 500,
-    color: 'var(--pw-color-text)',
-  }
+  // The one label style of every form control (CONTROL_LABEL_STYLE).
+  const labelStyle: React.CSSProperties = CONTROL_LABEL_STYLE
 
   // `patternMessage`: the field's own message replaces the browser's
   // "Please match the requested format." whenever the text misses `pattern`.

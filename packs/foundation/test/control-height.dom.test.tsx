@@ -8,7 +8,7 @@ import { describe, it, expect, afterEach } from 'vitest'
 import * as React from 'react'
 import { render, cleanup } from '@testing-library/react'
 import { BehaviorSurfaceProvider } from '@pwfabric/runtime'
-import { CONTROL_HEIGHT } from '../atoms/lib/_shared-utils.js'
+import { CONTROL_HEIGHT, CONTROL_LABEL_GAP } from '../atoms/lib/_shared-utils.js'
 import { InputBlock } from '../atoms/blocks/form/input/component.js'
 import { SelectBlock } from '../atoms/blocks/form/select/component.js'
 import { DateInputBlock } from '../atoms/blocks/form/date-input/component.js'
@@ -68,5 +68,55 @@ describe('single-line form controls share one height', () => {
     cleanup()
     const multi = box(SelectBlock, 'select', { label: 'Tags', name: 't', multiple: true, options: ['a'] }, (r) => r.querySelector('select'))
     expect(multi.style.height).toBe('')
+  })
+})
+
+/**
+ * Whether the field is a block-level box (no text line around it, so no
+ * descender gap under it): block, flex or grid, or an inline box that a flex
+ * parent blockifies.
+ */
+function blockLevel(el: HTMLElement): string {
+  const d = getComputedStyle(el).display
+  const parent = el.parentElement ? getComputedStyle(el.parentElement).display : ''
+  const level = ['block', 'flex', 'grid'].includes(d) || (d.startsWith('inline-') && /flex|grid/.test(parent)) ? 'block-level' : `inline (${d})`
+  return level
+}
+
+describe('every form control has the same label above the same field', () => {
+  /** The label, the gap under it, and everything between it and the control's box. */
+  function structure(C: unknown, type: string, props: Record<string, unknown>, pick: (root: HTMLElement) => HTMLElement | null): string {
+    const field = box(C, type, props, pick)
+    const root = document.querySelector('[data-block-id="c"]') as HTMLElement
+    const label = [...root.querySelectorAll<HTMLElement>('label, span')].find((n) => n.textContent === props['label'])
+    if (!label) throw new Error(`${type}: no label`)
+    const rootGap = root.style.gap || root.style.rowGap || ''
+    // Every element from the root down to the field: none adds a margin or padding above it.
+    const between: string[] = []
+    for (let n: HTMLElement | null = field.parentElement; n && n !== root; n = n.parentElement) between.push(`${n.style.marginTop}${n.style.paddingTop}`)
+    const out = [
+      label.style.display,
+      label.style.marginBottom,
+      label.style.lineHeight,
+      label.style.fontSize,
+      rootGap,
+      between.join(''),
+      blockLevel(field),
+    ].join('|')
+    cleanup()
+    return out
+  }
+
+  it('input, search, select, date, number and combobox match', () => {
+    const shapes = [
+      structure(InputBlock, 'input', { label: 'Name', name: 'n' }, (r) => r.querySelector('input')),
+      structure(InputBlock, 'input', { label: 'Search', name: 'q', type: 'search' }, (r) => r.querySelector('input')),
+      structure(SelectBlock, 'select', { label: 'Kind', name: 'k', options: ['a'] }, (r) => r.querySelector('select')),
+      structure(DateInputBlock, 'date-input', { label: 'Day', name: 'd' }, (r) => r.querySelector('input')),
+      structure(NumberStepperBlock, 'number-stepper', { label: 'Guests', name: 'g' }, (r) => r.querySelector('[data-pw-step-field]')?.parentElement ?? null),
+      structure(ComboboxBlock, 'combobox', { label: 'City', name: 'c', options: ['Oslo'] }, (r) => r.querySelector('[data-pw-combo-frame]')),
+    ]
+    expect(shapes).toEqual(shapes.map(() => shapes[0]))
+    expect(shapes[0]).toBe(`block|${CONTROL_LABEL_GAP}|var(--pw-control-label-line-height, 20px)|var(--pw-font-size-sm)|||block-level`)
   })
 })

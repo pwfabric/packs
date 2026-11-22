@@ -8,6 +8,18 @@
 
 export const CONTROL_HEIGHT = 'var(--pw-control-height, 40px)'
 
+export const CONTROL_LABEL_GAP = 'var(--pw-control-label-gap, 6px)'
+
+export const CONTROL_LABEL_STYLE: React.CSSProperties = {
+  display: 'block',
+  margin: 0,
+  marginBottom: CONTROL_LABEL_GAP,
+  fontSize: 'var(--pw-font-size-sm)',
+  fontWeight: 500,
+  lineHeight: 'var(--pw-control-label-line-height, 20px)',
+  color: 'var(--pw-color-text)',
+}
+
 export type CSSUnit = number | string | undefined
 
 export const HIT_AREA_CSS =

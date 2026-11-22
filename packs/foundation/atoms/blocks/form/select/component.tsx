@@ -3,7 +3,7 @@ import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
-import { CONTROL_BORDER, CONTROL_HEIGHT, textOf } from '../../../lib/_shared-utils.js'
+import { CONTROL_BORDER, CONTROL_HEIGHT, CONTROL_LABEL_STYLE, textOf } from '../../../lib/_shared-utils.js'
 
 /** The closed select is a real 44px-tall box at phone width or on a coarse pointer (R3). */
 const SELECT_TOUCH_CSS =
@@ -171,15 +171,12 @@ export const SelectBlock: BlockComponent = ({ props, block }) => {
   const present = wanted.filter((v) => options.some((o) => o.value === v)).length
   const remountKey = `${Array.isArray(defaultValue) ? defaultValue.join('\u0000') : (defaultValue ?? '')}\u0001${present}`
 
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    marginBottom: '6px',
-    fontSize: 'var(--pw-font-size-sm)',
-    fontWeight: 500,
-    color: 'var(--pw-color-text)',
-  }
+  // The one label style of every form control (CONTROL_LABEL_STYLE).
+  const labelStyle: React.CSSProperties = CONTROL_LABEL_STYLE
 
   const selectStyle: React.CSSProperties = {
+    // A block: an inline select sits on a text line and gains the line's descender gap.
+    display: 'block',
     width: '100%',
     boxSizing: 'border-box',
     padding: multiple ? '8px 12px' : '0 36px 0 12px',

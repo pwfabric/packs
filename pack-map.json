@@ -94,6 +94,8 @@
       ],
       "kit": [
         "CONTROL_HEIGHT",
+        "CONTROL_LABEL_GAP",
+        "CONTROL_LABEL_STYLE",
         "CSSUnit",
         "HIT_AREA_CSS",
         "ICON_PATHS",
