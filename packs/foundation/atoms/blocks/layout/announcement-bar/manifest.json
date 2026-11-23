@@ -82,7 +82,16 @@
     },
     "canHaveChildren": false,
     "icon": "▔",
-    "traits": []
+    "traits": [],
+    "messages": [
+      {
+        "id": "ui.announcement"
+      },
+      {
+        "id": "ui.announcement.dismiss",
+        "when": "dismissible"
+      }
+    ]
   },
   "tags": [
     "tier:structure"

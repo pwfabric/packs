@@ -70,7 +70,12 @@
     },
     "canHaveChildren": false,
     "icon": "›",
-    "traits": []
+    "traits": [],
+    "messages": [
+      {
+        "id": "ui.breadcrumb"
+      }
+    ]
   },
   "tags": [
     "tier:content"

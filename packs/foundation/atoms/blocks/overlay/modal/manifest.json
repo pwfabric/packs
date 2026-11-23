@@ -152,6 +152,12 @@
     "traits": [],
     "allowedChildTraits": [
       "modal-content"
+    ],
+    "messages": [
+      {
+        "id": "ui.close",
+        "when": "showCloseButton"
+      }
     ]
   },
   "tags": [

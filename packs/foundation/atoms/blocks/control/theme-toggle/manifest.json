@@ -53,7 +53,24 @@
     },
     "canHaveChildren": false,
     "icon": "◐",
-    "traits": []
+    "traits": [
+      "nav-utility"
+    ],
+    "messages": [
+      {
+        "id": "ui.colorScheme"
+      },
+      {
+        "id": "ui.colorScheme.light"
+      },
+      {
+        "id": "ui.colorScheme.dark"
+      },
+      {
+        "id": "ui.colorScheme.system",
+        "when": "showSystem"
+      }
+    ]
   },
   "tags": [
     "tier:structure"

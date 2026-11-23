@@ -187,7 +187,7 @@
         "type": "number",
         "jsonSchema": {
           "type": "integer",
-          "description": "Card layout only. 1 (default) = one item per line. Any value above 1 turns the card grid into auto-fit: as many cells per line as fit at minCellWidth — the width decides the count, not this number. Lower minCellWidth for more cells per line."
+          "description": "Card layout only. 1 (default) = one item per line. Any value above 1 turns the card grid into auto-fill: as many cells per line as fit at minCellWidth — the width decides the count, not this number; a line with fewer items keeps the empty cells, so a lone item never stretches across the row. Lower minCellWidth for more cells per line."
         },
         "bindable": false,
         "default": 1
@@ -197,7 +197,7 @@
         "type": "number",
         "jsonSchema": {
           "type": "integer",
-          "description": "Auto-fit minimum tile width in px for the card grid (small values give app-launcher style tight grids)."
+          "description": "Auto-fill minimum tile width in px for the card grid (small values give app-launcher style tight grids)."
         },
         "bindable": false,
         "default": 280

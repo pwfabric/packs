@@ -52,8 +52,9 @@ export const GridBlock: BlockComponent = ({ props, children, block }) => {
   const explicitMin = cssUnit(props.minChildWidth as CSSUnit)
   // TWO MODES (measured: `columns:12` produced no 12
   // tracks and child spans overflowed the page):
-  //  - minChildWidth given → RESPONSIVE: auto-fit minmax (historical behaviour;
-  //    auto-fit not auto-fill so empty trailing tracks collapse).
+  //  - minChildWidth given → RESPONSIVE: auto-fill minmax. Not auto-fit: that
+  //    collapses the empty trailing tracks, and a lone card on a row (one
+  //    item, or the last of an uneven count) stretched across the whole row.
   //  - minChildWidth absent → HONEST: exactly `columns` tracks, minmax(0,1fr)
   //    so nowrap content cannot widen a track past its share. This is what
   //    makes child layout.span deterministic.
@@ -67,8 +68,8 @@ export const GridBlock: BlockComponent = ({ props, children, block }) => {
   const trackGap = cssUnit((props.columnGap ?? props.gap) as CSSUnit) ?? 'var(--pw-layout-grid-gap)'
   const gridTemplateColumns = explicitMin
     ? ceiling
-      ? `repeat(auto-fit, minmax(max(min(${explicitMin}, 100%), calc((100% - ${ceiling - 1} * ${trackGap}) / ${ceiling})), 1fr))`
-      : `repeat(auto-fit, minmax(min(${explicitMin}, 100%), 1fr))`
+      ? `repeat(auto-fill, minmax(max(min(${explicitMin}, 100%), calc((100% - ${ceiling - 1} * ${trackGap}) / ${ceiling})), 1fr))`
+      : `repeat(auto-fill, minmax(min(${explicitMin}, 100%), 1fr))`
     : `repeat(${columns}, minmax(0, 1fr))`
   const rows = props.rows as number | undefined
   // HONEST-mode mobile safety (a sweep found 46 existing grids that declare
@@ -82,7 +83,7 @@ export const GridBlock: BlockComponent = ({ props, children, block }) => {
   )
   const collapseOnMobile = !explicitMin && !anyChildDeclaresSpan && columns > 1
   // `columnsXs` is the author naming the phone count, so it applies in either
-  // mode (an auto-fit grid would otherwise fall to one column by its minimum).
+  // mode (an auto-fill grid would otherwise fall to one column by its minimum).
   const rawXs = Number(props.columnsXs)
   const columnsXs = Number.isInteger(rawXs) && rawXs >= 1 ? Math.min(rawXs, 6) : undefined
   const phoneRule = collapseOnMobile || (columnsXs !== undefined && !anyChildDeclaresSpan)

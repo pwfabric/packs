@@ -97,7 +97,26 @@
     },
     "canHaveChildren": false,
     "icon": "⋯",
-    "traits": []
+    "traits": [],
+    "messages": [
+      {
+        "id": "ui.pagination.label"
+      },
+      {
+        "id": "ui.pagination.previous"
+      },
+      {
+        "id": "ui.pagination.next"
+      },
+      {
+        "id": "ui.pagination.first",
+        "when": "showFirstLast"
+      },
+      {
+        "id": "ui.pagination.last",
+        "when": "showFirstLast"
+      }
+    ]
   },
   "tags": [
     "tier:widget"

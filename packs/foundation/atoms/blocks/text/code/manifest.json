@@ -137,7 +137,19 @@
     },
     "canHaveChildren": false,
     "icon": "</>",
-    "traits": []
+    "traits": [],
+    "messages": [
+      {
+        "id": "ui.copy",
+        "prop": "copyLabel",
+        "when": "copyButton"
+      },
+      {
+        "id": "ui.copied",
+        "prop": "copiedLabel",
+        "when": "copyButton"
+      }
+    ]
   },
   "tags": [
     "tier:content"

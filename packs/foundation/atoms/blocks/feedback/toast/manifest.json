@@ -90,6 +90,12 @@
     "icon": "◧",
     "traits": [
       "modal-content"
+    ],
+    "messages": [
+      {
+        "id": "ui.dismiss",
+        "when": "dismissible"
+      }
     ]
   },
   "tags": [

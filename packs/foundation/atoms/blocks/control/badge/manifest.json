@@ -143,6 +143,12 @@
     "traits": [
       "inline",
       "modal-content"
+    ],
+    "messages": [
+      {
+        "id": "ui.remove",
+        "when": "dismissible"
+      }
     ]
   },
   "tags": [

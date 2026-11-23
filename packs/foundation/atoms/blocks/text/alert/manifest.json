@@ -95,7 +95,13 @@
     },
     "canHaveChildren": false,
     "icon": "⚠",
-    "traits": []
+    "traits": [],
+    "messages": [
+      {
+        "id": "ui.dismiss",
+        "when": "closeable"
+      }
+    ]
   },
   "tags": [
     "tier:content"
