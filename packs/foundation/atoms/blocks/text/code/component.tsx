@@ -3,6 +3,7 @@ import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
 import { textOf } from '../../../lib/_shared-utils.js'
 import { messageOf, useAppMessages } from '@pwfabric/runtime'
+import { useClipboardCopy } from '../../../lib/_shared-copy.js'
 
 // ============================================================
 // PROPS — declared in manifest.json, applied by the runtime
@@ -81,11 +82,7 @@ export const codeDefinition: BlockDefinition = {
 export const CodeBlock: BlockComponent = ({ props, block }) => {
   const appWords = useAppMessages()
   const p = props as unknown as CodeProps
-  const [copyStatus, setCopyStatus] = React.useState<'idle' | 'copied' | 'failed'>('idle')
-  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
-  React.useEffect(() => () => {
-    if (timerRef.current) clearTimeout(timerRef.current)
-  }, [])
+  const { status: copyStatus, copy } = useClipboardCopy()
   // THE CODE SURFACE IS ITS OWN TOKEN. Code drew on the muted card ground with
   // no way for a theme to give it the dark surface docs apps use. Every colour
   // reads a `--pw-color-code-*` token first; `tone: "dark"` sets them locally.
@@ -148,19 +145,7 @@ export const CodeBlock: BlockComponent = ({ props, block }) => {
   const copyButton = p.copyButton
   const highlightLines = Array.isArray(p.highlightLines) ? p.highlightLines : []
 
-  const handleCopy = async (): Promise<void> => {
-    if (!code) return
-    let next: 'copied' | 'failed' = 'copied'
-    try {
-      if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) throw new Error('clipboard unavailable')
-      await navigator.clipboard.writeText(code)
-    } catch {
-      next = 'failed'
-    }
-    setCopyStatus(next)
-    if (timerRef.current) clearTimeout(timerRef.current)
-    timerRef.current = setTimeout(() => setCopyStatus('idle'), 1500)
-  }
+  const handleCopy = (): Promise<void> => copy(code)
 
   return (
     <div

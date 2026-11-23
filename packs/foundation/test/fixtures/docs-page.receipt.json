@@ -1,0 +1,14 @@
+{
+  "title": "Install the CLI",
+  "description": "How to install the command-line tool, configure it and check the result.",
+  "blocks": [
+    {
+      "id": "guide",
+      "type": "prose",
+      "props": {
+        "copyButton": true,
+        "content": "# Install the CLI\n\nThe tool runs on Node 22 or later. See [Requirements](#requirements) first, or skip to [Configure](/configure).\n\n## Requirements\n\n| Platform | Supported | Notes |\n|:---------|:---------:|------:|\n| Linux | yes | x64 and arm64 |\n| macOS | yes | 13 or later |\n| Windows | yes | through PowerShell |\n\n## Steps\n\n1. Install the package\n   - with pnpm: `pnpm add -g example-cli`\n   - or from a release archive\n2. Check the version\n3. Write the settings file\n\n```bash\n# install it once\npnpm add -g example-cli\nexample --version\n```\n\n```json\n{ \"region\": \"eu\", \"retries\": 3 }\n```\n\n## Next\n\nRead the [full reference](https://example.com/reference) for every option."
+      }
+    }
+  ]
+}
