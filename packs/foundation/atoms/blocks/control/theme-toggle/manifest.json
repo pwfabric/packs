@@ -54,7 +54,8 @@
     "canHaveChildren": false,
     "icon": "◐",
     "traits": [
-      "nav-utility"
+      "nav-utility",
+      "chrome"
     ],
     "messages": [
       {

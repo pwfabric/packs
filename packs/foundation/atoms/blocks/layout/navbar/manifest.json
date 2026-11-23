@@ -422,7 +422,9 @@
     },
     "canHaveChildren": true,
     "icon": "☰",
-    "traits": [],
+    "traits": [
+      "chrome"
+    ],
     "allowedChildTraits": [
       "nav-utility"
     ],

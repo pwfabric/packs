@@ -70,7 +70,9 @@
     },
     "canHaveChildren": false,
     "icon": "›",
-    "traits": [],
+    "traits": [
+      "chrome"
+    ],
     "messages": [
       {
         "id": "ui.breadcrumb"

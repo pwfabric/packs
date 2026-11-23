@@ -176,6 +176,9 @@
         "id": "ui.nav.bottom",
         "prop": "ariaLabel"
       }
+    ],
+    "traits": [
+      "chrome"
     ]
   },
   "tags": [
