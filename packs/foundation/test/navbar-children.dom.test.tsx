@@ -46,6 +46,8 @@ describe('navbar: children sit in the band', () => {
     expect(slot.hasAttribute('data-pw-nav-narrow')).toBe(false)
     expect(slot.style.display).toBe('flex')
     expect(slot.style.alignItems).toBe('center')
+    // A gap from the bar's own call to action: without it the button touched the first language.
+    expect(slot.style.marginInlineStart).toBe('16px')
   })
 
   it('draws no slot when nothing is placed in it', () => {

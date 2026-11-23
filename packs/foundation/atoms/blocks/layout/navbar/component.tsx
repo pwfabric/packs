@@ -1342,7 +1342,7 @@ export const NavbarBlock: BlockComponent = ({ props, block, context, children })
           neither hidden on a phone nor drawn twice. Placed beside the bar, it
           drew as a band of its own under it. */}
       {React.Children.count(children) > 0 && (
-        <div data-pw-nav-children="" style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: '0 0 auto' }}>
+        <div data-pw-nav-children="" style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: '0 0 auto', marginInlineStart: '16px' }}>
           {children}
         </div>
       )}
