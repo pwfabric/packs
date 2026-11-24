@@ -148,7 +148,15 @@
     },
     "canHaveChildren": false,
     "icon": "☰",
-    "traits": []
+    "traits": [
+      "chrome"
+    ],
+    "messages": [
+      {
+        "id": "ui.sidebar.menu",
+        "prop": "title"
+      }
+    ]
   },
   "tags": [
     "tier:structure"

@@ -1,7 +1,9 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
+import { messageOf, useAppMessages } from '@pwfabric/runtime'
 import { cssUnit, textOf } from '../../../lib/_shared-utils.js'
+import { useClipboardCopy } from '../../../lib/_shared-copy.js'
 
 // ============================================================
 // PROPS — declared in manifest.json, applied by the runtime
@@ -19,6 +21,12 @@ export interface ProseProps {
    * Numbers → px; strings (e.g. '65ch', '720px') pass through.
    */
   readonly maxWidth?: number | string
+  /** A copy button on each code block. Off by default. */
+  readonly copyButton?: boolean
+  /** The copy button's word. Unset: the app's ui.copy. */
+  readonly copyLabel?: string
+  /** Shown and announced once the code reached the clipboard. Unset: the app's ui.copied. */
+  readonly copiedLabel?: string
 }
 
 // ============================================================
@@ -68,8 +76,20 @@ const ALLOWED_ATTRS: Record<string, ReadonlySet<string>> = {
   h6: HEADING_ATTRS,
   a: new Set(['href', 'title', 'rel', 'target']),
   img: new Set(['src', 'alt', 'title', 'width', 'height']),
-  td: new Set(['colspan', 'rowspan']),
-  th: new Set(['colspan', 'rowspan', 'scope']),
+  td: new Set(['colspan', 'rowspan', 'data-align']),
+  th: new Set(['colspan', 'rowspan', 'scope', 'data-align']),
+  pre: new Set(['data-lang']),
+  span: new Set(['data-tok']),
+}
+
+/**
+ * The values a data attribute the sanitizer keeps may hold: a cell's
+ * alignment, a code token's kind, a code block's language (a plain name).
+ */
+const DATA_VALUES: Record<string, (v: string) => boolean> = {
+  'data-align': (v) => v === 'left' || v === 'center' || v === 'right',
+  'data-tok': (v) => (CODE_TOKENS as readonly string[]).includes(v),
+  'data-lang': (v) => /^[a-z0-9][a-z0-9+#-]{0,19}$/i.test(v),
 }
 
 /**
@@ -252,6 +272,7 @@ export function sanitizeHtml(html: string, appHref?: (path: string) => string): 
       let v: string | null = decodeAttr(value)
       if (name === 'href' || name === 'src') v = safeUrl(v)
       if (name === 'id' && v !== null && !HEADING_ID.test(v)) v = null
+      if (v !== null && DATA_VALUES[name] && !DATA_VALUES[name](v)) v = null
       if (v == null) continue
       if (name === 'href' && startName === 'a' && appHref) v = appHref(v)
       if (name === 'target' && v === '_blank') blank = true
@@ -326,6 +347,116 @@ function inlineMd(s: string): string {
   return out.replace(PARKED, (_m, n: string) => parked[Number(n)] ?? '')
 }
 
+// ============================================================
+// CODE TOKENS — a small reader per language family, no dependency
+// ============================================================
+
+/** The kinds of token a code block marks; each is coloured from the theme. */
+export const CODE_TOKENS = ['keyword', 'string', 'comment', 'number'] as const
+
+const C_KEYWORDS = 'as async await break case catch class const continue default delete do else enum export extends false finally for from function if implements import in instanceof interface let new null of private protected public readonly return static super switch this throw true try type typeof undefined var void while yield'
+const LANGS: Record<string, { readonly keywords: string; readonly line: readonly string[]; readonly block?: readonly [string, string]; readonly quotes: string }> = {
+  js: { keywords: C_KEYWORDS, line: ['//'], block: ['/*', '*/'], quotes: `"'\`` },
+  json: { keywords: 'true false null', line: [], quotes: '"' },
+  css: { keywords: 'important inherit initial none auto', line: [], block: ['/*', '*/'], quotes: `"'` },
+  sh: { keywords: 'if then else elif fi for while do done case esac in function return export local echo cd exit set unset source', line: ['#'], quotes: `"'` },
+  py: { keywords: 'and as assert async await break class continue def del elif else except False finally for from global if import in is lambda None nonlocal not or pass raise return True try while with yield', line: ['#'], quotes: `"'` },
+  go: { keywords: 'break case chan const continue default defer else fallthrough for func go goto if import interface map package range return select struct switch type var nil true false', line: ['//'], block: ['/*', '*/'], quotes: `"'\`` },
+  rust: { keywords: 'as async await break const continue crate else enum extern false fn for if impl in let loop match mod move mut pub ref return self Self static struct super trait true type unsafe use where while', line: ['//'], block: ['/*', '*/'], quotes: `"'` },
+  sql: { keywords: 'select from where and or not insert into values update set delete create table drop alter join left right inner outer on group by order having limit as null is in', line: ['--'], quotes: `'"` },
+}
+const LANG_NAMES: Record<string, string> = {
+  js: 'js', javascript: 'js', jsx: 'js', mjs: 'js', cjs: 'js', ts: 'js', typescript: 'js', tsx: 'js',
+  json: 'json', css: 'css', sh: 'sh', bash: 'sh', shell: 'sh', zsh: 'sh', console: 'sh',
+  py: 'py', python: 'py', go: 'go', rs: 'rust', rust: 'rust', sql: 'sql',
+}
+
+/**
+ * A code block's text as HTML, its tokens marked `<span data-tok="…">` for
+ * a language this reader knows (the JavaScript family, JSON, CSS, shell,
+ * Python, Go, Rust, SQL) and escaped as plain text for any other. The text
+ * itself never changes: only spans are added around it.
+ */
+export function highlightCode(code: string, lang: string | undefined): string {
+  const family = lang ? LANG_NAMES[lang.toLowerCase()] : undefined
+  const spec = family ? LANGS[family] : undefined
+  if (!spec) return escapeHtml(code)
+  const keywords = new Set(spec.keywords.split(' '))
+  const caseless = family === 'sql'
+  const out: string[] = []
+  const mark = (kind: (typeof CODE_TOKENS)[number], text: string): void => {
+    out.push(`<span data-tok="${kind}">${escapeHtml(text)}</span>`)
+  }
+  let i = 0
+  let plain = ''
+  const flush = (): void => {
+    if (plain) out.push(escapeHtml(plain))
+    plain = ''
+  }
+  while (i < code.length) {
+    const rest = code.slice(i)
+    const line = spec.line.find((l) => rest.startsWith(l))
+    if (line) {
+      const end = code.indexOf('\n', i)
+      flush()
+      mark('comment', code.slice(i, end < 0 ? code.length : end))
+      i = end < 0 ? code.length : end
+      continue
+    }
+    if (spec.block && rest.startsWith(spec.block[0])) {
+      const end = code.indexOf(spec.block[1], i + spec.block[0].length)
+      const stop = end < 0 ? code.length : end + spec.block[1].length
+      flush()
+      mark('comment', code.slice(i, stop))
+      i = stop
+      continue
+    }
+    const ch = code[i] as string
+    if (spec.quotes.includes(ch)) {
+      let j = i + 1
+      while (j < code.length && code[j] !== ch && !(ch !== '`' && code[j] === '\n')) j += code[j] === '\\' ? 2 : 1
+      const stop = Math.min(j + 1, code.length)
+      flush()
+      mark('string', code.slice(i, stop))
+      i = stop
+      continue
+    }
+    const num = /^(?:0x[0-9a-f]+|\d+(?:\.\d+)?(?:e[+-]?\d+)?)/i.exec(rest)
+    if (num && !/[A-Za-z0-9_$]/.test(code[i - 1] ?? '')) {
+      flush()
+      mark('number', num[0])
+      i += num[0].length
+      continue
+    }
+    const word = /^[A-Za-z_$][A-Za-z0-9_$-]*/.exec(rest)
+    if (word && !/[A-Za-z0-9_$]/.test(code[i - 1] ?? '')) {
+      const w = family === 'css' || family === 'sh' ? word[0] : word[0].replace(/-.*$/, '')
+      if (keywords.has(caseless ? w.toLowerCase() : w)) {
+        flush()
+        mark('keyword', w)
+      } else plain += w
+      i += w.length
+      continue
+    }
+    plain += ch
+    i++
+  }
+  flush()
+  return out.join('')
+}
+
+/** A GitHub-style table's separator row: `|:---|---:|:-:|`. */
+const TABLE_RULE = /^\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?$/
+
+/** The cells of a table row: split on `|` (not `\|`), the outer pipes dropped, each trimmed. */
+function tableCells(line: string): string[] {
+  const body = line.trim().replace(/^\|/, '').replace(/(?<!\\)\|$/, '')
+  return body.split(/(?<!\\)\|/).map((c) => c.trim().replace(/\\\|/g, '|'))
+}
+
+/** A list item line: its indent, its kind and its text. */
+const LIST_ITEM = /^(\s*)([-*+]|\d+\.)\s+(.*)$/
+
 function markdownToHtml(md: string): string {
   const lines = md.replace(/\r\n/g, '\n').split('\n')
   const out: string[] = []
@@ -359,19 +490,42 @@ function markdownToHtml(md: string): string {
     const line = lines[i]
     if (line === undefined) break
     const trimmed = line.trim()
-    // Fenced code block
+    // Fenced code block, its language named after the fence (```ts)
     if (/^```/.test(trimmed)) {
       closeList()
+      const lang = /^```\s*([A-Za-z0-9][A-Za-z0-9+#-]{0,19})?/.exec(trimmed)?.[1]
       const buf: string[] = []
       i++
       for (;;) {
         const fenced = lines[i]
         if (fenced === undefined || /^```/.test(fenced.trim())) break
-        buf.push(escapeHtml(fenced))
+        buf.push(fenced)
         i++
       }
       i++ // consume closing fence
-      out.push(`<pre><code>${buf.join('\n')}</code></pre>`)
+      out.push(`<pre${lang ? ` data-lang="${escapeAttr(lang.toLowerCase())}"` : ''}><code>${highlightCode(buf.join('\n'), lang)}</code></pre>`)
+      continue
+    }
+    // GitHub-style table: a row of cells, then a separator row
+    const rule = lines[i + 1]
+    if (trimmed.includes('|') && rule !== undefined && TABLE_RULE.test(rule.trim()) && rule.includes('-')) {
+      closeList()
+      const head = tableCells(trimmed)
+      const align = tableCells(rule).map((c) => (c.startsWith(':') && c.endsWith(':') ? 'center' : c.endsWith(':') ? 'right' : c.startsWith(':') ? 'left' : ''))
+      const cell = (tag: 'th' | 'td', text: string, n: number): string => {
+        const a = align[n]
+        return `<${tag}${a ? ` data-align="${a}"` : ''}>${inlineMd(escapeHtml(text))}</${tag}>`
+      }
+      const rows: string[] = []
+      i += 2
+      for (;;) {
+        const row = lines[i]
+        if (row === undefined || row.trim() === '' || !row.includes('|')) break
+        const cells = tableCells(row)
+        rows.push(`<tr>${head.map((_h, n) => cell('td', cells[n] ?? '', n)).join('')}</tr>`)
+        i++
+      }
+      out.push(`<table><thead><tr>${head.map((h, n) => cell('th', h, n)).join('')}</tr></thead>${rows.length ? `<tbody>${rows.join('')}</tbody>` : ''}</table>`)
       continue
     }
     // Blank line
@@ -416,26 +570,38 @@ function markdownToHtml(md: string): string {
       out.push(`<blockquote>${buf.join('<br />')}</blockquote>`)
       continue
     }
-    // Unordered list
-    if (/^[-*+]\s+/.test(trimmed)) {
-      if (listType !== 'ul') {
-        closeList()
-        out.push('<ul>')
-        listType = 'ul'
+    // A list: its items, an item indented under another a list inside it
+    if (LIST_ITEM.test(line) && /^[-*+]|^\d+\./.test(trimmed)) {
+      closeList()
+      // Each open list: its kind and the indent of its items.
+      const stack: { tag: 'ul' | 'ol'; indent: number }[] = []
+      // One piece, no line breaks inside: an item's text is its text.
+      const parts: string[] = []
+      const closeTo = (depth: number): void => {
+        while (stack.length > depth) parts.push(`</li></${(stack.pop() as { tag: string }).tag}>`)
       }
-      out.push(`<li>${inlineMd(escapeHtml(trimmed.replace(/^[-*+]\s+/, '')))}</li>`)
-      i++
-      continue
-    }
-    // Ordered list
-    if (/^\d+\.\s+/.test(trimmed)) {
-      if (listType !== 'ol') {
-        closeList()
-        out.push('<ol>')
-        listType = 'ol'
+      for (;;) {
+        const item = lines[i]
+        const m = item === undefined ? null : LIST_ITEM.exec(item)
+        if (!m) break
+        const indent = (m[1] ?? '').replace(/\t/g, '    ').length
+        const tag: 'ul' | 'ol' = /^\d/.test(m[2] ?? '') ? 'ol' : 'ul'
+        const text = inlineMd(escapeHtml(m[3] ?? ''))
+        // Close the lists this item is not inside.
+        while (stack.length > 0 && indent < (stack[stack.length - 1] as { indent: number }).indent) closeTo(stack.length - 1)
+        const top = stack[stack.length - 1]
+        if (!top || indent > top.indent) {
+          stack.push({ tag, indent })
+          parts.push(`<${tag}><li>${text}`)
+        } else if (top.tag !== tag) {
+          closeTo(stack.length - 1)
+          stack.push({ tag, indent })
+          parts.push(`<${tag}><li>${text}`)
+        } else parts.push(`</li><li>${text}`)
+        i++
       }
-      out.push(`<li>${inlineMd(escapeHtml(trimmed.replace(/^\d+\.\s+/, '')))}</li>`)
-      i++
+      closeTo(0)
+      out.push(parts.join(''))
       continue
     }
     // Paragraph
@@ -451,12 +617,41 @@ function markdownToHtml(md: string): string {
 // COMPONENT
 // ============================================================
 
+/**
+ * A copy button before each code block of sanitized prose: written after the
+ * sanitizer, so it is the block's own markup, never the content's. Each
+ * button names its code block by number (`data-pw-prose-copy="0"`).
+ */
+function withCopyButtons(html: string, label: (n: number) => string): string {
+  let n = 0
+  return html.replace(/<pre\b[^>]*>[\s\S]*?<\/pre>/g, (pre) => {
+    const at = n++
+    return `<div data-pw-prose-code=""><button type="button" data-pw-prose-copy="${at}">${escapeHtml(label(at))}</button>${pre}</div>`
+  })
+}
+
 export const ProseBlock: BlockComponent = ({ props, block, context }) => {
   const p = props as unknown as ProseProps
+  const appWords = useAppMessages()
+  const { status, key, copy } = useClipboardCopy()
   const raw = textOf(p.content)
   // Markdown vs HTML detection, then sanitize the resulting HTML in both paths.
   const html = looksLikeHtml(raw) ? raw : markdownToHtml(raw)
-  const sanitized = sanitizeHtml(html, context?.appHref)
+  const copyButton = p.copyButton === true
+  // The app's words: the props when set, else its ui.copy / ui.copied.
+  const copyLabel = textOf(p.copyLabel) || messageOf(appWords, 'ui.copy', '')
+  const copiedLabel = textOf(p.copiedLabel) || messageOf(appWords, 'ui.copied', '')
+  const copied = status === 'copied' ? key : null
+  const sanitized = copyButton
+    ? withCopyButtons(sanitizeHtml(html, context?.appHref), (n) => (copied === String(n) ? copiedLabel : copyLabel))
+    : sanitizeHtml(html, context?.appHref)
+  // One listener for every button: the content is markup, not elements of ours.
+  const onClick = (e: React.MouseEvent<HTMLDivElement>): void => {
+    const button = (e.target as Element | null)?.closest?.('[data-pw-prose-copy]')
+    if (!button || context?.interactionMode === 'inert') return
+    const code = button.parentElement?.querySelector('pre')?.textContent ?? ''
+    void copy(code, button.getAttribute('data-pw-prose-copy') ?? undefined)
+  }
 
   // Stable per-instance id so the scoped <style> only targets THIS block's
   // descendants. pwpack blocks ship no CSS file, so we inline a scoped style tag.
@@ -500,12 +695,32 @@ export const ProseBlock: BlockComponent = ({ props, block, context }) => {
 [data-prose-id="${proseId}"] table { width: 100%; border-collapse: collapse; margin: 0 0 var(--pw-space-md); }
 [data-prose-id="${proseId}"] th, [data-prose-id="${proseId}"] td { border: 1px solid var(--pw-color-border); padding: var(--pw-space-xs) var(--pw-space-sm); text-align: left; }
 [data-prose-id="${proseId}"] th { color: var(--pw-color-text); font-weight: var(--pw-font-weight-heading); }
+[data-prose-id="${proseId}"] [data-align="center"] { text-align: center; }
+[data-prose-id="${proseId}"] [data-align="right"] { text-align: right; }
+[data-prose-id="${proseId}"] li > ul, [data-prose-id="${proseId}"] li > ol { margin: var(--pw-space-xs) 0 0; }
+[data-prose-id="${proseId}"] [data-tok="keyword"] { color: var(--pw-color-code-keyword, var(--pw-color-primary-ink, inherit)); font-weight: var(--pw-font-weight-heading); }
+[data-prose-id="${proseId}"] [data-tok="string"] { color: var(--pw-color-code-string, inherit); }
+[data-prose-id="${proseId}"] [data-tok="number"] { color: var(--pw-color-code-number, var(--pw-color-primary-ink, inherit)); }
+[data-prose-id="${proseId}"] [data-tok="comment"] { color: var(--pw-color-code-comment, var(--pw-color-code-muted, var(--pw-color-text-muted))); font-style: italic; }
+[data-prose-id="${proseId}"] [data-pw-prose-code] { position: relative; }
+[data-prose-id="${proseId}"] [data-pw-prose-copy] { position: absolute; top: var(--pw-space-xs); right: var(--pw-space-xs); background: transparent; border: none; cursor: pointer; color: var(--pw-color-code-muted, var(--pw-color-text-muted)); font-size: var(--pw-font-size-xs); font-family: inherit; min-height: 32px; padding: 0 var(--pw-space-sm); }
+@media (max-width: 640px), (pointer: coarse) { [data-prose-id="${proseId}"] [data-pw-prose-copy] { min-height: 44px; min-width: 44px; } }
 `.trim()
 
   return (
     <div id={block.id} data-block-id={block.id} style={wrapStyle} data-block-type="prose">
       <style>{css}</style>
-      <div data-prose-id={proseId} dangerouslySetInnerHTML={{ __html: sanitized }} />
+      <div data-prose-id={proseId} onClick={copyButton ? onClick : undefined} dangerouslySetInnerHTML={{ __html: sanitized }} />
+      {copyButton ? (
+        // The copy is announced, not silent.
+        <span
+          role="status"
+          aria-live="polite"
+          style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' }}
+        >
+          {copied !== null ? copiedLabel : ''}
+        </span>
+      ) : null}
     </div>
   )
 }

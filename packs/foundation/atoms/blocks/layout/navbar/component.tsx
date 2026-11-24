@@ -555,7 +555,7 @@ const GhostCta: React.FC<{
   )
 }
 
-export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
+export const NavbarBlock: BlockComponent = ({ props, block, context, children }) => {
   // The bar's own words are the app's (ui.menu.*, ui.nav.main, ui.avatar.user).
   const openMenuWord = useAppMessage('ui.menu.open', '')
   const closeMenuWord = useAppMessage('ui.menu.close', '')
@@ -1335,6 +1335,15 @@ export const NavbarBlock: BlockComponent = ({ props, block, context }) => {
           )}
           {hasAvatar && renderAvatar(36)}
           {renderAccount(false)}
+        </div>
+      )}
+      {/* WHAT THE APP PLACES IN THE BAR (a language switch, a theme toggle)
+          sits in the band at every width, once: in neither form, so it is
+          neither hidden on a phone nor drawn twice. Placed beside the bar, it
+          drew as a band of its own under it. */}
+      {React.Children.count(children) > 0 && (
+        <div data-pw-nav-children="" style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: '0 0 auto', marginInlineStart: '16px' }}>
+          {children}
         </div>
       )}
       <div data-pw-nav-narrow="" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>

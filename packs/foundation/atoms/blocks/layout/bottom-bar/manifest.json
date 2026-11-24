@@ -170,7 +170,16 @@
       "position": "fixed",
       "height": 60
     },
-    "canHaveChildren": false
+    "canHaveChildren": false,
+    "messages": [
+      {
+        "id": "ui.nav.bottom",
+        "prop": "ariaLabel"
+      }
+    ],
+    "traits": [
+      "chrome"
+    ]
   },
   "tags": [
     "tier:structure"

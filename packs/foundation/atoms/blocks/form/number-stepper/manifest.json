@@ -142,6 +142,16 @@
     "traits": [
       "form-field",
       "modal-content"
+    ],
+    "messages": [
+      {
+        "id": "ui.stepper.decrease",
+        "prop": "decreaseLabel"
+      },
+      {
+        "id": "ui.stepper.increase",
+        "prop": "increaseLabel"
+      }
     ]
   },
   "tags": [

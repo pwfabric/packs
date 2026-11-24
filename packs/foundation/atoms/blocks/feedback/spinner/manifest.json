@@ -73,6 +73,12 @@
     "icon": "◠",
     "traits": [
       "inline"
+    ],
+    "messages": [
+      {
+        "id": "ui.loading",
+        "prop": "label"
+      }
     ]
   },
   "tags": [

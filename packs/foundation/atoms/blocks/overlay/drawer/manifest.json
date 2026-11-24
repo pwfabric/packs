@@ -123,7 +123,13 @@
     },
     "canHaveChildren": true,
     "icon": "◧",
-    "traits": []
+    "traits": [],
+    "messages": [
+      {
+        "id": "ui.close",
+        "when": "showCloseButton"
+      }
+    ]
   },
   "tags": [
     "tier:widget"

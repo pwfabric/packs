@@ -512,9 +512,20 @@ describe('grid, container, section', () => {
     expect((document.getElementById('g') as HTMLElement).style.boxSizing).toBe('border-box')
   })
 
-  it('a grid with minChildWidth uses auto-fit tracks', () => {
+  it('a grid with minChildWidth keeps its empty tracks, so a lone card on a row keeps its width', () => {
     mount(el(GridBlock, 'g2', 'grid', { columns: 3, minChildWidth: 240 }))
-    expect((document.getElementById('g2') as HTMLElement).style.gridTemplateColumns).toContain('240px')
+    const cols = (document.getElementById('g2') as HTMLElement).style.gridTemplateColumns
+    expect(cols).toContain('240px')
+    // auto-fit collapses the empty tracks and the one card stretches across the row.
+    expect(cols).toContain('auto-fill')
+    expect(cols).not.toContain('auto-fit')
+  })
+
+  it('a card repeater keeps its empty cells, so one item does not stretch across the row', () => {
+    mount(el(RepeaterBlock, 'rg', 'repeater', { items: [{ a: 1 }], layout: 'card', columns: 3, minCellWidth: 280 }))
+    const grid = [...document.querySelectorAll<HTMLElement>('#rg, #rg *')].find((n) => n.style.display === 'grid')
+    expect(grid?.style.gridTemplateColumns).toContain('auto-fill')
+    expect(grid?.style.gridTemplateColumns).toContain('280px')
   })
 
   it('an authored columns is the most tracks a minChildWidth grid holds', () => {

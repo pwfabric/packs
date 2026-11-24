@@ -203,7 +203,16 @@
       "width": 88,
       "showLabels": true
     },
-    "canHaveChildren": false
+    "canHaveChildren": false,
+    "messages": [
+      {
+        "id": "ui.nav.rail",
+        "prop": "ariaLabel"
+      }
+    ],
+    "traits": [
+      "chrome"
+    ]
   },
   "tags": [
     "tier:structure"

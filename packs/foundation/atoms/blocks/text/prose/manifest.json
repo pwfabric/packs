@@ -1,7 +1,7 @@
 {
   "id": "text.prose",
   "kind": "block",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "category": "text",
   "name": "prose",
   "state": "stable",
@@ -10,7 +10,8 @@
     "useCases": [
       "Article or blog post body bound to a CMS field",
       "Documentation page section with headings, lists, code, and links",
-      "Long terms-of-service / policy copy that needs readable rhythm"
+      "Long terms-of-service / policy copy that needs readable rhythm",
+      "Documentation with tables, nested steps and code samples a reader copies (copyButton: true)"
     ],
     "composesWith": [
       "layout.section",
@@ -24,14 +25,14 @@
       "A standalone heading — use text.heading",
       "Untrusted third-party HTML expecting full passthrough — prose sanitizes to a conservative allowlist (no script/iframe/event handlers)"
     ],
-    "implementation": "Further anti-patterns:\n- Interactive form markup — prose strips form/input/button; use form.* blocks\n\nFurther use cases:\n- Any multi-paragraph rich text where individual text blocks would be tedious"
+    "implementation": "Further anti-patterns:\n- Interactive form markup — prose strips form/input/button; use form.* blocks\n\nFurther use cases:\n- Any multi-paragraph rich text where individual text blocks would be tedious\n- Code samples: a fenced block names its language after the fence (```ts, ```bash, ```json …); with copyButton: true each block gets a copy button that reads ui.copy / ui.copied (or copyLabel / copiedLabel)"
   },
   "definition": {
     "props": [
       {
         "name": "content",
         "type": "string",
-        "description": "Markdown string (preferred) OR a raw HTML fragment. Markdown supports headings (#), lists, **bold**, *italic*, `code`, fenced code, > blockquote, links and images. HTML is sanitized to a conservative tag/attribute allowlist. Bindable to a data source.",
+        "description": "Markdown string (preferred) OR a raw HTML fragment. Markdown supports headings (#, each with an anchor id from its text, unique in the block), nested lists (indent an item under another), GitHub-style tables (| a | b | over |---|---:|, the colons aligning a column), **bold**, *italic*, `code`, fenced code with its language after the fence (```ts — its keywords, strings, numbers and comments coloured from the theme), > blockquote, links and images. A link to an app page (/setup) or an in-page anchor (#options) goes through the app's routing; an outside address is unchanged. HTML is sanitized to a conservative tag/attribute allowlist. Bindable to a data source.",
         "jsonSchema": {
           "type": "string"
         },
@@ -49,6 +50,36 @@
           ]
         },
         "bindable": false
+      },
+      {
+        "name": "copyButton",
+        "type": "boolean",
+        "description": "A copy button on each code block, which copies that block's code and announces it. Its words are copyLabel and copiedLabel, else the app's ui.copy and ui.copied.",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "copyLabel",
+        "type": "string",
+        "copy": true,
+        "description": "The copy button's word. Unset: the app's ui.copy. Write it in the app's language.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "copiedLabel",
+        "type": "string",
+        "copy": true,
+        "description": "Shown and announced once the code reached the clipboard. Unset: the app's ui.copied.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
       }
     ],
     "defaultProps": {
@@ -56,7 +87,19 @@
     },
     "canHaveChildren": false,
     "icon": "¶",
-    "traits": []
+    "traits": [],
+    "messages": [
+      {
+        "id": "ui.copy",
+        "prop": "copyLabel",
+        "when": "copyButton"
+      },
+      {
+        "id": "ui.copied",
+        "prop": "copiedLabel",
+        "when": "copyButton"
+      }
+    ]
   },
   "tags": [
     "tier:content"

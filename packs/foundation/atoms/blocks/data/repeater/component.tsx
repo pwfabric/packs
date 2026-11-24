@@ -521,7 +521,9 @@ export const RepeaterBlock: BlockComponent = ({ props, block, children, context 
         }
       : {
           display: 'grid',
-          gridTemplateColumns: `repeat(auto-fit, minmax(min(${columns <= 1 ? '100%' : `${minCellWidth}px`}, 100%), 1fr))`,
+          // auto-fill, not auto-fit: the empty cells keep their place, so one
+          // item (or the last of an uneven count) keeps its cell's width.
+          gridTemplateColumns: `repeat(auto-fill, minmax(min(${columns <= 1 ? '100%' : `${minCellWidth}px`}, 100%), 1fr))`,
           gap: cssUnit(p.gap) ?? 'var(--pw-layout-grid-gap)',
           width: '100%',
           ...block.style,
