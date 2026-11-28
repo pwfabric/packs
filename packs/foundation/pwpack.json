@@ -1,12 +1,12 @@
 {
   "id": "@pwpack/foundation",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "formatVersion": "1.0",
   "name": "Foundation",
   "description": "The ground floor every app stands on: the core block vocabulary (layout, text, controls, forms, data, feedback, media), the top-bar, bottom-bar and chrome-less shells with their page parts, two app layouts (top bar, documentation with a sidebar), a plain base theme and three that extend it, each with its own dark mode (base; zinc, paper, ember), the icon dictionary, four capabilities and the REST connector.",
   "category": "ui-design",
   "engines": {
-    "pwfabric": ">=3.7.0 <4"
+    "pwfabric": ">=3.8.0 <4"
   },
   "requires": [],
   "tokens": [

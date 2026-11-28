@@ -66,7 +66,7 @@ const CASES: [string, string, unknown, Record<string, unknown>][] = [
     },
   ],
   ['control/breadcrumb', 'breadcrumb', BreadcrumbBlock, { items: [{ label: 'Guides', href: '/guides' }, { label: 'A' }] }],
-  ['layout/navbar', 'navbar', NavbarBlock, { logoText: 'Acme', logoHref: '/' }],
+  ['layout/navbar', 'navbar', NavbarBlock, { logoText: 'Acme', logoHref: '/', showCTA: true, ctaLabel: 'Start', ctaHref: '/start', secondaryCtaLabel: 'Sign in', secondaryCtaHref: '/in', showSearch: true, searchPlaceholder: 'Search' }],
   ['layout/table-of-contents', 'table-of-contents', TableOfContentsBlock, { title: 'On this page', items: [{ label: 'A', href: '#a', level: 2 }, { label: 'B', href: '#b', level: 3 }] }],
   ['control/back-to-top', 'back-to-top', BackToTopBlock, { label: 'Top' }],
   ['control/button', 'button', ButtonBlock, { label: 'Go', variant: 'primary' }],

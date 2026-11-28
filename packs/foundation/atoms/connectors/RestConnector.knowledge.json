@@ -17,9 +17,9 @@
         "key": "itemsPath",
         "type": "string",
         "label": "Records location",
-        "description": "Name of the field in the response body that holds the array of records — such as 'data', 'results', 'items'. Use dots for a nested field: 'payload.rows'.",
+        "description": "Name of the field in the response body that holds the array of records — such as 'data', 'results', 'items'. Use dots for a nested field: 'payload.rows'. Use '$' when the response body is itself the array (an API that answers [ {..}, {..} ]). Whatever is there must be an array: anything else is reported as an error of the source, not shown as an empty list.",
         "required": true,
-        "group": "YANIT"
+        "group": "RESPONSE"
       },
       {
         "key": "idField",
@@ -27,7 +27,7 @@
         "label": "ID field",
         "description": "Name of the field that uniquely identifies each record — 'id' in most APIs.",
         "required": true,
-        "group": "YANIT"
+        "group": "RESPONSE"
       }
     ]
   },
@@ -42,7 +42,7 @@
     "capabilities": [
       "query (read; pagination via the engine's own query string)"
     ],
-    "configSchema": "connection.config = { baseUrl, itemsPath, idField } — the source name comes from entityType and is appended to the address",
+    "configSchema": "connection.config = { baseUrl, itemsPath, idField } — the source name comes from entityType and is appended to the address; itemsPath '$' when the answer is the array itself",
     "antiPatterns": [
       "Microsoft Graph / SharePoint lists — they have their own engine (GraphListConnector); site resolution and field flattening are not in this atom",
       "Entities in the platform's own database — that is the platform/entities capability's job; this atom is for external APIs",

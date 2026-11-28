@@ -573,6 +573,18 @@
         "type": "length",
         "default": "0px",
         "description": "Letter spacing of the brand’s name."
+      },
+      {
+        "name": "buttonRadius",
+        "type": "length",
+        "default": "var(--pw-border-radius)",
+        "description": "Corner radius of the bar’s call-to-action buttons; a theme sets 9999px for pill buttons."
+      },
+      {
+        "name": "searchRadius",
+        "type": "length",
+        "default": "var(--pw-border-radius)",
+        "description": "Corner radius of the search box."
       }
     ]
   },

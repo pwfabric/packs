@@ -67,7 +67,7 @@
   "packs": {
     "foundation": {
       "requires": [],
-      "engines": ">=3.7.0 <4",
+      "engines": ">=3.8.0 <4",
       "expect": {
         "blocks": 58,
         "patterns": 28

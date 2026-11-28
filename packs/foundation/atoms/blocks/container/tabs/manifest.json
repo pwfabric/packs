@@ -129,6 +129,20 @@
     "traits": [],
     "allowedChildTraits": [
       "tab-panel"
+    ],
+    "tokens": [
+      {
+        "name": "radius",
+        "type": "length",
+        "default": "var(--pw-border-radius)",
+        "description": "Corner radius of a tab in the pills style."
+      },
+      {
+        "name": "verticalRadius",
+        "type": "length",
+        "default": "var(--pw-border-radius-sm)",
+        "description": "Corner radius of the open side of a tab in a vertical strip."
+      }
     ]
   },
   "tags": [
