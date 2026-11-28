@@ -11,6 +11,14 @@ import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 
 export const LINK_TARGETS = ['_self', '_blank', '_parent', '_top'] as const
 
+/** The CSS weight of each fontWeight name. */
+export const LINK_WEIGHT: Readonly<Record<NonNullable<LinkProps['fontWeight']>, number>> = {
+  normal: 400,
+  medium: 500,
+  semibold: 600,
+  bold: 700,
+}
+
 export interface LinkProps {
   readonly icon?: string
   readonly ariaLabel?: string
@@ -32,6 +40,8 @@ export interface LinkProps {
   /** 8–96 px. */
   readonly fontSize?: number
   readonly fontWeight?: 'normal' | 'medium' | 'semibold' | 'bold'
+  /** inline (default) or block: a line of its own, as tall as its own line height. */
+  readonly display?: 'inline' | 'block'
   /**
    * This link names the page in view (a nav item): it carries
    * aria-current="page" and is drawn marked. Bindable: "{{item.active}}".
@@ -70,6 +80,15 @@ export const linkDefinition: BlockDefinition = {
 const LINK_UNDERLINE_CSS =
   '[data-pw-ul="hover"] { text-decoration: none; } [data-pw-ul="hover"]:hover, [data-pw-ul="hover"]:focus-visible { text-decoration: underline; text-underline-offset: 0.15em; }'
 
+/**
+ * A link drawn with no underline (a menu entry, a pill) shows nothing that says it
+ * is one, so hover and press lay a faint tint of its own ink over it — the same
+ * answer a button gives, never a recolour (a current entry keeps its fill).
+ */
+export const LINK_PLAIN_CSS =
+  '@media (hover: hover) { [data-pw-ul="none"]:hover { background-image: linear-gradient(color-mix(in srgb, currentColor 8%, transparent) 0 0) !important; } }' +
+  ' [data-pw-ul="none"]:active { background-image: linear-gradient(color-mix(in srgb, currentColor 14%, transparent) 0 0) !important; }'
+
 const LINK_TOUCH_CSS =
   '@media (max-width: 640px), (pointer: coarse) { [data-pw-touch] { display: inline-flex; align-items: center; min-height: 44px; } }'
 
@@ -96,9 +115,12 @@ export const LinkBlock: BlockComponent = ({ props, block, context }) => {
     // Live measurement: the only element below AA in dark mode across 128 rendered blocks.
     color: p.color ?? 'var(--pw-color-link, var(--pw-color-primary-ink, #18181b))',
     fontSize: cssUnit(p.fontSize),
-    fontWeight: p.fontWeight as React.CSSProperties['fontWeight'],
+    // The prop is a name (normal | medium | semibold | bold); CSS takes a number.
+    // Written as given, `font-weight: semibold` is not CSS and the browser drops it.
+    fontWeight: p.fontWeight === undefined ? undefined : LINK_WEIGHT[p.fontWeight],
     ...(underlineStyles[underline] ?? underlineStyles.always),
     cursor: 'pointer',
+    ...(p.display === 'block' ? { display: 'block', width: 'fit-content' } : {}),
     ...(p.current === true
       ? { fontWeight: 600, backgroundColor: 'color-mix(in srgb, currentColor 14%, transparent)' }
       : {}),
@@ -171,7 +193,8 @@ export const LinkBlock: BlockComponent = ({ props, block, context }) => {
   if (iconEl) {
     // Icon and text sit on one line, centred, a theme xs space apart;
     // block.style still wins when it sets any of the three.
-    style.display = style.display ?? 'inline-flex'
+    // display: block keeps its own line; with an icon that line is a flex row.
+    style.display = style.display === 'block' ? 'flex' : (style.display ?? 'inline-flex')
     style.alignItems = style.alignItems ?? 'center'
     style.gap = style.gap ?? 'var(--pw-space-xs, 4px)'
   }
@@ -188,13 +211,13 @@ export const LinkBlock: BlockComponent = ({ props, block, context }) => {
 
   return (
     <>
-    <style>{HIT_AREA_CSS + LINK_TOUCH_CSS + (underline === 'hover' ? LINK_UNDERLINE_CSS : '')}</style>
+    <style>{HIT_AREA_CSS + LINK_TOUCH_CSS + (underline === 'hover' ? LINK_UNDERLINE_CSS : underline === 'none' ? LINK_PLAIN_CSS : '')}</style>
     <a
       id={block.id}
       data-block-id={block.id}
       data-pw-hit=""
       data-pw-touch=""
-      data-pw-ul={underline === 'hover' ? 'hover' : undefined}
+      data-pw-ul={underline === 'hover' ? 'hover' : underline === 'none' ? 'none' : undefined}
       href={resolved}
       target={target}
       rel={rel}

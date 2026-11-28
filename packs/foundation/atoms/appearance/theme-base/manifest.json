@@ -1,0 +1,152 @@
+{
+  "id": "theme-base",
+  "kind": "ui-appearance",
+  "version": "1.0.0",
+  "category": "ui",
+  "name": "Base",
+  "state": "stable",
+  "description": "The plain base every foundation theme builds on, and the engine’s own fallback look: white ground, grey text and borders, one blue, system sans, 6px corners, light shadows; its own dark mode. Wear it to see a page with no character of its own, or extend it to write only what differs.",
+  "tags": [
+    "theme",
+    "appearance",
+    "base",
+    "neutral"
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#2563eb",
+      "secondary": "#f3f4f6",
+      "accent": "#eff6ff",
+      "background": "#ffffff",
+      "card": "#ffffff",
+      "text": "#111827",
+      "textMuted": "#4b5563",
+      "border": "#e5e7eb",
+      "error": "#dc2626",
+      "success": "#15803d",
+      "warning": "#b45309",
+      "info": "#2563eb",
+      "textOnPrimary": "#ffffff",
+      "heading": "#111827",
+      "link": "#1d4ed8",
+      "tableBorder": "#e5e7eb",
+      "codeSurface": "#f3f4f6"
+    },
+    "border": {
+      "radius": "6px",
+      "width": "1px",
+      "style": "solid",
+      "radiusLarge": "8px",
+      "radiusSmall": "4px",
+      "radiusXl": "12px",
+      "radius2xl": "16px",
+      "radiusFull": "9999px"
+    },
+    "typography": {
+      "fontFamily": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif",
+      "headingFontFamily": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif",
+      "monoFontFamily": "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+      "baseFontSize": "16px",
+      "headingWeight": "600",
+      "headingLineHeight": "1.25",
+      "letterSpacing": "0em",
+      "bodyLineHeight": "1.6",
+      "bodyWeight": "400",
+      "bodyLetterSpacing": "0em",
+      "fontSizeXs": "12px",
+      "fontSizeSm": "14px",
+      "fontSizeLg": "18px",
+      "fontSizeXl": "20px",
+      "fontSize2xl": "24px",
+      "fontSize3xl": "30px",
+      "fontSize4xl": "36px"
+    },
+    "spacing": {
+      "base": "1rem",
+      "xs": "0.25rem",
+      "sm": "0.5rem",
+      "md": "1rem",
+      "lg": "1.5rem",
+      "xl": "2rem",
+      "xxl": "3rem"
+    },
+    "shadows": {
+      "card": "0 1px 2px rgba(0,0,0,.05)",
+      "button": "none",
+      "sm": "0 1px 2px rgba(0,0,0,.05)",
+      "md": "0 4px 12px rgba(0,0,0,.08)",
+      "lg": "0 10px 24px rgba(0,0,0,.10)",
+      "xl": "0 20px 40px rgba(0,0,0,.12)"
+    },
+    "motion": {
+      "durationFast": "150ms",
+      "durationNormal": "300ms",
+      "durationSlow": "500ms",
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "easingBounce": "cubic-bezier(0.34, 1.56, 0.64, 1)"
+    },
+    "layout": {
+      "gap": "0px",
+      "padding": "0px",
+      "containerMaxWidth": "1280px",
+      "gridGap": "16px",
+      "sectionPaddingY": "clamp(2.5rem, 5vw, 4rem)",
+      "sectionPaddingX": "clamp(1rem, 3vw, 1.5rem)"
+    },
+    "focus": {
+      "ringColor": "#2563eb",
+      "ringWidth": "2px",
+      "ringOffset": "2px"
+    },
+    "zIndex": {
+      "sticky": 50,
+      "nav": 100,
+      "dropdown": 200,
+      "drawer": 300,
+      "modal": 400,
+      "toast": 500
+    }
+  },
+  "darkTheme": {
+    "colors": {
+      "primary": "#60a5fa",
+      "secondary": "#1f2937",
+      "accent": "#172554",
+      "background": "#0b0f19",
+      "card": "#111827",
+      "text": "#f3f4f6",
+      "textMuted": "#9ca3af",
+      "border": "#374151",
+      "error": "#f87171",
+      "success": "#4ade80",
+      "warning": "#fbbf24",
+      "info": "#60a5fa",
+      "textOnPrimary": "#0b0f19",
+      "heading": "#f9fafb",
+      "link": "#93c5fd",
+      "tableBorder": "#374151",
+      "codeSurface": "#1f2937"
+    },
+    "focus": {
+      "ringColor": "#60a5fa"
+    }
+  },
+  "knowledge": {
+    "purpose": "The plain base of the foundation themes: neutral grey and one blue, nothing more. Zinc, paper and ember extend it and write only what differs; wear it on its own to judge a page by its structure, not its look, or as the start of a theme of your own (\"extends\": \"theme-base\").",
+    "useCases": [
+      "A starting point for a theme of your own: extend it and change what you need",
+      "Judging a layout without a theme’s character",
+      "Tests and demos that need one predictable look"
+    ],
+    "composesWith": [
+      "platform/persistence",
+      "platform/entities",
+      "platform/navigation"
+    ],
+    "antiPatterns": [
+      "A finished product look — wear zinc, paper or ember",
+      "Pinning colours in block props — theme tokens already cascade",
+      "Expecting two themes on one surface — a surface carries a single token set"
+    ]
+  }
+}

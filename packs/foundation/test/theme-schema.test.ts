@@ -68,8 +68,8 @@ describe('themes parse under surfaceThemeSchema', () => {
   const manifests = themeManifests()
 
   it('finds the shipped themes', () => {
-    // zinc, midnight, paper, linen, slate and ember.
-    expect(manifests.length).toBeGreaterThanOrEqual(6)
+    // base, and zinc, paper and ember, which extend it.
+    expect(manifests.length).toBe(4)
   })
 
   it.each(manifests.map((f) => [relative(REPO, f), f]))('%s', (_name, file) => {

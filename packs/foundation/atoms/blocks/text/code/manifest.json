@@ -1,7 +1,7 @@
 {
   "id": "text.code",
   "kind": "block",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "category": "text",
   "name": "code",
   "state": "stable",

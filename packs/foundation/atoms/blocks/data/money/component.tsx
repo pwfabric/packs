@@ -218,7 +218,7 @@ export const MoneyBlock: BlockComponent = ({ props, block, context }) => {
             fontSize: 'var(--pw-font-size-xs)',
             fontWeight: 600,
             padding: '2px 8px',
-            borderRadius: '999px',
+            borderRadius: 'var(--pw-border-radius-full)',
             background: 'var(--pw-color-success-surface, var(--pw-color-surface-raised))',
             color: 'var(--pw-color-success-on-surface, var(--pw-color-text))',
           }}

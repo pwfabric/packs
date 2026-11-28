@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { HIT_AREA_CSS, listOf, MEDIA_LETTERBOX, ON_OVERLAY_SCRIM, OVERLAY_SCRIM, safeRenderValue } from '../../../lib/_kit.js'
+import { HIT_AREA_CSS, listOf, MEDIA_LETTERBOX, ON_OVERLAY_SCRIM, OVERLAY_SCRIM, safeRenderValue, PRESS_CSS } from '../../../lib/_kit.js'
 import { messageOf, useAppMessages } from '@pwfabric/runtime'
 
 /**
@@ -214,7 +214,7 @@ const CarouselSingle: React.FC<SingleProps> = ({
     width: '100%',
     paddingBottom: aspectPad,
     backgroundColor: MEDIA_LETTERBOX,
-    borderRadius: '4px',
+    borderRadius: 'var(--pw-border-radius-sm)',
     overflow: 'hidden',
   }
 
@@ -252,8 +252,8 @@ const CarouselSingle: React.FC<SingleProps> = ({
         </div>
         {showArrows && items.length > 1 && (
           <>
-            <style>{HIT_AREA_CSS + ARROW_HIT_CSS}</style>
-            <button
+            <style>{PRESS_CSS + HIT_AREA_CSS + ARROW_HIT_CSS}</style>
+            <button data-pw-press=""
               type="button"
               data-pw-hit=""
               data-pw-arrow=""
@@ -279,7 +279,7 @@ const CarouselSingle: React.FC<SingleProps> = ({
             >
               ‹
             </button>
-            <button
+            <button data-pw-press=""
               type="button"
               data-pw-hit=""
               data-pw-arrow=""
@@ -317,9 +317,9 @@ const CarouselSingle: React.FC<SingleProps> = ({
             marginTop: '4px',
           }}
         >
-          <style>{DOT_HIT_CSS}</style>
+          <style>{PRESS_CSS + DOT_HIT_CSS}</style>
           {items.map((_, i) => (
-            <button
+            <button data-pw-press=""
               type="button"
               key={i}
               onClick={() => setActiveIndex(i)}
@@ -379,7 +379,7 @@ const ImageSlide: React.FC<{ item: CarouselItemData; aspectPad: string; first?: 
         width: '100%',
         paddingBottom: aspectPad,
         backgroundColor: MEDIA_LETTERBOX,
-        borderRadius: '4px',
+        borderRadius: 'var(--pw-border-radius-sm)',
         overflow: 'hidden',
       }}
     >
@@ -526,8 +526,8 @@ const CarouselStrip: React.FC<StripProps> = ({
         </div>
         {showArrows && pageCount > 1 && (
           <>
-            <style>{HIT_AREA_CSS + ARROW_HIT_CSS}</style>
-            <button
+            <style>{PRESS_CSS + HIT_AREA_CSS + ARROW_HIT_CSS}</style>
+            <button data-pw-press=""
               type="button"
               data-pw-hit=""
               data-pw-arrow=""
@@ -554,7 +554,7 @@ const CarouselStrip: React.FC<StripProps> = ({
             >
               ‹
             </button>
-            <button
+            <button data-pw-press=""
               type="button"
               data-pw-hit=""
               data-pw-arrow=""
@@ -593,9 +593,9 @@ const CarouselStrip: React.FC<StripProps> = ({
             marginTop: '4px',
           }}
         >
-          <style>{DOT_HIT_CSS}</style>
+          <style>{PRESS_CSS + DOT_HIT_CSS}</style>
           {Array.from({ length: pageCount }).map((_, i) => (
-            <button
+            <button data-pw-press=""
               type="button"
               key={i}
               onClick={() => setPage(i)}

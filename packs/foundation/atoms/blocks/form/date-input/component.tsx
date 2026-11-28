@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { CONTROL_BORDER, CONTROL_HEIGHT, CONTROL_LABEL_STYLE, safeRenderValue } from '../../../lib/_shared-utils.js'
+import { CONTROL_BORDER, CONTROL_HEIGHT, CONTROL_LABEL_STYLE, safeRenderValue, PRESS_CSS } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 import { useAppMessage, useAppMessages, messageOf } from '@pwfabric/runtime'
@@ -351,7 +351,7 @@ export const DateInputBlock: BlockComponent = ({ props, block, context }) => {
     alignItems: 'center',
     justifyContent: 'center',
     border: '1px solid var(--pw-color-border)',
-    borderRadius: '6px',
+    borderRadius: 'var(--pw-border-radius)',
     background: 'transparent',
     color: 'var(--pw-color-text)',
     cursor: 'pointer',
@@ -360,7 +360,7 @@ export const DateInputBlock: BlockComponent = ({ props, block, context }) => {
 
   return (
     <div ref={rootRef} id={block.id} data-block-id={block.id} style={wrapperStyle} data-block-type="date-input">
-      <style>{DATE_FIELD_TOUCH_CSS}</style>
+      <style>{PRESS_CSS + DATE_FIELD_TOUCH_CSS}</style>
       {label && (
         <label htmlFor={controlId} style={labelStyle}>
           {label}
@@ -430,9 +430,9 @@ export const DateInputBlock: BlockComponent = ({ props, block, context }) => {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <button type="button" aria-label={previousMonthWord} data-pw-cal-nav="" style={navBtnStyle} onClick={() => shiftView(-1)}>‹</button>
+                  <button data-pw-press="" type="button" aria-label={previousMonthWord} data-pw-cal-nav="" style={navBtnStyle} onClick={() => shiftView(-1)}>‹</button>
                   <span aria-live="polite" style={{ fontSize: 'var(--pw-font-size-sm)', fontWeight: 600, textTransform: 'capitalize' }}>{monthTitle}</span>
-                  <button type="button" aria-label={nextMonthWord} data-pw-cal-nav="" style={navBtnStyle} onClick={() => shiftView(1)}>›</button>
+                  <button data-pw-press="" type="button" aria-label={nextMonthWord} data-pw-cal-nav="" style={navBtnStyle} onClick={() => shiftView(1)}>›</button>
                 </div>
                 <div ref={gridRef} onKeyDown={onGridKey} style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
                   {weekdays(locale).map((w) => (
@@ -450,7 +450,7 @@ export const DateInputBlock: BlockComponent = ({ props, block, context }) => {
                     // One tab stop in the grid; the arrows move it.
                     const tabStop = focusInView ? iso === focusISO : d.getDate() === 1
                     return (
-                      <button
+                      <button data-pw-press=""
                         key={iso}
                         type="button"
                         // aria-disabled, not disabled: a greyed day stays
@@ -468,7 +468,7 @@ export const DateInputBlock: BlockComponent = ({ props, block, context }) => {
                         style={{
                           height: 32,
                           border: 'none',
-                          borderRadius: '6px',
+                          borderRadius: 'var(--pw-border-radius)',
                           fontSize: 'var(--pw-font-size-sm)',
                           fontFamily: 'inherit',
                           cursor: enabled ? 'pointer' : 'not-allowed',

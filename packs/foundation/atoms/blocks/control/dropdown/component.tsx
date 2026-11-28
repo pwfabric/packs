@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { listOf, safeHref } from '../../../lib/_shared-utils.js'
+import { listOf, safeHref, PRESS_CSS } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 
@@ -123,13 +123,13 @@ export const DropdownBlock: BlockComponent = ({ props, block, context }) => {
     position: 'relative',
     display: 'inline-block',
     backgroundColor: (variantStyles[triggerVariant] ?? variantStyles['secondary'])?.backgroundColor,
-    borderRadius: '6px',
+    borderRadius: 'var(--pw-border-radius)',
   }
 
   const triggerStyle: React.CSSProperties = {
     ...(variantStyles[triggerVariant] ?? variantStyles.secondary),
     padding: '10px 16px',
-    borderRadius: '6px',
+    borderRadius: 'var(--pw-border-radius)',
     cursor: 'pointer',
     fontWeight: 500,
     fontSize: 'var(--pw-font-size-sm)',
@@ -145,7 +145,7 @@ export const DropdownBlock: BlockComponent = ({ props, block, context }) => {
     minWidth: '160px',
     backgroundColor: 'var(--pw-color-card)',
     border: '1px solid var(--pw-color-border)',
-    borderRadius: '8px',
+    borderRadius: 'var(--pw-border-radius-lg)',
     boxShadow: 'var(--pw-shadow-lg)',
     zIndex: 'var(--pw-z-dropdown)',
     opacity: isOpen ? 1 : 0,
@@ -163,7 +163,7 @@ export const DropdownBlock: BlockComponent = ({ props, block, context }) => {
     textAlign: 'left',
     backgroundColor: 'transparent',
     border: 'none',
-    borderRadius: '4px',
+    borderRadius: 'var(--pw-border-radius-sm)',
     cursor: disabled ? 'not-allowed' : 'pointer',
     opacity: disabled ? 0.5 : 1,
     fontSize: 'var(--pw-font-size-sm)',
@@ -227,8 +227,8 @@ export const DropdownBlock: BlockComponent = ({ props, block, context }) => {
       style={{ ...containerStyle, ...block.style }}
       data-block-type="dropdown"
     >
-      <style>{DROPDOWN_TOUCH_CSS}</style>
-      <button
+      <style>{PRESS_CSS + DROPDOWN_TOUCH_CSS}</style>
+      <button data-pw-press=""
         ref={triggerRef}
         type="button"
         style={triggerStyle}
@@ -256,7 +256,7 @@ export const DropdownBlock: BlockComponent = ({ props, block, context }) => {
           item.divider ? (
             <div key={item.id} style={dividerStyle} role="separator" />
           ) : (
-            <button
+            <button data-pw-press=""
               key={item.id}
               type="button"
               style={itemStyleFn(item.disabled)}

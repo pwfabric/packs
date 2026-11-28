@@ -1,7 +1,7 @@
 {
   "id": "overlay.drawer",
   "kind": "block",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "category": "overlay",
   "name": "drawer",
   "state": "stable",

@@ -1,24 +1,45 @@
 {
   "id": "theme-paper",
   "kind": "ui-appearance",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "category": "ui",
   "name": "Paper",
   "state": "stable",
-  "description": "Editorial: warm paper ground, ink-navy primary, Newsreader headings over Source Serif body, square corners, no shadows, an 18px reading size.",
+  "description": "Calm reading: strong cream ground, ink-navy primary, burgundy links, light Newsreader headings over Source Serif body at 18px with a long line, square corners, no shadows, a narrow column.",
   "tags": [
     "theme",
     "appearance",
     "light",
     "editorial"
   ],
+  "knowledge": {
+    "purpose": "A look for pages people read through and places people visit: serif voice, a generous 18px body with a long line height, warm paper and rust links, near-square corners and no shadows, so type carries the page. It serves a magazine, a journal or a long guide, and a café, a booking page or a local service.",
+    "useCases": [
+      "A magazine, a journal or a blog",
+      "Documentation or long guides read top to bottom",
+      "A studio or practice whose site is its writing and its pictures",
+      "Pick it as a starting point and edit token values one by one"
+    ],
+    "composesWith": [
+      "platform/persistence",
+      "platform/entities",
+      "platform/navigation"
+    ],
+    "antiPatterns": [
+      "A dense data screen or a tool people work in all day — wear zinc",
+      "A launch, an event or a brand that must be loud — wear ember",
+      "Pinning colours in block props — theme tokens already cascade",
+      "Expecting two themes on one surface — a surface carries a single token set"
+    ]
+  },
+  "extends": "theme-base",
   "theme": {
     "colors": {
       "primary": "#1f3354",
       "secondary": "#ede6d8",
       "accent": "#efe3cc",
-      "background": "#f7f3ea",
-      "card": "#fbf8f2",
+      "background": "#f5efe3",
+      "card": "#faf6ee",
       "text": "#1d1a16",
       "textMuted": "#5a5248",
       "border": "#ddd3c1",
@@ -26,73 +47,66 @@
       "success": "#2f6b3a",
       "warning": "#8a5a00",
       "info": "#1f4f8a",
-      "textOnPrimary": "#ffffff"
+      "textOnPrimary": "#ffffff",
+      "heading": "#1d1a16",
+      "link": "#8b1e3f",
+      "tableBorder": "#ddd3c1",
+      "codeSurface": "#ede5d5"
     },
     "border": {
-      "radius": "3px",
-      "width": "1px",
-      "style": "solid",
-      "radiusLarge": "4px",
-      "radiusSmall": "2px",
-      "radiusXl": "6px",
-      "radius2xl": "8px",
-      "radiusFull": "9999px"
+      "radius": "0px",
+      "radiusLarge": "0px",
+      "radiusSmall": "0px",
+      "radiusXl": "0px",
+      "radius2xl": "0px",
+      "radiusFull": "0px"
     },
     "typography": {
       "fontFamily": "\"Source Serif 4\", Georgia, \"Times New Roman\", serif",
       "headingFontFamily": "Newsreader, Georgia, \"Times New Roman\", serif",
-      "monoFontFamily": "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
       "baseFontSize": "18px",
-      "headingWeight": "600",
+      "headingWeight": "500",
       "headingLineHeight": "1.15",
-      "letterSpacing": "-0.015em",
-      "bodyLineHeight": "1.65",
-      "bodyWeight": "400",
-      "bodyLetterSpacing": "0em",
+      "bodyLineHeight": "1.75",
       "fontSizeXs": "13px",
       "fontSizeSm": "15px",
       "fontSizeLg": "20px",
-      "fontSizeXl": "23px",
-      "fontSize2xl": "28px",
-      "fontSize3xl": "36px",
-      "fontSize4xl": "46px"
+      "fontSizeXl": "22px",
+      "fontSize2xl": "26px",
+      "fontSize3xl": "32px",
+      "fontSize4xl": "40px",
+      "headingLineHeightH1": "1.1",
+      "headingLineHeightH2": "1.2",
+      "headingLineHeightH3": "1.3"
     },
     "spacing": {
-      "base": "1rem",
-      "xs": "0.25rem",
-      "sm": "0.5rem",
-      "md": "1rem",
+      "xs": "0.3rem",
+      "sm": "0.6rem",
+      "md": "1.1rem",
       "lg": "1.75rem",
       "xl": "2.5rem",
       "xxl": "4rem"
     },
     "shadows": {
       "card": "none",
-      "button": "none",
       "sm": "none",
-      "md": "0 6px 18px rgba(29,26,22,.08)",
-      "lg": "0 12px 28px rgba(29,26,22,.1)",
-      "xl": "0 20px 40px rgba(29,26,22,.12)"
+      "md": "0 2px 8px rgba(40,30,15,.08)",
+      "lg": "0 8px 20px rgba(40,30,15,.10)",
+      "xl": "0 16px 36px rgba(40,30,15,.12)"
     },
     "motion": {
-      "durationFast": "150ms",
       "durationNormal": "200ms",
       "durationSlow": "300ms",
-      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
       "easingBounce": "cubic-bezier(0.68, -0.55, 0.27, 1.55)"
     },
     "layout": {
-      "gap": "0px",
-      "padding": "0px",
-      "containerMaxWidth": "1160px",
+      "containerMaxWidth": "1080px",
       "gridGap": "28px",
-      "sectionPaddingY": "clamp(3rem, 6vw, 5rem)",
+      "sectionPaddingY": "clamp(4rem, 7vw, 6rem)",
       "sectionPaddingX": "clamp(1rem, 3vw, 2rem)"
     },
     "focus": {
-      "ringColor": "#3d6aa8",
-      "ringWidth": "2px",
-      "ringOffset": "2px"
+      "ringColor": "#3d6aa8"
     },
     "zIndex": {
       "sticky": 150,
@@ -101,6 +115,17 @@
       "drawer": 400,
       "modal": 500,
       "toast": 540
+    },
+    "blocks": {
+      "prose": {
+        "h1SpaceBelow": "0.6em",
+        "h2SpaceAbove": "2.2em",
+        "h2SpaceBelow": "0.5em",
+        "paragraphSpaceBelow": "1.1em",
+        "listItemSpaceBelow": "0.4em",
+        "inlineCodeFontSize": "0.88em",
+        "tableCellPaddingBlock": "0.55em"
+      }
     }
   },
   "darkTheme": {
@@ -117,30 +142,14 @@
       "success": "#9fd1a5",
       "warning": "#e8c27a",
       "info": "#9cc0ee",
-      "textOnPrimary": "#121b2b"
+      "textOnPrimary": "#121b2b",
+      "heading": "#efe8dc",
+      "link": "#e6a3b6",
+      "tableBorder": "#3a342b",
+      "codeSurface": "#24201a"
     },
     "focus": {
       "ringColor": "#a9c1e8"
     }
-  },
-  "knowledge": {
-    "purpose": "A look for pages people read through: serif voice, a generous 18px body with a long line height, near-square corners and no shadows, so type and pictures carry the page.",
-    "useCases": [
-      "A magazine, a journal or a blog",
-      "Documentation or long guides read top to bottom",
-      "A studio or practice whose site is its writing and its pictures",
-      "Pick it as a starting point and edit token values one by one"
-    ],
-    "composesWith": [
-      "platform/persistence",
-      "platform/entities",
-      "platform/navigation"
-    ],
-    "antiPatterns": [
-      "A dense data screen — wear slate or midnight",
-      "A phone-first ordering or booking flow — wear linen or zinc",
-      "Pinning colours in block props — theme tokens already cascade",
-      "Expecting two themes on one surface — a surface carries a single token set"
-    ]
   }
 }

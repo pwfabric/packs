@@ -1,7 +1,7 @@
 {
   "id": "data.calendar-month",
   "kind": "block",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "category": "data",
   "name": "calendar-month",
   "state": "experimental",

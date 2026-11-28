@@ -107,7 +107,7 @@ export const SkeletonBlock: BlockComponent = ({ props, block }) => {
             ...baseStyle,
             width,
             height: height ?? '120px',
-            borderRadius: '8px',
+            borderRadius: 'var(--pw-border-radius-lg)',
           }}
         />
       )

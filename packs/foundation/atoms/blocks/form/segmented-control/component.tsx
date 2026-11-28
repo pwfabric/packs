@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { HIT_AREA_CSS, CONTROL_BORDER, MOTION, controlLabelStyle, safeRenderValue, listOf } from '../../../lib/_shared-utils.js'
+import { HIT_AREA_CSS, CONTROL_BORDER, MOTION, controlLabelStyle, safeRenderValue, listOf, PRESS_CSS } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 
@@ -303,7 +303,7 @@ export const SegmentedControlBlock: BlockComponent = ({ props, block }) => {
           {safeRenderValue(label)}
         </span>
       )}
-      <style>{HIT_AREA_CSS + SEGMENT_TOUCH_CSS}</style>
+      <style>{PRESS_CSS + HIT_AREA_CSS + SEGMENT_TOUCH_CSS}</style>
       <div
         role="radiogroup"
         {...(label ? { 'aria-labelledby': labelId } : {})}
@@ -325,7 +325,7 @@ export const SegmentedControlBlock: BlockComponent = ({ props, block }) => {
         {options.map((opt, i) => {
           const active = opt.value === value
           return (
-            <button
+            <button data-pw-press=""
               key={`${opt.value}-${i}`}
               ref={(el) => {
                 buttonsRef.current[i] = el
@@ -367,7 +367,7 @@ export const SegmentedControlBlock: BlockComponent = ({ props, block }) => {
                     display: 'inline-block',
                     width: '10px',
                     height: '10px',
-                    borderRadius: '999px',
+                    borderRadius: 'var(--pw-border-radius-full)',
                     backgroundColor: opt.color,
                     border: '1px solid var(--pw-color-border, #e4e4e7)',
                     marginRight: '6px',

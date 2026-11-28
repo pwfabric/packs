@@ -1,7 +1,7 @@
 {
   "id": "control.theme-toggle",
   "kind": "block",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "category": "control",
   "name": "theme-toggle",
   "state": "stable",
@@ -45,6 +45,20 @@
         },
         "bindable": false,
         "default": true
+      },
+      {
+        "name": "variant",
+        "type": "\"segmented\" | \"select\"",
+        "description": "segmented (default): the choices side by side. select: the current choice with its icon, the others in a list — compact, for a sidebar foot or a dense bar.",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "segmented",
+            "select"
+          ]
+        },
+        "bindable": false,
+        "default": "segmented"
       }
     ],
     "defaultProps": {

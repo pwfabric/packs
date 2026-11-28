@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { safeRenderValue, tint } from '../../../lib/_shared-utils.js'
+import { safeRenderValue, tint, PRESS_CSS } from '../../../lib/_shared-utils.js'
 import { messageOf, useAppMessages } from '@pwfabric/runtime'
 
 // ============================================================
@@ -97,7 +97,7 @@ export const AlertBlock: BlockComponent = ({ props, block, context }) => {
     alignItems: 'flex-start',
     gap: '8px',
     padding: '12px 16px',
-    borderRadius: '6px',
+    borderRadius: 'var(--pw-border-radius)',
     backgroundColor: c.bg,
     border: `1px solid ${c.border}`,
     color: c.text,
@@ -120,7 +120,9 @@ export const AlertBlock: BlockComponent = ({ props, block, context }) => {
         {message ? <div>{message}</div> : null}
       </div>
       {p.closeable && (
-        <button
+        <>
+        <style>{PRESS_CSS}</style>
+        <button data-pw-press=""
           type="button"
           onClick={() => setDismissed(true)}
           style={{
@@ -135,6 +137,7 @@ export const AlertBlock: BlockComponent = ({ props, block, context }) => {
         >
           ×
         </button>
+        </>
       )}
     </div>
   )

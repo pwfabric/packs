@@ -3,7 +3,7 @@ import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
-import { HIT_AREA_CSS, OVERLAY_DISMISS_EVENT, OVERLAY_SCRIM, lockBodyScroll } from '../../../lib/_shared-utils.js'
+import { HIT_AREA_CSS, OVERLAY_DISMISS_EVENT, OVERLAY_SCRIM, lockBodyScroll, PRESS_CSS } from '../../../lib/_shared-utils.js'
 import { useAppMessage } from '@pwfabric/runtime'
 
 // ============================================================
@@ -267,7 +267,7 @@ export const ModalBlock: BlockComponent = ({ props, children, block, context }) 
     alignItems: 'center',
     justifyContent: 'center',
     color: 'var(--pw-color-text-muted)',
-    borderRadius: '4px',
+    borderRadius: 'var(--pw-border-radius-sm)',
   }
 
   const contentStyle: React.CSSProperties = {
@@ -307,9 +307,9 @@ export const ModalBlock: BlockComponent = ({ props, children, block, context }) 
       data-block-type="modal"
       style={{ maxWidth: sizeMap[size] ?? sizeMap['md'], width: '100%', ...block.style }}
     >
-      <style>{(showCloseButton ? HIT_AREA_CSS : '') + MODAL_TOUCH_CSS}</style>
+      <style>{PRESS_CSS + (showCloseButton ? HIT_AREA_CSS : '') + MODAL_TOUCH_CSS}</style>
       {triggerLabel ? (
-        <button
+        <button data-pw-press=""
           type="button"
           style={triggerBtnStyle}
           onClick={openModal}
@@ -326,7 +326,7 @@ export const ModalBlock: BlockComponent = ({ props, children, block, context }) 
             marginTop: '8px',
             padding: '16px',
             border: '1px dashed var(--pw-color-border)',
-            borderRadius: '8px',
+            borderRadius: 'var(--pw-border-radius-lg)',
           }}
         >
           {children}
@@ -351,7 +351,7 @@ export const ModalBlock: BlockComponent = ({ props, children, block, context }) 
                 </h2>
               )}
               {showCloseButton && (
-                <button type="button" style={closeButtonStyle} onClick={closeModal} aria-label={closeName} data-pw-modal-close="" data-pw-hit="" data-pw-modal-touch="">
+                <button data-pw-press="" type="button" style={closeButtonStyle} onClick={closeModal} aria-label={closeName} data-pw-modal-close="" data-pw-hit="" data-pw-modal-touch="">
                   <svg
                     width="20"
                     height="20"

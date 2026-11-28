@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { safeRenderValue } from '../../../lib/_shared-utils.js'
+import { safeRenderValue, PRESS_CSS } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 
@@ -175,7 +175,7 @@ export const ToggleBlock: BlockComponent = ({ props, block }) => {
       ...block.style }}
     >
       {/* A 44px row on a phone or a touch screen: the whole label is the target. */}
-      <style>{ROW_HIT_CSS}</style>
+      <style>{PRESS_CSS + ROW_HIT_CSS}</style>
       <label style={containerStyle} data-pw-row-hit="">
         {/* A checkbox submits "on" or nothing, so an
             unset switch was absent and a required boolean always failed. The
@@ -184,7 +184,7 @@ export const ToggleBlock: BlockComponent = ({ props, block }) => {
         {/* The track IS the control: a real button with the switch role, so it
             takes keyboard focus and the runtime's focus ring shows on it (the
             old 0×0 checkbox took focus invisibly). */}
-        <button
+        <button data-pw-press=""
           type="button"
           role="switch"
           aria-checked={checked}

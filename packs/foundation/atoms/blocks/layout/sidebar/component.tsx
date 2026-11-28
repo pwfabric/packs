@@ -77,12 +77,15 @@ export function sidebarTrail(items: readonly SidebarItem[], activeHref: string |
     for (let i = 0; i < list.length; i++) {
       const item = list[i] as SidebarItem
       const key = `${prefix}${i}`
-      if (item.href && routeState(item.href, activeHref, item.match) !== null) return trail
+      // Children first: a group that matches by prefix ("/guides" on
+      // "/guides/deploy") would otherwise answer for its own page and stay
+      // closed over the page in view.
       const children = sidebarChildren(item)
       if (children.length) {
         const hit = visit(children, `${key}.`, [...trail, key])
         if (hit) return hit
       }
+      if (item.href && routeState(item.href, activeHref, item.match) !== null) return trail
     }
     return null
   }
@@ -111,7 +114,9 @@ const SIDEBAR_FOLD_CSS =
 
 /** A phone or touch row is a 44px target. A closed group's list is not drawn. */
 const SIDEBAR_CSS =
-  '[data-pw-sidebar-tree] ul { display: flex; flex-direction: column; gap: 2px; }' +
+  '[data-pw-sidebar-tree] ul { display: flex; flex-direction: column; gap: var(--pw-sidebar-row-gap, 2px); }' +
+  // A nested list: inset and a guide line drawn without moving the text (box-shadow), both off by default.
+  '[data-pw-sidebar-tree] ul ul { box-shadow: inset var(--pw-sidebar-nest-rule-width, 0px) 0 0 var(--pw-sidebar-nest-rule-color, var(--pw-color-border)); }' +
   '[data-pw-sidebar-tree] ul[hidden] { display: none !important; }' +
   '@media (max-width: 640px), (pointer: coarse) { [data-pw-sidebar-row] { min-height: 44px; } }' +
   '[data-pw-sidebar-link]:hover { background: color-mix(in srgb, var(--pw-color-text, #09090b) 6%, transparent); }' +
@@ -183,7 +188,7 @@ export const SidebarBlock: BlockComponent = ({ props, block, context }) => {
     display: 'flex',
     alignItems: 'center',
     gap: '4px',
-    paddingLeft: `${depth * 12}px`,
+    paddingLeft: `calc(${depth} * var(--pw-sidebar-depth-indent, 12px))`,
   })
   const linkStyle = (state: 'page' | 'section' | null, group: boolean): React.CSSProperties => {
     const current = state === 'page'
@@ -193,19 +198,23 @@ export const SidebarBlock: BlockComponent = ({ props, block, context }) => {
     display: 'flex',
     alignItems: 'center',
     alignSelf: 'stretch',
-    padding: '6px 10px',
-    borderRadius: 'var(--pw-border-radius-sm, 6px)',
+    // Each look below is a token with today's value as its fallback, so an app's
+    // layout or theme can restyle the tree (a docs site's grey, flat entries)
+    // without a block of its own: --pw-sidebar-*.
+    padding: 'var(--pw-sidebar-item-padding-block, 6px) var(--pw-sidebar-item-padding-inline, 10px)',
+    borderRadius: 'var(--pw-sidebar-item-radius, var(--pw-border-radius-sm, 6px))',
+    lineHeight: 'var(--pw-sidebar-line-height, inherit)',
     // The section the page is in (a `match: "prefix"` entry above it): a lighter edge, no tint.
     borderLeft: current
-      ? '3px solid var(--pw-color-primary)'
+      ? 'var(--pw-sidebar-edge-width, 3px) solid var(--pw-sidebar-current-edge-color, var(--pw-color-primary))'
       : state === 'section'
-        ? '3px solid color-mix(in srgb, var(--pw-color-primary) 45%, transparent)'
-        : '3px solid transparent',
-    backgroundColor: current ? 'color-mix(in srgb, var(--pw-color-primary) 10%, transparent)' : undefined,
-    color: 'var(--pw-color-text)',
+        ? 'var(--pw-sidebar-edge-width, 3px) solid var(--pw-sidebar-section-edge-color, color-mix(in srgb, var(--pw-color-primary) 45%, transparent))'
+        : 'var(--pw-sidebar-edge-width, 3px) solid transparent',
+    backgroundColor: current ? 'var(--pw-sidebar-current-surface, color-mix(in srgb, var(--pw-color-primary) 10%, transparent))' : undefined,
+    color: current ? 'var(--pw-sidebar-current-ink, var(--pw-color-text))' : 'var(--pw-sidebar-ink, var(--pw-color-text))',
     textDecoration: 'none',
     fontSize: 'var(--pw-font-size-sm)',
-    fontWeight: state !== null || group ? 600 : 400,
+    fontWeight: (state !== null ? 'var(--pw-sidebar-current-weight, 600)' : group ? 'var(--pw-sidebar-group-weight, 600)' : 400) as React.CSSProperties['fontWeight'],
     overflowWrap: 'anywhere',
     }
   }
@@ -228,7 +237,16 @@ export const SidebarBlock: BlockComponent = ({ props, block, context }) => {
   const renderList = (list: readonly SidebarItem[], depth: number, prefix: string, id?: string, hidden?: boolean): React.ReactElement => (
     // No display on the list itself: an inline display overrides `hidden`, and
     // every closed group showed open. The stack is drawn by SIDEBAR_CSS.
-    <ul id={id} hidden={hidden} style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+    // A nested list's inset is inline (this style would win over a stylesheet rule): off by default.
+    <ul
+      id={id}
+      hidden={hidden}
+      style={
+        depth === 0
+          ? { listStyle: 'none', margin: 0, padding: 0 }
+          : { listStyle: 'none', margin: 0, padding: 0, marginInlineStart: 'var(--pw-sidebar-nest-indent, 0px)', paddingInlineStart: 'var(--pw-sidebar-nest-padding, 0px)', paddingTop: 'var(--pw-sidebar-nest-space-above, 0px)' }
+      }
+    >
       {list.map((item, i) => {
         const key = `${prefix}${i}`
         const label = safeRenderValue(item.label)

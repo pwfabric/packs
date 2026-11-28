@@ -1,98 +1,110 @@
 {
   "id": "theme-ember",
   "kind": "ui-appearance",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "category": "ui",
   "name": "Ember",
   "state": "stable",
-  "description": "Dark stage for a product: warm near-black ground, an amber primary, Montserrat headings over DM Sans body, large type and soft rounded corners.",
+  "description": "Loud brand: a warm peach-tinted ground, burnt-orange primary, huge tight Montserrat headings over DM Sans, round corners, deep soft shadows and generous space; amber on a warm near-black stage in dark.",
   "tags": [
     "theme",
     "appearance",
-    "dark",
-    "brand"
+    "brand",
+    "expressive"
   ],
+  "knowledge": {
+    "purpose": "A loud, warm look for a page that sells one thing: big Montserrat headings, burnt orange on cream in light, amber on a near-black stage in dark, rounded corners and glowing cards.",
+    "useCases": [
+      "A product launch or a pre-order waitlist",
+      "An event, a festival or a night venue",
+      "A portfolio or a studio that wants a dramatic first screen",
+      "Pick it as a starting point and edit token values one by one"
+    ],
+    "composesWith": [
+      "platform/persistence",
+      "platform/entities",
+      "platform/navigation"
+    ],
+    "antiPatterns": [
+      "A tool people work in all day — wear zinc",
+      "Long reading — essays, a journal, a guide — wear paper",
+      "Pinning colours in block props — theme tokens already cascade",
+      "Expecting two themes on one surface — a surface carries a single token set"
+    ]
+  },
+  "extends": "theme-base",
   "theme": {
     "colors": {
-      "primary": "#f0a24b",
-      "secondary": "#2a221d",
-      "accent": "#33281f",
-      "background": "#14110f",
-      "card": "#1e1916",
-      "text": "#f6eee6",
-      "textMuted": "#bfb2a4",
-      "border": "#3a302a",
-      "error": "#f59a8f",
-      "success": "#93d3a0",
-      "warning": "#f3c46b",
-      "info": "#9cc4ee",
-      "textOnPrimary": "#1c1106"
+      "primary": "#c2410c",
+      "secondary": "#fff1e3",
+      "accent": "#ffe8cc",
+      "background": "#fff1e6",
+      "card": "#ffffff",
+      "text": "#1c1410",
+      "textMuted": "#6b5a4c",
+      "border": "#f2d9c4",
+      "error": "#c81e1e",
+      "success": "#2f7a3d",
+      "warning": "#9a5b00",
+      "info": "#1f5fa8",
+      "textOnPrimary": "#ffffff",
+      "heading": "#1c1410",
+      "link": "#b3400b",
+      "tableBorder": "#f2d9c4",
+      "codeSurface": "#ffe6d2"
     },
     "border": {
-      "radius": "14px",
-      "width": "1px",
-      "style": "solid",
-      "radiusLarge": "18px",
+      "radius": "16px",
+      "radiusLarge": "20px",
       "radiusSmall": "10px",
-      "radiusXl": "22px",
-      "radius2xl": "28px",
-      "radiusFull": "9999px"
+      "radiusXl": "24px",
+      "radius2xl": "32px"
     },
     "typography": {
       "fontFamily": "\"DM Sans\", ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif",
       "headingFontFamily": "Montserrat, ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif",
-      "monoFontFamily": "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
-      "baseFontSize": "17px",
-      "headingWeight": "700",
+      "headingWeight": "800",
       "headingLineHeight": "1.1",
-      "letterSpacing": "-0.02em",
-      "bodyLineHeight": "1.6",
-      "bodyWeight": "400",
-      "bodyLetterSpacing": "0em",
-      "fontSizeXs": "13px",
-      "fontSizeSm": "15px",
+      "letterSpacing": "-0.035em",
       "fontSizeLg": "19px",
-      "fontSizeXl": "23px",
-      "fontSize2xl": "30px",
-      "fontSize3xl": "40px",
-      "fontSize4xl": "54px"
+      "fontSizeXl": "24px",
+      "fontSize2xl": "32px",
+      "fontSize3xl": "44px",
+      "fontSize4xl": "60px",
+      "headingWeightH1": "800",
+      "headingLineHeightH1": "1.05",
+      "headingLineHeightH2": "1.1",
+      "headingLineHeightH3": "1.2"
     },
     "spacing": {
-      "base": "1rem",
-      "xs": "0.25rem",
-      "sm": "0.5rem",
-      "md": "1rem",
-      "lg": "1.75rem",
-      "xl": "2.75rem",
-      "xxl": "4.5rem"
+      "xs": "0.3rem",
+      "sm": "0.6rem",
+      "md": "1.25rem",
+      "lg": "2.5rem",
+      "xl": "3.5rem",
+      "xxl": "6rem"
     },
     "shadows": {
-      "card": "0 0 0 1px rgba(255,236,214,.05), 0 10px 30px rgba(0,0,0,.45)",
-      "button": "0 6px 20px -6px rgba(240,162,75,.45)",
-      "sm": "0 1px 2px rgba(0,0,0,.4)",
-      "md": "0 6px 16px rgba(0,0,0,.45)",
-      "lg": "0 14px 32px rgba(0,0,0,.5)",
-      "xl": "0 24px 56px rgba(0,0,0,.55)"
+      "card": "0 2px 4px rgba(60,30,10,.06), 0 24px 48px -16px rgba(120,60,20,.30)",
+      "button": "0 8px 24px -8px rgba(194,65,12,.55)",
+      "sm": "0 2px 4px rgba(60,30,10,.08)",
+      "md": "0 10px 24px -6px rgba(60,30,10,.18)",
+      "lg": "0 20px 40px -10px rgba(60,30,10,.24)",
+      "xl": "0 32px 64px -16px rgba(60,30,10,.30)"
     },
     "motion": {
-      "durationFast": "150ms",
       "durationNormal": "200ms",
       "durationSlow": "300ms",
-      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
       "easingBounce": "cubic-bezier(0.68, -0.55, 0.27, 1.55)"
     },
     "layout": {
-      "gap": "0px",
-      "padding": "0px",
       "containerMaxWidth": "1200px",
       "gridGap": "24px",
-      "sectionPaddingY": "clamp(3.5rem, 8vw, 6rem)",
+      "sectionPaddingY": "clamp(5rem, 10vw, 8rem)",
       "sectionPaddingX": "clamp(1rem, 4vw, 2rem)"
     },
     "focus": {
-      "ringColor": "#f0a24b",
-      "ringWidth": "2px",
-      "ringOffset": "2px"
+      "ringColor": "#c2410c"
     },
     "zIndex": {
       "sticky": 150,
@@ -101,6 +113,19 @@
       "drawer": 400,
       "modal": 500,
       "toast": 540
+    },
+    "blocks": {
+      "navbar": {
+        "logoWeight": "800",
+        "logoLetterSpacing": "-0.02em"
+      },
+      "sidebar": {
+        "itemRadius": "9999px",
+        "edgeWidth": "0px"
+      },
+      "button": {
+        "radius": "9999px"
+      }
     }
   },
   "darkTheme": {
@@ -117,30 +142,22 @@
       "success": "#93d3a0",
       "warning": "#f3c46b",
       "info": "#9cc4ee",
-      "textOnPrimary": "#1c1106"
+      "textOnPrimary": "#1c1106",
+      "heading": "#f6eee6",
+      "link": "#f0a24b",
+      "tableBorder": "#3a302a",
+      "codeSurface": "#2a221d"
     },
     "focus": {
       "ringColor": "#f0a24b"
+    },
+    "shadows": {
+      "card": "0 0 0 1px rgba(255,236,214,.05), 0 10px 30px rgba(0,0,0,.45)",
+      "button": "0 6px 20px -6px rgba(240,162,75,.45)",
+      "sm": "0 1px 2px rgba(0,0,0,.4)",
+      "md": "0 6px 16px rgba(0,0,0,.45)",
+      "lg": "0 14px 32px rgba(0,0,0,.5)",
+      "xl": "0 24px 56px rgba(0,0,0,.55)"
     }
-  },
-  "knowledge": {
-    "purpose": "A dark, warm look for a page that sells one thing: amber light on a near-black stage, big headings, rounded corners, glowing cards. Dark in both modes.",
-    "useCases": [
-      "A product launch or a pre-order waitlist",
-      "An event, a festival or a night venue",
-      "A portfolio or a studio that wants a dramatic first screen",
-      "Pick it as a starting point and edit token values one by one"
-    ],
-    "composesWith": [
-      "platform/persistence",
-      "platform/entities",
-      "platform/navigation"
-    ],
-    "antiPatterns": [
-      "A tool people work in all day — wear midnight or slate",
-      "A page that must look calm and official — wear zinc",
-      "Pinning colours in block props — theme tokens already cascade",
-      "Expecting two themes on one surface — a surface carries a single token set"
-    ]
   }
 }

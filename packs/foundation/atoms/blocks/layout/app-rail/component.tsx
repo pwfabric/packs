@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { safeRenderValue, safeHref, ICON_PATHS, listOf } from '../../../lib/_shared-utils.js'
+import { safeRenderValue, safeHref, ICON_PATHS, listOf, PRESS_CSS } from '../../../lib/_shared-utils.js'
 import {
   AccountAvatar,
   AccountControl,
@@ -123,7 +123,7 @@ function RailItem({
     justifyContent: 'center',
     gap: 4,
     padding: '10px 4px',
-    borderRadius: 8,
+    borderRadius: 'var(--pw-border-radius-lg)',
     textDecoration: 'none',
     fontSize: 'var(--pw-font-size-xs, 12px)',
     lineHeight: 1.2,
@@ -260,6 +260,7 @@ function AppRailAsBottomBar({
       data-pw-shape="bottom-bar"
       style={{ height: 0, flexShrink: 0, width: '100%', ...block.style, flex: undefined }}
     >
+      <style>{PRESS_CSS}</style>
       <nav style={barStyle} aria-label={ariaLabel}>
         {shown.map((item, i) => {
           const href = safeHref(item.href)
@@ -293,7 +294,7 @@ function AppRailAsBottomBar({
             renderTrigger={({ ref, ...trigger }, state) => {
               const active = state.signedIn && sameRoute(state.account.profileHref, activeHref)
               return (
-                <button
+                <button data-pw-press=""
                   ref={ref}
                   {...trigger}
                   aria-current={active ? 'page' : undefined}
@@ -363,6 +364,7 @@ export const AppRailBlock: BlockComponent = ({ props, block, context }) => {
 
   return (
     <div id={block.id} data-block-id={block.id} data-block-type="app-rail" style={outerStyle}>
+      <style>{PRESS_CSS}</style>
       <nav
         aria-label={ariaLabel}
         style={{
@@ -408,7 +410,7 @@ export const AppRailBlock: BlockComponent = ({ props, block, context }) => {
                 placement="right-end"
                 wrapperStyle={{ display: 'flex', justifyContent: 'center' }}
                 renderTrigger={({ ref, ...trigger }, state) => (
-                  <button
+                  <button data-pw-press=""
                     ref={ref}
                     {...trigger}
                     title={state.label}
@@ -423,7 +425,7 @@ export const AppRailBlock: BlockComponent = ({ props, block, context }) => {
                       width: '100%',
                       padding: '8px 4px',
                       border: 'none',
-                      borderRadius: 8,
+                      borderRadius: 'var(--pw-border-radius-lg)',
                       background: state.open ? 'var(--pw-color-card, #fafafa)' : 'transparent',
                       color: 'var(--pw-color-text-muted, #71717a)',
                       fontFamily: 'inherit',

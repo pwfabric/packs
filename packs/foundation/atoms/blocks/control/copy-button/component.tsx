@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { HIT_AREA_CSS, safeRenderValue, ICON_PATHS } from '../../../lib/_shared-utils.js'
+import { HIT_AREA_CSS, safeRenderValue, ICON_PATHS, PRESS_CSS } from '../../../lib/_shared-utils.js'
 
 /** On a phone or touch screen the button is a REAL 44px box (R3 measures the box). */
 const COPY_TOUCH_CSS =
@@ -112,8 +112,8 @@ export const CopyButtonBlock: BlockComponent = ({ props, block, context }) => {
 
   return (
     <>
-    <style>{HIT_AREA_CSS + COPY_TOUCH_CSS}</style>
-    <button
+    <style>{PRESS_CSS + HIT_AREA_CSS + COPY_TOUCH_CSS}</style>
+    <button data-pw-press=""
       id={block.id}
       data-block-id={block.id}
       data-block-type="copy-button"

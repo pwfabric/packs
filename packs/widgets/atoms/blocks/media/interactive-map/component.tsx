@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { HIT_AREA_CSS, listOf, safeRenderValue } from '../../../lib/_kit.js'
+import { HIT_AREA_CSS, listOf, safeRenderValue, PRESS_CSS } from '../../../lib/_kit.js'
 import { messageOf, useAppMessages } from '@pwfabric/runtime'
 
 /** On a phone a location chip is DRAWN 44px tall (plus the shared hit area). */
@@ -112,9 +112,9 @@ export const InteractiveMapBlock: BlockComponent = ({ props, block }) => {
           aria-label={title || messageOf(messages, 'ui.map.locations', '')}
           style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}
         >
-          <style>{HIT_AREA_CSS + PIN_HIT_CSS}</style>
+          <style>{PRESS_CSS + HIT_AREA_CSS + PIN_HIT_CSS}</style>
           {locations.map((loc, i) => (
-            <button
+            <button data-pw-press=""
               key={`${loc.label}-${i}`}
               type="button"
               onClick={() => setActiveIndex(i)}
@@ -125,7 +125,7 @@ export const InteractiveMapBlock: BlockComponent = ({ props, block }) => {
               data-pw-pin=""
               style={{
                 padding: '4px 10px',
-                borderRadius: 999,
+                borderRadius: 'var(--pw-border-radius-full)',
                 border: `1px solid ${i === activeIndex ? 'var(--pw-color-primary, #18181b)' : 'var(--pw-color-border, #e4e4e7)'}`,
                 background: i === activeIndex ? 'var(--pw-color-primary, #18181b)' : 'transparent',
                 color:
@@ -154,7 +154,7 @@ export const InteractiveMapBlock: BlockComponent = ({ props, block }) => {
               aspectRatio: `${ratioW} / ${ratioH}`,
               overflow: 'hidden',
               border: '1px solid var(--pw-color-border, #e4e4e7)',
-              borderRadius: 8,
+              borderRadius: 'var(--pw-border-radius-lg)',
               background: 'var(--pw-color-surface, var(--pw-color-card, #f4f4f5))',
             }}
           >
@@ -208,7 +208,7 @@ export const InteractiveMapBlock: BlockComponent = ({ props, block }) => {
               alignItems: 'center',
               justifyContent: 'center',
               border: '1px dashed var(--pw-color-border, #e4e4e7)',
-              borderRadius: 8,
+              borderRadius: 'var(--pw-border-radius-lg)',
               color: 'var(--pw-color-text-muted, #71717a)',
               fontSize: 'var(--pw-font-size-sm, 14px)',
               textAlign: 'center',

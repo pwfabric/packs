@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { MOTION, safeRenderValue, ICON_PATHS } from '../../../lib/_shared-utils.js'
+import { MOTION, safeRenderValue, ICON_PATHS, PRESS_CSS } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 import { messageOf, useAppMessages } from '@pwfabric/runtime'
@@ -139,7 +139,7 @@ export const ToastBlock: BlockComponent = ({ props, block, context }) => {
         ...block.style,
       }}
     >
-      <style>{TOAST_KEYFRAMES + (dismissible ? TOAST_TOUCH_CSS : '')}</style>
+      <style>{PRESS_CSS + TOAST_KEYFRAMES + (dismissible ? TOAST_TOUCH_CSS : '')}</style>
       <svg
         width={18}
         height={18}
@@ -177,7 +177,7 @@ export const ToastBlock: BlockComponent = ({ props, block, context }) => {
         </div>
       </div>
       {dismissible ? (
-        <button
+        <button data-pw-press=""
           type="button"
           aria-label={messageOf(appWords, 'ui.dismiss', '')}
           data-pw-toast-x=""

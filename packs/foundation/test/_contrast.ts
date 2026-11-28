@@ -13,6 +13,8 @@ import { readFileSync, readdirSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { deriveDarkTheme, surfaceThemeToCSS } from '@pwfabric/contracts'
+// @ts-expect-error a plain .mjs tool with no types
+import { resolvedThemes } from '../../../tools/theme-bases.mjs'
 
 export interface Rgba {
   r: number
@@ -36,7 +38,8 @@ export function presetTokenSets(
     .flatMap((root) => readdirSync(root).filter((d) => d.startsWith('theme-')).map((dir) => ({ root, dir })))
     .sort((a, b) => a.dir.localeCompare(b.dir))
   for (const { root, dir } of themes) {
-    const theme = JSON.parse(readFileSync(join(root, dir, 'manifest.json'), 'utf8')).theme
+    // As drawn: a theme that extends another, over its base (appearance §3.5).
+    const theme = (resolvedThemes(root) as Array<{ dir: string; theme: Record<string, unknown> }>).find((t) => t.dir === dir)!.theme
     const preset = dir.replace(/^theme-/, '')
     out.push({ preset, mode: 'light', vars: surfaceThemeToCSS(theme) })
     out.push({ preset, mode: 'dark', vars: surfaceThemeToCSS(deriveDarkTheme(theme)) })

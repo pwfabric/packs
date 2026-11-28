@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { HIT_AREA_CSS, safeRenderValue, safeHref, ICON_PATHS } from '../../../lib/_shared-utils.js'
+import { HIT_AREA_CSS, safeRenderValue, safeHref, ICON_PATHS, PRESS_CSS } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 import { messageOf, useAppMessages } from '@pwfabric/runtime'
@@ -142,7 +142,7 @@ export const AnnouncementBarBlock: BlockComponent = ({ props, block, context }) 
       aria-label={messageOf(appWords, 'ui.announcement', '')}
       style={barStyle}
     >
-      {actionLabel || dismissible ? <style>{HIT_AREA_CSS + ANNOUNCE_TOUCH_CSS}</style> : null}
+      {actionLabel || dismissible ? <style>{PRESS_CSS + HIT_AREA_CSS + ANNOUNCE_TOUCH_CSS}</style> : null}
       <span style={{ textAlign: 'center' }}>{safeRenderValue(message)}</span>
 
       {actionLabel && (
@@ -178,7 +178,7 @@ export const AnnouncementBarBlock: BlockComponent = ({ props, block, context }) 
       )}
 
       {dismissible && (
-        <button
+        <button data-pw-press=""
           type="button"
           aria-label={messageOf(appWords, 'ui.announcement.dismiss', '')}
           onClick={handleDismiss}

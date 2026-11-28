@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { safeRenderValue } from '../../../lib/_shared-utils.js'
+import { safeRenderValue, PRESS_CSS } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 
@@ -144,8 +144,8 @@ export const PopoverBlock: BlockComponent = ({ props, block, context }) => {
       ref={rootRef}
       style={rootStyle}
     >
-      <style>{POPOVER_TOUCH_CSS}</style>
-      <button
+      <style>{PRESS_CSS + POPOVER_TOUCH_CSS}</style>
+      <button data-pw-press=""
         type="button"
         onClick={handleToggle}
         aria-expanded={open}

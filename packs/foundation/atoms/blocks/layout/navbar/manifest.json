@@ -1,7 +1,7 @@
 {
   "id": "layout.navbar",
   "kind": "block",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "category": "layout",
   "name": "navbar",
   "state": "stable",
@@ -284,7 +284,7 @@
       },
       {
         "name": "socialLinks",
-        "type": "[{icon, href}]",
+        "type": "[{icon, href, label?}]",
         "jsonSchema": {
           "type": "array",
           "items": {
@@ -295,6 +295,10 @@
               },
               "href": {
                 "type": "string"
+              },
+              "label": {
+                "type": "string",
+                "description": "The link's name for a screen reader and its tooltip (\"GitHub\"). Unset: the icon's name."
               }
             },
             "required": [
@@ -312,6 +316,89 @@
           "type": "string"
         },
         "bindable": true
+      },
+      {
+        "name": "logoTagline",
+        "type": "string",
+        "copy": true,
+        "description": "A short word drawn beside the logo text, smaller and fainter, inside the same link: \"PWFabric engine\". Write it in the app's language. Unlike secondaryLogoText (a second wordmark at the far right), it reads as part of the brand.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "skipTo",
+        "type": "string",
+        "description": "The id of the page's main content (its main landmark). A \"Skip to content\" link becomes the first keyboard stop, hidden until it is focused.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": false
+      },
+      {
+        "name": "skipLinkLabel",
+        "type": "string",
+        "copy": true,
+        "description": "The skip link's word. Unset: the app's ui.skipToContent. Write it in the app's language.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "drawerLinks",
+        "type": "[{label, href, items?: [{label, href}]}]",
+        "description": "Destinations listed only in the phone drawer, before links — a documentation site's page tree, which the wide bar leaves to its sidebar. Same shape as links; a link with items is drawn with its pages under it.",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "href": {
+                "type": "string"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "label": {
+                      "type": "string"
+                    },
+                    "href": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "label",
+                    "href"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "label"
+            ]
+          }
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "contentMaxWidth",
+        "type": "number | string",
+        "description": "Keep the bar's contents within this width, centred, while its background and bottom line stay full width — set it to the page's own width so the logo lines up with the content. A number is px; a string is a CSS length (\"90rem\") or a var(). Unset: the contents span the bar.",
+        "jsonSchema": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "bindable": false
       },
       {
         "name": "rightInfo",
@@ -437,6 +524,55 @@
       },
       {
         "id": "ui.nav.main"
+      },
+      {
+        "id": "ui.skipToContent",
+        "prop": "skipLinkLabel",
+        "when": "skipTo"
+      }
+    ],
+    "tokens": [
+      {
+        "name": "paddingTop",
+        "type": "length",
+        "default": "12px",
+        "description": "Space above the bar’s contents."
+      },
+      {
+        "name": "paddingBottom",
+        "type": "length",
+        "default": "12px",
+        "description": "Space below the bar’s contents."
+      },
+      {
+        "name": "paddingInline",
+        "type": "length",
+        "default": "24px",
+        "description": "Space left and right of the bar’s contents."
+      },
+      {
+        "name": "logoSize",
+        "type": "length",
+        "default": "var(--pw-font-size-lg)",
+        "description": "Size of the brand’s name."
+      },
+      {
+        "name": "logoWeight",
+        "type": "fontWeight",
+        "default": "700",
+        "description": "Weight of the brand’s name."
+      },
+      {
+        "name": "logoInk",
+        "type": "color",
+        "default": "var(--pw-color-text)",
+        "description": "Ink of the brand’s name."
+      },
+      {
+        "name": "logoLetterSpacing",
+        "type": "length",
+        "default": "0px",
+        "description": "Letter spacing of the brand’s name."
       }
     ]
   },

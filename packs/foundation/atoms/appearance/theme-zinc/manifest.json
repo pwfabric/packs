@@ -1,97 +1,87 @@
 {
   "id": "theme-zinc",
   "kind": "ui-appearance",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "category": "ui",
   "name": "Zinc",
   "state": "stable",
-  "description": "Neutral product: white ground, near-black ink and buttons, thin borders, system sans. The quiet default for a shop, a service site or a product tool.",
+  "description": "Neutral product and working tool: white ground, near-black ink and buttons, blue links, thin borders, system sans; a calm neutral dark mode for screens people work in all day.",
   "tags": [
     "theme",
     "appearance",
     "light"
   ],
+  "knowledge": {
+    "purpose": "A neutral look that gets out of the way: system sans, near-black primary, blue links, 8px corners, light shadows. It serves a shop, a service or a product page, and equally a tool, an admin screen or reference docs; its dark mode is a calm neutral one for screens people work in all day.",
+    "useCases": [
+      "A shop or a product site where photographs carry the colour",
+      "A service or booking page that needs no brand palette yet",
+      "A starting point when the brand is not known: edit primary and the fonts first",
+      "Pick it as a starting point and edit token values one by one"
+    ],
+    "composesWith": [
+      "platform/persistence",
+      "platform/entities",
+      "platform/navigation"
+    ],
+    "antiPatterns": [
+      "Long reading — essays, a journal, a guide — wear paper",
+      "A launch, an event or a brand that must be loud — wear ember",
+      "Pinning colours in block props — theme tokens already cascade",
+      "Expecting two themes on one surface — a surface carries a single token set"
+    ]
+  },
+  "extends": "theme-base",
   "theme": {
     "colors": {
       "primary": "#18181b",
       "secondary": "#f4f4f5",
       "accent": "#f4f4f5",
-      "background": "#ffffff",
-      "card": "#ffffff",
       "text": "#09090b",
       "textMuted": "#5f5f69",
       "border": "#e4e4e7",
       "error": "#d92d20",
-      "success": "#15803d",
-      "warning": "#b45309",
       "info": "#1d4ed8",
-      "textOnPrimary": "#fafafa"
-    },
-    "border": {
-      "radius": "8px",
-      "width": "1px",
-      "style": "solid",
-      "radiusLarge": "12px",
-      "radiusSmall": "6px",
-      "radiusXl": "16px",
-      "radius2xl": "16px",
-      "radiusFull": "9999px"
+      "textOnPrimary": "#fafafa",
+      "heading": "#09090b",
+      "tableBorder": "#e4e4e7",
+      "codeSurface": "#f4f4f5"
     },
     "typography": {
-      "fontFamily": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif",
-      "headingFontFamily": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif",
-      "monoFontFamily": "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
-      "baseFontSize": "16px",
-      "headingWeight": "600",
-      "headingLineHeight": "1.25",
-      "letterSpacing": "-0.02em",
-      "bodyLineHeight": "1.6",
-      "bodyWeight": "400",
-      "bodyLetterSpacing": "0em",
-      "fontSizeXs": "12px",
-      "fontSizeSm": "14px",
-      "fontSizeLg": "18px",
-      "fontSizeXl": "20px",
-      "fontSize2xl": "24px",
-      "fontSize3xl": "30px",
-      "fontSize4xl": "36px"
+      "baseFontSize": "15px",
+      "letterSpacing": "-0.01em",
+      "bodyLineHeight": "1.5",
+      "fontSizeSm": "13px",
+      "fontSizeLg": "17px",
+      "fontSizeXl": "19px",
+      "fontSize2xl": "22px",
+      "fontSize3xl": "26px",
+      "fontSize4xl": "30px",
+      "headingWeightH1": "700",
+      "headingLineHeightH1": "1.15",
+      "headingLineHeightH2": "1.25",
+      "headingLineHeightH3": "1.3"
     },
     "spacing": {
-      "base": "1rem",
-      "xs": "0.25rem",
-      "sm": "0.5rem",
-      "md": "1rem",
-      "lg": "1.5rem",
-      "xl": "2rem",
-      "xxl": "3rem"
+      "md": "0.875rem",
+      "lg": "1.25rem",
+      "xl": "1.75rem",
+      "xxl": "2.5rem"
     },
     "shadows": {
-      "card": "0 1px 2px 0 rgba(0,0,0,.05)",
-      "button": "none",
-      "sm": "0 1px 2px 0 rgba(0,0,0,.05)",
-      "md": "0 4px 6px -1px rgba(0,0,0,.08), 0 2px 4px -2px rgba(0,0,0,.06)",
-      "lg": "0 10px 15px -3px rgba(0,0,0,.08), 0 4px 6px -4px rgba(0,0,0,.06)",
-      "xl": "0 20px 25px -5px rgba(0,0,0,.08), 0 8px 10px -6px rgba(0,0,0,.06)"
+      "card": "none"
     },
     "motion": {
-      "durationFast": "150ms",
       "durationNormal": "200ms",
       "durationSlow": "300ms",
-      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
       "easingBounce": "cubic-bezier(0.68, -0.55, 0.27, 1.55)"
     },
     "layout": {
-      "gap": "0px",
-      "padding": "0px",
-      "containerMaxWidth": "1200px",
       "gridGap": "24px",
-      "sectionPaddingY": "clamp(2.5rem, 5vw, 4rem)",
-      "sectionPaddingX": "clamp(1rem, 3vw, 1.5rem)"
+      "sectionPaddingY": "clamp(2rem, 4vw, 3rem)"
     },
     "focus": {
-      "ringColor": "#71717a",
-      "ringWidth": "2px",
-      "ringOffset": "2px"
+      "ringColor": "#71717a"
     },
     "zIndex": {
       "sticky": 150,
@@ -100,6 +90,20 @@
       "drawer": 400,
       "modal": 500,
       "toast": 540
+    },
+    "blocks": {
+      "prose": {
+        "h2RuleWidth": "1px",
+        "h2RuleGap": "0.35em"
+      },
+      "sidebar": {
+        "currentSurface": "var(--pw-color-secondary)",
+        "currentInk": "var(--pw-color-text)",
+        "edgeWidth": "0px"
+      },
+      "table-of-contents": {
+        "currentInk": "var(--pw-color-text)"
+      }
     }
   },
   "darkTheme": {
@@ -116,29 +120,14 @@
       "success": "#4ade80",
       "warning": "#fbbf24",
       "info": "#60a5fa",
-      "textOnPrimary": "#18181b"
+      "textOnPrimary": "#18181b",
+      "heading": "#fafafa",
+      "link": "#93b2ff",
+      "tableBorder": "#2e2e33",
+      "codeSurface": "#1f1f23"
     },
     "focus": {
       "ringColor": "#a1a1aa"
     }
-  },
-  "knowledge": {
-    "purpose": "A neutral product look that gets out of the way of the content: system sans, near-black primary, 8px corners, light shadows; its own neutral dark mode.",
-    "useCases": [
-      "A shop or a product site where photographs carry the colour",
-      "A service or booking page that needs no brand palette yet",
-      "A starting point when the brand is not known: edit primary and the fonts first",
-      "Pick it as a starting point and edit token values one by one"
-    ],
-    "composesWith": [
-      "platform/persistence",
-      "platform/entities",
-      "platform/navigation"
-    ],
-    "antiPatterns": [
-      "Editorial reading pages — wear paper, whose serif voice and wider measure suit long text",
-      "Pinning colours in block props — theme tokens already cascade",
-      "Expecting two themes on one surface — a surface carries a single token set"
-    ]
   }
 }

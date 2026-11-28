@@ -520,6 +520,13 @@ export const OVERLAY_SCRIM = 'rgba(0,0,0,0.5)'
 
 export const OVERLAY_SCRIM_STRONG = 'rgba(0,0,0,0.85)'
 
+export const PRESS_CSS =
+  '@media (hover: hover) { [data-pw-press]:not(:disabled):not([aria-disabled="true"]):hover { background-image: linear-gradient(color-mix(in srgb, currentColor 10%, transparent) 0 0) !important; cursor: pointer; } }' +
+  ' [data-pw-press]:not(:disabled):not([aria-disabled="true"]):active { background-image: linear-gradient(color-mix(in srgb, currentColor 18%, transparent) 0 0) !important; }' +
+  ' [data-pw-press="sink"]:not(:disabled):not([aria-disabled="true"]):active { transform: translateY(1px); }' +
+  ' [data-pw-press]:focus-visible { outline: var(--pw-focus-ring-width, 2px) solid var(--pw-focus-ring-color, var(--pw-color-primary)); outline-offset: var(--pw-focus-ring-offset, 2px); }' +
+  ' @media (prefers-reduced-motion: reduce) { [data-pw-press="sink"]:active { transform: none; } }'
+
 export function controlLabelStyle(columnGap?: string): React.CSSProperties {
   return columnGap ? { ...CONTROL_LABEL_STYLE, marginBottom: `calc(${CONTROL_LABEL_GAP} - ${columnGap})` } : CONTROL_LABEL_STYLE
 }

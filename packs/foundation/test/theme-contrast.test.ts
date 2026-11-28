@@ -95,7 +95,7 @@ describe('contrast in every preset × light / derived dark', () => {
   it('prints the table', () => {
     // eslint-disable-next-line no-console
     console.table(rows)
-    expect(rows).toHaveLength(12) // six presets (zinc, midnight + the four themes folded in from the themes pack) × light / derived dark
+    expect(rows).toHaveLength(8) // four presets (base, zinc, paper, ember) × light / derived dark
   })
 
   it.each(rows)('$cell · badge: the selected (primary) badge is seen', (row) => {

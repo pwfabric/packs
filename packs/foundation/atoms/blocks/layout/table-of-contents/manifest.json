@@ -1,0 +1,175 @@
+{
+  "id": "layout.table-of-contents",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "layout",
+  "name": "table-of-contents",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "A page's own table of contents: its sections as links to their anchors, an h3 under its h2, the section being read marked as the visitor scrolls.",
+    "useCases": [
+      "\"On This Page\" column beside a documentation page",
+      "Contents list at the top of a long article or policy page",
+      "Section index beside a handbook chapter"
+    ],
+    "composesWith": [
+      "text.prose",
+      "layout.sidebar",
+      "layout.container"
+    ],
+    "antiPatterns": [
+      "Navigation between pages — use layout.sidebar or layout.navbar",
+      "A short page with one or two sections — the headings are enough",
+      "Items that are not this page's anchors — it marks the section in view by its id"
+    ],
+    "implementation": "A <nav> named by its title (the title prop, else the app word ui.toc) over links to #anchors, in the order the page shows them. items: [{label, href, level?}] — href is the section's anchor as the content renders it (prose writes GitHub-style ids: \"Track A — run\" is #track-a--run), level 3 sits 12px under the level 2 above it. trackScroll (default true): while the visitor scrolls, the last section whose heading has passed under the top bar carries aria-current=\"location\" and the current ink. The block never reads the page to find its items, so the first frame already draws them. Its look is tokens with fallbacks: --pw-toc-ink, --pw-toc-hover-ink, --pw-toc-current-ink, --pw-toc-title-ink, --pw-toc-title-weight, --pw-toc-title-tracking, --pw-toc-title-gap, --pw-toc-h2-weight, --pw-toc-h3-weight, --pw-toc-indent, --pw-toc-gap, --pw-toc-line-height. On a phone each link is a 44px target."
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "title",
+        "type": "string",
+        "copy": true,
+        "description": "The heading over the list, which also names the navigation landmark (\"On This Page\"). Unset: the app's ui.toc. Write it in the app's language.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "items",
+        "type": "[{label, href, level?}]",
+        "description": "The page's sections in order: label, the section's anchor (#options) and its level (2, or 3 for a sub-section).",
+        "jsonSchema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "href": {
+                "type": "string"
+              },
+              "level": {
+                "type": "number",
+                "enum": [
+                  2,
+                  3
+                ]
+              }
+            },
+            "required": [
+              "label",
+              "href"
+            ]
+          }
+        },
+        "bindable": true,
+        "default": []
+      },
+      {
+        "name": "trackScroll",
+        "type": "boolean",
+        "description": "Mark the section being read as the visitor scrolls (aria-current=\"location\").",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": true
+      }
+    ],
+    "defaultProps": {
+      "items": [],
+      "trackScroll": true
+    },
+    "canHaveChildren": false,
+    "icon": "☰",
+    "traits": [
+      "chrome"
+    ],
+    "messages": [
+      {
+        "id": "ui.toc",
+        "prop": "title"
+      }
+    ],
+    "tokens": [
+      {
+        "name": "ink",
+        "type": "color",
+        "default": "var(--pw-color-text-muted)",
+        "description": "Ink of an entry."
+      },
+      {
+        "name": "hoverInk",
+        "type": "color",
+        "default": "var(--pw-color-text)",
+        "description": "Ink of an entry under the pointer."
+      },
+      {
+        "name": "currentInk",
+        "type": "color",
+        "default": "var(--pw-color-primary-ink, var(--pw-color-text))",
+        "description": "Ink of the entry for the section in view."
+      },
+      {
+        "name": "lineHeight",
+        "type": "lineHeight",
+        "default": "20px",
+        "description": "Line height of the title and the entries."
+      },
+      {
+        "name": "entryWeight",
+        "type": "fontWeight",
+        "default": "500",
+        "description": "Weight of a top-level entry (an h2)."
+      },
+      {
+        "name": "subEntryWeight",
+        "type": "fontWeight",
+        "default": "400",
+        "description": "Weight of a nested entry (an h3)."
+      },
+      {
+        "name": "depthIndent",
+        "type": "length",
+        "default": "12px",
+        "description": "How far a nested entry sits in."
+      },
+      {
+        "name": "rowGap",
+        "type": "length",
+        "default": "8px",
+        "description": "Space between two entries."
+      },
+      {
+        "name": "titleInk",
+        "type": "color",
+        "default": "var(--pw-color-text)",
+        "description": "Ink of the title."
+      },
+      {
+        "name": "titleWeight",
+        "type": "fontWeight",
+        "default": "600",
+        "description": "Weight of the title."
+      },
+      {
+        "name": "titleLetterSpacing",
+        "type": "length",
+        "default": "0px",
+        "description": "Letter spacing of the title."
+      },
+      {
+        "name": "titleSpaceBelow",
+        "type": "length",
+        "default": "8px",
+        "description": "Space between the title and the first entry."
+      }
+    ]
+  },
+  "tags": [
+    "tier:structure"
+  ]
+}

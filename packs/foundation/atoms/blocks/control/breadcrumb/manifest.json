@@ -1,7 +1,7 @@
 {
   "id": "control.breadcrumb",
   "kind": "block",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "category": "control",
   "name": "breadcrumb",
   "state": "stable",
@@ -76,6 +76,20 @@
     "messages": [
       {
         "id": "ui.breadcrumb"
+      }
+    ],
+    "tokens": [
+      {
+        "name": "linkInk",
+        "type": "color",
+        "default": "var(--pw-color-primary-ink, #18181b)",
+        "description": "Ink of a link to a page above this one."
+      },
+      {
+        "name": "currentInk",
+        "type": "color",
+        "default": "var(--pw-color-text)",
+        "description": "Ink of the current page’s name."
       }
     ]
   },

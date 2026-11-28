@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { CONTROL_BORDER, ICON_PATHS, textOf, tint } from '../../../lib/_shared-utils.js'
+import { CONTROL_BORDER, ICON_PATHS, textOf, tint, PRESS_CSS } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 import { messageOf, useAppMessages } from '@pwfabric/runtime'
@@ -192,7 +192,9 @@ export const BadgeBlock: BlockComponent = ({ props, block }) => {
       )}
       {text}
       {dismissible && (
-        <button
+        <>
+        <style>{PRESS_CSS}</style>
+        <button data-pw-press=""
           type="button"
           aria-label={messageOf(appWords, 'ui.remove', '', { name: textOf(text) })}
           onClick={handleDismiss}
@@ -209,7 +211,7 @@ export const BadgeBlock: BlockComponent = ({ props, block }) => {
             background: 'transparent',
             color: 'inherit',
             cursor: 'pointer',
-            borderRadius: '9999px',
+            borderRadius: 'var(--pw-border-radius-full)',
             lineHeight: 0,
           }}
         >
@@ -226,6 +228,7 @@ export const BadgeBlock: BlockComponent = ({ props, block }) => {
             dangerouslySetInnerHTML={{ __html: (ICON_PATHS.x ?? []).join('') }}
           />
         </button>
+        </>
       )}
     </span>
   )

@@ -3,7 +3,7 @@ import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
-import { listOf } from '../../../lib/_shared-utils.js'
+import { listOf, PRESS_CSS } from '../../../lib/_shared-utils.js'
 
 // ============================================================
 // PROPS — declared in manifest.json, applied by the runtime
@@ -166,7 +166,7 @@ export const TabsBlock: BlockComponent = ({ props, children, block, context }) =
     if (variant === 'pills') {
       return {
         ...base,
-        borderRadius: '6px',
+        borderRadius: 'var(--pw-border-radius)',
         backgroundColor: isActive ? 'var(--pw-color-primary)' : 'var(--pw-color-card)',
         color: isActive ? 'var(--pw-color-text-on-primary)' : 'var(--pw-color-text-muted)',
       }
@@ -236,13 +236,13 @@ export const TabsBlock: BlockComponent = ({ props, children, block, context }) =
 
   return (
     <div id={block.id} data-block-id={block.id} style={{ ...containerStyle, ...block.style }} data-block-type="tabs">
-      <style>{TAB_HIT_CSS}</style>
+      <style>{PRESS_CSS + TAB_HIT_CSS}</style>
       <div style={tabListStyle} role="tablist" aria-orientation={isVertical ? 'vertical' : 'horizontal'} onKeyDown={handleTabKeyDown}>
         {tabs.map((tab: TabItem) => {
           const tabElementId = `${block.id}-tab-${tab.id}`
           const panelElementId = `${block.id}-panel-${tab.id}`
           return (
-            <button
+            <button data-pw-press=""
               key={tab.id}
               type="button"
               id={tabElementId}

@@ -13,11 +13,11 @@
     "build": "node tools/pack-all.mjs"
   },
   "devDependencies": {
-    "@pwfabric/cli": "3.5.0",
-    "@pwfabric/contracts": "3.5.0",
-    "@pwfabric/core": "3.5.0",
-    "@pwfabric/pack": "3.5.0",
-    "@pwfabric/runtime": "3.5.0",
+    "@pwfabric/cli": "3.6.0",
+    "@pwfabric/contracts": "3.6.0",
+    "@pwfabric/core": "3.6.0",
+    "@pwfabric/pack": "3.6.0",
+    "@pwfabric/runtime": "3.6.0",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
     "@types/node": "^22.0.0",

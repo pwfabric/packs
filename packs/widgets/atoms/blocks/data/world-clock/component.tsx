@@ -89,7 +89,7 @@ export const WorldClockBlock: BlockComponent = ({ props, block, context }) => {
             key={`${c.timezone}-${i}`}
             style={{
               padding: '10px 16px',
-              borderRadius: 10,
+              borderRadius: 'var(--pw-border-radius-xl)',
               border: '1px solid var(--pw-color-border, #e4e4e7)',
               // The tiles share the row: two clocks fill it instead of leaving
               // a ragged gap at the end.

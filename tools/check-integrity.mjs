@@ -24,6 +24,7 @@ import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs'
 import { join, dirname, relative, resolve, basename } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { atomsDir, libDir, familyDir, surfacesDir, surfaceDirs } from './lib/pack-layout.mjs'
+import { resolvedThemes } from './theme-bases.mjs'
 import {
   itemScopeFindings,
   formFieldFindings,
@@ -1906,6 +1907,16 @@ let themeAtomCount = 0
     } catch (e) {
       fail(file, `unparseable — ${e.message}`)
       continue
+    }
+    // A theme that extends another is judged as it is drawn: over its base (appearance §3.5).
+    if (atom.kind === 'ui-appearance' && atom.extends) {
+      try {
+        const hit = resolvedThemes(dirname(dirname(path))).find((t) => t.id === atom.id)
+        atom = { ...atom, theme: hit.theme, ...(hit.darkTheme ? { darkTheme: hit.darkTheme } : {}) }
+      } catch (e) {
+        fail(file, e.message)
+        continue
+      }
     }
     if (atom.kind !== 'ui-appearance' || !atom.theme) continue
     themeAtomCount++

@@ -12,6 +12,7 @@ const PAGINATION_CSS =
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 import { messageOf, useAppMessages } from '@pwfabric/runtime'
+import { PRESS_CSS } from '../../../lib/_shared-utils.js'
 
 // ============================================================
 // PROPS — declared in manifest.json, applied by the runtime
@@ -116,7 +117,7 @@ export const PaginationBlock: BlockComponent = ({ props, block }) => {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: '6px',
+    borderRadius: 'var(--pw-border-radius)',
     border: '1px solid var(--pw-color-border)',
     backgroundColor: 'var(--pw-color-card)',
     color: 'var(--pw-color-text-on-card, var(--pw-color-text))',
@@ -149,9 +150,9 @@ export const PaginationBlock: BlockComponent = ({ props, block }) => {
       data-pw-pagination=""
       style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' , ...block.style }}
     >
-      <style>{PAGINATION_CSS}</style>
+      <style>{PRESS_CSS + PAGINATION_CSS}</style>
       {showFirstLast && (
-        <button
+        <button data-pw-press=""
           data-pw-hit=""
           style={currentPage === 1 ? disabledBtnStyle : btnBase}
           onClick={() => handlePage(1)}
@@ -161,7 +162,7 @@ export const PaginationBlock: BlockComponent = ({ props, block }) => {
           «
         </button>
       )}
-      <button
+      <button data-pw-press=""
         data-pw-hit=""
         style={currentPage === 1 ? disabledBtnStyle : btnBase}
         onClick={() => handlePage(currentPage - 1)}
@@ -176,7 +177,7 @@ export const PaginationBlock: BlockComponent = ({ props, block }) => {
             ⋯
           </span>
         ) : (
-          <button
+          <button data-pw-press=""
             key={page}
             data-pw-hit=""
             style={page === currentPage ? activeBtnStyle : btnBase}
@@ -188,7 +189,7 @@ export const PaginationBlock: BlockComponent = ({ props, block }) => {
           </button>
         )
       )}
-      <button
+      <button data-pw-press=""
         data-pw-hit=""
         style={currentPage === totalPages ? disabledBtnStyle : btnBase}
         onClick={() => handlePage(currentPage + 1)}
@@ -198,7 +199,7 @@ export const PaginationBlock: BlockComponent = ({ props, block }) => {
         ›
       </button>
       {showFirstLast && (
-        <button
+        <button data-pw-press=""
           data-pw-hit=""
           style={currentPage === totalPages ? disabledBtnStyle : btnBase}
           onClick={() => handlePage(totalPages)}

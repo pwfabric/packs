@@ -3,7 +3,7 @@ import type { BlockDefinition } from '@pwfabric/core'
 import { SURFACE_EVENTS } from '@pwfabric/runtime'
 import type { BlockComponent } from '../../../lib/component-types.js'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
-import { HIT_AREA_CSS, safeHref, textOf, tint } from '../../../lib/_shared-utils.js'
+import { HIT_AREA_CSS, safeHref, textOf, tint, PRESS_CSS } from '../../../lib/_shared-utils.js'
 
 /**
  * An actionable chip (a button or a link) is a REAL 44px-tall box on a phone or
@@ -114,7 +114,7 @@ export const ChipBlock: BlockComponent = ({ props, context, block }) => {
     alignItems: 'center',
     gap: sm ? '4px' : '6px',
     padding: sm ? '2px 8px' : '4px 12px',
-    borderRadius: '999px',
+    borderRadius: 'var(--pw-border-radius-full)',
     // sm sits beside 14px row titles and must read smaller than them; md is
     // the size of small body copy.
     fontSize: sm ? 'var(--pw-font-size-xs)' : 'var(--pw-font-size-sm)',
@@ -186,7 +186,7 @@ export const ChipBlock: BlockComponent = ({ props, context, block }) => {
   if (href) {
     return (
       <>
-        <style>{HIT_AREA_CSS + CHIP_TOUCH_CSS}</style>
+        <style>{PRESS_CSS + HIT_AREA_CSS + CHIP_TOUCH_CSS}</style>
         <a id={block.id} data-block-id={block.id} data-block-type="chip" href={href} style={base} data-pw-hit="" data-pw-chip-touch="">
           {body(true)}
         </a>
@@ -214,8 +214,8 @@ export const ChipBlock: BlockComponent = ({ props, context, block }) => {
   // it, and it says so to a screen reader. Otherwise a press chooses it.
   return (
     <>
-    <style>{HIT_AREA_CSS + CHIP_TOUCH_CSS}</style>
-    <button
+    <style>{PRESS_CSS + HIT_AREA_CSS + CHIP_TOUCH_CSS}</style>
+    <button data-pw-press=""
       id={block.id}
       data-block-id={block.id}
       data-block-type="chip"

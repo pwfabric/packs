@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { MOTION, listOf, safeRenderValue, transitionOf } from '../../../lib/_shared-utils.js'
+import { MOTION, listOf, safeRenderValue, transitionOf, PRESS_CSS } from '../../../lib/_shared-utils.js'
 
 /** A visitor who asks for less motion gets the panel open and closed at once. */
 const ACCORDION_CSS = '@media (prefers-reduced-motion: reduce) { [data-pw-accordion-panel] { transition: none !important; } }'
@@ -146,7 +146,7 @@ export const AccordionBlock: BlockComponent = ({ props, block }) => {
 
   return (
     <div id={block.id} data-block-id={block.id} style={{ ...containerStyle, ...block.style }} data-block-type="accordion">
-      {items.length > 0 && <style>{ACCORDION_CSS}</style>}
+      {items.length > 0 && <style>{PRESS_CSS + ACCORDION_CSS}</style>}
       {items.map((item: AccordionItem, index: number) => {
         // `id` is REQUIRED by the manifest, but a receipt that omits it used to
         // produce `…-header-undefined` for every row — duplicate DOM ids, broken
@@ -158,7 +158,7 @@ export const AccordionBlock: BlockComponent = ({ props, block }) => {
         const panelId = `${block.id}-panel-${itemId}`
         return (
           <div key={itemId} style={itemStyle(index === 0)}>
-            <button
+            <button data-pw-press=""
               type="button"
               id={headerId}
               style={headerBtnStyle(isOpen, item.disabled)}

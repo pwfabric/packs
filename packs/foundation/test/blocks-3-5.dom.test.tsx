@@ -271,7 +271,8 @@ describe('accordion openAll: a FAQ read top to bottom', () => {
 
   it('a visitor who asks for less motion gets no transition', () => {
     mount(el(AccordionBlock, 'acc', 'accordion', { items }))
-    expect(document.querySelector('#acc style')?.textContent).toBe(
+    // The block's style also carries the shared press states (PRESS_CSS) for its headers.
+    expect(document.querySelector('#acc style')?.textContent).toContain(
       '@media (prefers-reduced-motion: reduce) { [data-pw-accordion-panel] { transition: none !important; } }',
     )
   })

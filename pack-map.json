@@ -54,7 +54,7 @@
   },
   "atomCap": 100,
   "expectTotal": {
-    "blocks": 73,
+    "blocks": 75,
     "patterns": 28,
     "surfaces": 0
   },
@@ -67,14 +67,15 @@
   "packs": {
     "foundation": {
       "requires": [],
+      "engines": ">=3.7.0 <4",
       "expect": {
-        "blocks": 56,
+        "blocks": 58,
         "patterns": 28
       },
       "license": "Apache-2.0",
       "listing": {
         "name": "Foundation",
-        "description": "The ground floor every app stands on: the core block vocabulary (layout, text, controls, forms, data, feedback, media), the top-bar, bottom-bar and chrome-less shells with their page parts, two app layouts (top bar, documentation with a sidebar), six themes, each with its own dark mode (zinc, midnight, paper, linen, slate, ember), the icon dictionary, four capabilities and the REST connector.",
+        "description": "The ground floor every app stands on: the core block vocabulary (layout, text, controls, forms, data, feedback, media), the top-bar, bottom-bar and chrome-less shells with their page parts, two app layouts (top bar, documentation with a sidebar), a plain base theme and three that extend it, each with its own dark mode (base; zinc, paper, ember), the icon dictionary, four capabilities and the REST connector.",
         "category": "ui-design"
       }
     },
@@ -103,6 +104,7 @@
         "ON_OVERLAY_SCRIM",
         "OVERLAY_SCRIM",
         "OVERLAY_SCRIM_STRONG",
+        "PRESS_CSS",
         "controlLabelStyle",
         "cssUnit",
         "listOf",

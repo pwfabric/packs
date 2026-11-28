@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useAppMessage } from '@pwfabric/runtime'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { HIT_AREA_CSS, ICON_PATHS, listOf, safeHref, safeRenderValue } from '../../../lib/_kit.js'
+import { HIT_AREA_CSS, ICON_PATHS, listOf, safeHref, safeRenderValue, PRESS_CSS } from '../../../lib/_kit.js'
 import { sameRoute } from '../../../lib/_shared-account-menu.js'
 
 /**
@@ -146,7 +146,7 @@ function TreeItem({
     >
       <div data-pw-tree-row="" style={{ display: 'flex', alignItems: 'center', gap: 6, paddingLeft: depth * 16, paddingTop: 4, paddingBottom: 4 }}>
         {hasChildren ? (
-          <button
+          <button data-pw-press=""
             type="button"
             onClick={() => toggle(node.id)}
             aria-expanded={isOpen}
@@ -270,7 +270,7 @@ export const TreeViewBlock: BlockComponent = ({ props, block }) => {
           {safeRenderValue(title)}
         </TitleTag>
       )}
-      <style>{TREE_PHONE_CSS + HIT_AREA_CSS}</style>
+      <style>{PRESS_CSS + TREE_PHONE_CSS + HIT_AREA_CSS}</style>
       <ul role="tree" aria-labelledby={title ? `${block.id}-title` : undefined} style={{ margin: 0, padding: 0 }}>
         {nodes.map((node) => (
           <TreeItem key={node.id} node={node} depth={0} expanded={expanded} toggle={toggle} activeHref={activeHref} />
