@@ -4,7 +4,7 @@ import type { BlockComponent } from '../../../lib/component-types.js'
 import { HIT_AREA_CSS, ICON_PATHS, langOf, safeHref, listOf, textOf } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
-import { useAppMessage } from '@pwfabric/runtime'
+import { createSkipLink, useAppMessage } from '@pwfabric/runtime'
 import {
   AccountAvatar,
   AccountControl,
@@ -19,7 +19,14 @@ import {
 // ============================================================
 
 /** On a phone or touch screen the brand link is a REAL 44px-tall box (it was 24–33px). */
-const NAV_BRAND_TOUCH_CSS = '@media (max-width: 640px), (pointer: coarse) { [data-pw-nav-brand] { min-height: 44px; } }'
+const NAV_BRAND_TOUCH_CSS = '@media (max-width: 640px), (pointer: coarse) { [data-pw-nav-brand] { min-height: 44px; } }' +
+  // THE ANCHOR OFFSET IN THE FIRST FRAME. The engine hoists position: sticky to the block's
+  // wrapper and names it there (data-pw-position, receipt §2), so the bar's offset is in the
+  // first frame: a page opened at #section lands below it, not under it. 64px until the bar's
+  // own height is published (the effect below).
+  ':root:has([data-pw-position] > [data-pw-navbar]) { scroll-padding-top: var(--pw-sticky-top-offset, 64px); }' +
+  '[data-pw-skip-link] { position: absolute; left: -9999px; top: 8px; z-index: 1; padding: 8px 12px; border-radius: var(--pw-border-radius-sm, 6px); background: var(--pw-color-background); color: var(--pw-color-text); border: 1px solid var(--pw-color-border); font-size: var(--pw-font-size-sm); }' +
+  '[data-pw-skip-link]:focus { left: 8px; outline: var(--pw-focus-ring-width, 2px) solid var(--pw-focus-ring-color, var(--pw-color-primary, #18181b)); outline-offset: 2px; }'
 
 /**
  * ONE PAINTED FRAME IS RIGHT AT EVERY WIDTH.
@@ -74,6 +81,16 @@ export interface NavbarProps {
   readonly searchStateKey?: string
   readonly socialLinks: readonly NavSocialLink[]
   readonly secondaryLogoText?: string
+  /** A short word beside the logo text, quieter than it, inside the same link ("PWFabric engine"). */
+  readonly logoTagline?: string
+  /** The id of the page's main content: a "Skip to content" link, the first keyboard stop, shown only when focused. */
+  readonly skipTo?: string
+  /** The skip link's word. Unset: the app's ui.skipToContent. */
+  readonly skipLinkLabel?: string
+  /** Destinations listed only in the phone drawer, before links: a docs site's page tree, which the wide bar leaves to its sidebar. */
+  readonly drawerLinks?: readonly NavLink[]
+  /** Keep the bar's contents within this width, centred, while its background and line stay full width (the page's own width, e.g. 1440). */
+  readonly contentMaxWidth?: number | string
   /** Small, muted, non-interactive status nodes at the front of the right cluster ("24°C İstanbul"). */
   readonly rightInfo: readonly NavInfoSlot[]
   /**
@@ -155,6 +172,8 @@ interface NavLinkData {
 interface NavSocialLinkData {
   icon: string
   href?: string
+  /** The link's name for a screen reader and its tooltip ("GitHub"). Unset: the icon's name. */
+  label?: string
 }
 
 interface NavInfoSlotData {
@@ -250,7 +269,7 @@ const NavLinkItem: React.FC<{ link: NavLinkData; kit: NavLinkKit }> = ({ link, k
       alignItems: 'flex-start',
       gap: '10px',
       padding: '8px 10px',
-      borderRadius: '8px',
+      borderRadius: 'var(--pw-border-radius-lg)',
       color: 'var(--pw-color-text)',
       textDecoration: 'none',
     }
@@ -304,7 +323,7 @@ const NavLinkItem: React.FC<{ link: NavLinkData; kit: NavLinkKit }> = ({ link, k
             padding: '20px',
             backgroundColor: 'var(--pw-color-card)',
             border: '1px solid var(--pw-color-border)',
-            borderRadius: '12px',
+            borderRadius: 'var(--pw-border-radius-xl)',
             boxShadow: 'var(--pw-shadow-lg)',
             zIndex: 'var(--pw-z-dropdown)',
             opacity: open ? 1 : 0,
@@ -397,7 +416,7 @@ const NavLinkItem: React.FC<{ link: NavLinkData; kit: NavLinkKit }> = ({ link, k
                 gap: '8px',
                 width: '220px',
                 padding: '16px',
-                borderRadius: '10px',
+                borderRadius: 'var(--pw-border-radius-xl)',
                 textDecoration: 'none',
                 // A fixed black alpha is INVISIBLE on a dark bar — this file's own
                 // note (below) says the same about the removed shadow.
@@ -487,7 +506,7 @@ const NavLinkItem: React.FC<{ link: NavLinkData; kit: NavLinkKit }> = ({ link, k
           padding: '6px',
           backgroundColor: 'var(--pw-color-card)',
           border: '1px solid var(--pw-color-border)',
-          borderRadius: '8px',
+          borderRadius: 'var(--pw-border-radius-lg)',
           boxShadow: 'var(--pw-shadow-lg)',
           zIndex: 'var(--pw-z-dropdown)',
           opacity: open ? 1 : 0,
@@ -505,7 +524,7 @@ const NavLinkItem: React.FC<{ link: NavLinkData; kit: NavLinkKit }> = ({ link, k
             style={{
               display: 'block',
               padding: '8px 12px',
-              borderRadius: '6px',
+              borderRadius: 'var(--pw-border-radius)',
               color: 'var(--pw-color-text)',
               textDecoration: 'none',
               fontSize: 'var(--pw-font-size-sm)',
@@ -583,6 +602,7 @@ export const NavbarBlock: BlockComponent = ({ props, block, context, children })
   const rawLogoHref = safeHref(props.logoHref as string | undefined)
   const logoHref = rawLogoHref && rawLogoHref !== '#' ? rawLogoHref : undefined
   const links = listOf<NavLinkData>(p.links)
+  const drawerLinks = listOf<NavLinkData>(p.drawerLinks)
   const activeHref = typeof props.activeHref === 'string' ? props.activeHref : undefined
   /** A link is active when it, or one of its dropdown entries, routes to activeHref. */
   //
@@ -619,6 +639,10 @@ export const NavbarBlock: BlockComponent = ({ props, block, context, children })
   const searchPlaceholder = p.searchPlaceholder ?? 'Search…'
   const socialLinks = listOf<NavSocialLinkData>(p.socialLinks)
   const secondaryLogoText = textOf(p.secondaryLogoText) || undefined
+  const logoTagline = textOf(p.logoTagline) || undefined
+  const skipTo = typeof p.skipTo === 'string' && /^[A-Za-z][A-Za-z0-9_-]*$/.test(p.skipTo) ? p.skipTo : undefined
+  const skipWord = useAppMessage('ui.skipToContent', '')
+  const skipLabel = textOf(p.skipLinkLabel) || skipWord
   const rightInfo = listOf<NavInfoSlotData>(p.rightInfo)
   const hasUtility =
     showCTA ||
@@ -730,7 +754,7 @@ export const NavbarBlock: BlockComponent = ({ props, block, context, children })
         alignItems: 'center',
         gap: '6px',
         padding: '6px 10px',
-        borderRadius: '6px',
+        borderRadius: 'var(--pw-border-radius)',
         border: '1px solid var(--pw-color-border)',
         backgroundColor: 'var(--pw-color-card)',
         flex: '0 0 auto',
@@ -794,7 +818,7 @@ export const NavbarBlock: BlockComponent = ({ props, block, context, children })
       justifyContent: 'center',
       width: '32px',
       height: '32px',
-      borderRadius: '6px',
+      borderRadius: 'var(--pw-border-radius)',
       color: 'var(--pw-color-text-muted)',
       flex: '0 0 auto',
       textDecoration: 'none',
@@ -805,8 +829,8 @@ export const NavbarBlock: BlockComponent = ({ props, block, context, children })
         key={i}
         href={href}
         onClick={handleNavClick(href)}
-        aria-label={item.icon}
-        title={item.icon}
+        aria-label={item.label || item.icon}
+        title={item.label || item.icon}
         style={iconStyle}
       >
         {icon}
@@ -941,6 +965,7 @@ export const NavbarBlock: BlockComponent = ({ props, block, context, children })
           <img src={logoSrc} alt="" height={28} loading="eager" decoding="async" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} />
         )}
         {logoText}
+        {logoTagline && <span data-pw-nav-tagline="" style={taglineStyle}>{logoTagline}</span>}
       </>
     )
     if (!logoHref) return <span style={logoStyle}>{inner}</span>
@@ -973,6 +998,14 @@ export const NavbarBlock: BlockComponent = ({ props, block, context, children })
   // what gold needed; on a theme with a DARK primary and no on-card tokens
   // (a neutral theme) it collapsed to dark-on-dark. Card-painted (default)
   // keeps the on-card chain.
+  // A length the CSS can take as it is: px for a number; a string only when it is a plain length or a var().
+  const rawWidth = p.contentMaxWidth
+  const contentWidth =
+    typeof rawWidth === 'number' && rawWidth > 0
+      ? `${rawWidth}px`
+      : typeof rawWidth === 'string' && /^(\d+(\.\d+)?(px|rem|em|vw|%)|var\(--[a-z0-9-]+\))$/.test(rawWidth.trim())
+        ? rawWidth.trim()
+        : undefined
   const isPrimaryBg = typeof backgroundColor === 'string' && backgroundColor.includes('color-primary')
   const navStyle: React.CSSProperties = {
     ['--pw-color-text' as string]: isPrimaryBg
@@ -984,20 +1017,35 @@ export const NavbarBlock: BlockComponent = ({ props, block, context, children })
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '12px 24px',
+    paddingTop: 'var(--pw-navbar-padding-top, 12px)',
+    paddingBottom: 'var(--pw-navbar-padding-bottom, 12px)',
+    paddingInline: 'var(--pw-navbar-padding-inline, 24px)',
+    // contentMaxWidth: the side padding grows so the contents sit in that width, centred;
+    // never below the bar's own inset. The background and the line stay full width.
+    ...(contentWidth ? { paddingInline: `max(var(--pw-navbar-padding-inline, 24px), calc((100% - ${contentWidth}) / 2 + var(--pw-navbar-padding-inline, 24px)))` } : {}),
     backgroundColor,
     borderBottom: '1px solid var(--pw-color-border)',
     position: 'relative',
   }
 
+  // The brand's look is declared tokens (manifest definition.tokens), today's values as defaults.
   const logoStyle: React.CSSProperties = {
-    fontWeight: 700,
-    fontSize: 'var(--pw-font-size-lg)',
-    color: 'var(--pw-color-text)',
+    fontWeight: 'var(--pw-navbar-logo-weight, 700)' as React.CSSProperties['fontWeight'],
+    fontSize: 'var(--pw-navbar-logo-size, var(--pw-font-size-lg))',
+    color: 'var(--pw-navbar-logo-ink, var(--pw-color-text))',
+    letterSpacing: 'var(--pw-navbar-logo-letter-spacing, 0px)',
     display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
+    alignItems: logoTagline ? 'baseline' : 'center',
+    gap: logoTagline ? '0.4rem' : '8px',
     textDecoration: 'none',
+  }
+
+  /** The tagline: smaller, lighter and fainter than the name it follows. */
+  const taglineStyle: React.CSSProperties = {
+    fontSize: '0.85em',
+    fontWeight: 500,
+    letterSpacing: 'normal',
+    opacity: 0.55,
   }
 
   const linksStyle: React.CSSProperties = {
@@ -1019,7 +1067,7 @@ export const NavbarBlock: BlockComponent = ({ props, block, context, children })
     backgroundColor: 'var(--pw-color-primary)',
     color: 'var(--pw-color-text-on-primary)',
     padding: '8px 16px',
-    borderRadius: '6px',
+    borderRadius: 'var(--pw-border-radius)',
     border: 'none',
     cursor: 'pointer',
     fontWeight: 500,
@@ -1034,7 +1082,7 @@ export const NavbarBlock: BlockComponent = ({ props, block, context, children })
     backgroundColor: 'transparent',
     color: 'var(--pw-color-text)',
     padding: '8px 16px',
-    borderRadius: '6px',
+    borderRadius: 'var(--pw-border-radius)',
     border: 'none',
     cursor: 'pointer',
     fontWeight: 500,
@@ -1148,7 +1196,7 @@ export const NavbarBlock: BlockComponent = ({ props, block, context, children })
                 gap: '8px',
                 padding: '2px',
                 border: 'none',
-                borderRadius: '999px',
+                borderRadius: 'var(--pw-border-radius-full)',
                 background: state.open ? 'color-mix(in srgb, currentColor 12%, transparent)' : 'transparent',
                 color: 'var(--pw-color-text)',
                 fontFamily: 'inherit',
@@ -1181,6 +1229,7 @@ export const NavbarBlock: BlockComponent = ({ props, block, context, children })
   // account control stays in the bar either way.
   const hasDrawer =
     links.length > 0 ||
+    drawerLinks.length > 0 ||
     Boolean(secondaryLogoText) ||
     showSearch ||
     socialLinks.length > 0 ||
@@ -1203,7 +1252,7 @@ export const NavbarBlock: BlockComponent = ({ props, block, context, children })
         marginTop: '12px',
       }}
     >
-      {links.map((link, i) => {
+      {[...drawerLinks, ...links].map((link, i) => {
         const subItems = Array.isArray(link.items) ? link.items : []
         const megaColumns = Array.isArray(link.megaColumns) ? link.megaColumns : []
         // A mega-menu flattens to the union of its column items (+ the
@@ -1301,6 +1350,11 @@ export const NavbarBlock: BlockComponent = ({ props, block, context, children })
       data-block-type="navbar"
     >
       {stickyOffsetCss}
+      {skipTo && skipLabel && (
+        <a href={`#${skipTo}`} data-pw-skip-link="" onClick={(e) => createSkipLink(skipTo, skipLabel).handleClick(e.nativeEvent)}>
+          {skipLabel}
+        </a>
+      )}
       {renderBrand()}
       {links.length > 0 && (
         <nav data-pw-nav-wide="" aria-label={drawerLabel} style={linksStyle}>
@@ -1314,7 +1368,9 @@ export const NavbarBlock: BlockComponent = ({ props, block, context, children })
         </nav>
       )}
       {hasUtility && (
-        <div data-pw-nav-wide="" style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: '0 0 auto' }}>
+        // The cluster keeps to the right edge (an auto margin), whatever else sits in the bar: with no links
+        // and a placed child, space-between put it in the middle.
+        <div data-pw-nav-wide="" style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: '0 0 auto', marginInlineStart: 'auto' }}>
           {secondaryLogoText && renderSecondaryLogo()}
           {rightInfo.length > 0 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: '0 0 auto' }}>

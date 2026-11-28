@@ -82,3 +82,16 @@ describe('link icon beside the text', () => {
     expect(c.querySelector('a')).toBeNull()
   })
 })
+
+describe('link fontWeight', () => {
+  it('each weight name is drawn as its CSS number (semibold is not CSS)', () => {
+    const weights: Record<string, string> = { normal: '400', medium: '500', semibold: '600', bold: '700' }
+    for (const [name, css] of Object.entries(weights)) {
+      const a = mount({ href: '/x', text: name, fontWeight: name }).querySelector('a') as HTMLAnchorElement
+      expect(a.style.fontWeight).toBe(css)
+      cleanup()
+    }
+    const plain = mount({ href: '/x', text: 'plain' }).querySelector('a') as HTMLAnchorElement
+    expect(plain.style.fontWeight).toBe('')
+  })
+})

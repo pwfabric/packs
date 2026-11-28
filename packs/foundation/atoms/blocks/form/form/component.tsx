@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { cssUnit, safeHref, type CSSUnit } from '../../../lib/_shared-utils.js'
+import { cssUnit, safeHref, type CSSUnit, PRESS_CSS } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 import { messageOf, useAppMessages } from '@pwfabric/runtime'
@@ -467,7 +467,7 @@ export const FormBlock: BlockComponent = ({ props, children, block, context }) =
       {secondaryLabel}
     </a>
   ) : (
-    <button id={secondaryId} type="button" style={secondaryStyle} disabled={submitting} onClick={pressSecondary}>
+    <button data-pw-press="" id={secondaryId} type="button" style={secondaryStyle} disabled={submitting} onClick={pressSecondary}>
       {secondaryLabel}
     </button>
   )
@@ -551,6 +551,7 @@ export const FormBlock: BlockComponent = ({ props, children, block, context }) =
       // a new password (form.input `autocomplete`).
       data-pw-auth={authIntent}
     >
+      <style>{PRESS_CSS}</style>
       {children}
       {missing.length > 0 ? (
         <div
@@ -580,9 +581,9 @@ export const FormBlock: BlockComponent = ({ props, children, block, context }) =
         {submitLabel === '' ? (
           // No label written: the browser's own submit button, labelled in the
           // visitor's language ("Gönder", "Submit", "Senden").
-          <input type="submit" disabled={submitting} aria-busy={submitting || undefined} style={submitStyle} />
+          <input data-pw-press="sink" type="submit" disabled={submitting} aria-busy={submitting || undefined} style={submitStyle} />
         ) : (
-        <button
+        <button data-pw-press="sink"
           type="submit"
           disabled={submitting}
           aria-busy={submitting || undefined}
@@ -612,7 +613,7 @@ export const FormBlock: BlockComponent = ({ props, children, block, context }) =
             // Same as submit: unset → the browser's own, localised reset button.
             <input type="reset" style={resetStyle} />
           ) : (
-            <button type="reset" style={resetStyle}>
+            <button data-pw-press="" type="reset" style={resetStyle}>
               {resetLabel}
             </button>
           ))}

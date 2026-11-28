@@ -1,7 +1,7 @@
 {
   "id": "layout.sidebar",
   "kind": "block",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "category": "layout",
   "name": "sidebar",
   "state": "stable",
@@ -155,6 +155,122 @@
       {
         "id": "ui.sidebar.menu",
         "prop": "title"
+      }
+    ],
+    "tokens": [
+      {
+        "name": "ink",
+        "type": "color",
+        "default": "var(--pw-color-text)",
+        "description": "Ink of a link."
+      },
+      {
+        "name": "currentInk",
+        "type": "color",
+        "default": "var(--pw-color-text)",
+        "description": "Ink of the link to the page in view."
+      },
+      {
+        "name": "currentSurface",
+        "type": "color",
+        "default": "color-mix(in srgb, var(--pw-color-primary) 10%, transparent)",
+        "description": "Fill behind the link to the page in view."
+      },
+      {
+        "name": "currentWeight",
+        "type": "fontWeight",
+        "default": "600",
+        "description": "Weight of the link to the page in view and of the section it is in."
+      },
+      {
+        "name": "groupWeight",
+        "type": "fontWeight",
+        "default": "600",
+        "description": "Weight of a group label."
+      },
+      {
+        "name": "itemPaddingBlock",
+        "type": "length",
+        "default": "6px",
+        "description": "Space above and below a row’s text."
+      },
+      {
+        "name": "itemPaddingInline",
+        "type": "length",
+        "default": "10px",
+        "description": "Space left and right of a row’s text."
+      },
+      {
+        "name": "itemRadius",
+        "type": "length",
+        "default": "var(--pw-border-radius-sm, 6px)",
+        "description": "Corner radius of a row."
+      },
+      {
+        "name": "lineHeight",
+        "type": "lineHeight",
+        "default": "inherit",
+        "description": "Line height of a row."
+      },
+      {
+        "name": "rowGap",
+        "type": "length",
+        "default": "2px",
+        "description": "Space between two rows."
+      },
+      {
+        "name": "depthIndent",
+        "type": "length",
+        "default": "12px",
+        "description": "How far a row’s text moves in per level of depth."
+      },
+      {
+        "name": "nestIndent",
+        "type": "length",
+        "default": "0px",
+        "description": "How far a nested list sits in from its parent."
+      },
+      {
+        "name": "nestPadding",
+        "type": "length",
+        "default": "0px",
+        "description": "Space between a nested list’s guide line and its rows."
+      },
+      {
+        "name": "nestSpaceAbove",
+        "type": "length",
+        "default": "0px",
+        "description": "Space above a nested list."
+      },
+      {
+        "name": "nestRuleWidth",
+        "type": "length",
+        "default": "0px",
+        "description": "Thickness of the guide line beside a nested list; 0 draws none."
+      },
+      {
+        "name": "nestRuleColor",
+        "type": "color",
+        "default": "var(--pw-color-border)",
+        "description": "Colour of the guide line beside a nested list."
+      },
+      {
+        "name": "edgeWidth",
+        "type": "length",
+        "default": "3px",
+        "description": "Thickness of the edge on a row’s left; 0 draws none."
+      },
+      {
+        "name": "currentEdgeColor",
+        "type": "color",
+        "default": "var(--pw-color-primary)",
+        "description": "Edge colour of the link to the page in view."
+      },
+      {
+        "name": "sectionEdgeColor",
+        "type": "color",
+        "default": "color-mix(in srgb, var(--pw-color-primary) 45%, transparent)",
+        "description": "Edge colour of the section the page is in."
       }
     ]
   },

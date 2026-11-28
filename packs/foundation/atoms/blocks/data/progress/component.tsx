@@ -67,14 +67,14 @@ export const ProgressBlock: BlockComponent = ({ props, block }) => {
   }
   const trackStyle: React.CSSProperties = {
     width: '100%',
-    borderRadius: '999px',
+    borderRadius: 'var(--pw-border-radius-full)',
     overflow: 'hidden',
     backgroundColor: 'var(--pw-color-border)',
     height: sizeMap[p.size] ?? '10px',
   }
   const fillStyle: React.CSSProperties = {
     height: '100%',
-    borderRadius: '999px',
+    borderRadius: 'var(--pw-border-radius-full)',
     width: `${pct}%`,
     transition: p.animated ? 'width var(--pw-duration-slow) var(--pw-easing)' : undefined,
     backgroundColor: colorMap[p.color ?? 'primary'] ?? colorMap['primary'],

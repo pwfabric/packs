@@ -165,7 +165,7 @@ export const CalendarMonthBlock: BlockComponent = ({ props, block, context }) =>
                 overflow: 'hidden',
                 padding: 4,
                 border: '1px solid var(--pw-color-border, #e4e4e7)',
-                borderRadius: 6,
+                borderRadius: 'var(--pw-border-radius)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 2,
@@ -178,7 +178,7 @@ export const CalendarMonthBlock: BlockComponent = ({ props, block, context }) =>
                   style={{
                     fontSize: 'var(--pw-font-size-xs)',
                     padding: '1px 4px',
-                    borderRadius: 3,
+                    borderRadius: 'var(--pw-border-radius-sm)',
                     background: `color-mix(in srgb, ${ev.color ?? 'var(--pw-color-primary, #18181b)'} 22%, transparent)`,
                     color: `color-mix(in srgb, ${ev.color ?? 'var(--pw-color-primary, #18181b)'} 45%, var(--pw-color-text, #09090b))`,
                     fontWeight: 600,

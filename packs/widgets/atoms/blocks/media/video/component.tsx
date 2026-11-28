@@ -89,7 +89,7 @@ export const VideoBlock: BlockComponent = ({ props, block, context }) => {
     width: '100%',
     aspectRatio,
     backgroundColor: MEDIA_LETTERBOX,
-    borderRadius: '4px',
+    borderRadius: 'var(--pw-border-radius-sm)',
     overflow: 'hidden',
   }
 

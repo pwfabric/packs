@@ -1,7 +1,7 @@
 {
   "id": "media.gallery",
   "kind": "block",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "category": "media",
   "name": "gallery",
   "state": "experimental",

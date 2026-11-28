@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { CONTROL_HEIGHT, CONTROL_LABEL_STYLE, safeRenderValue, ICON_PATHS } from '../../../lib/_shared-utils.js'
+import { CONTROL_HEIGHT, CONTROL_LABEL_STYLE, safeRenderValue, ICON_PATHS, PRESS_CSS } from '../../../lib/_shared-utils.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 import { messageOf, useAppMessages } from '@pwfabric/runtime'
@@ -168,7 +168,7 @@ export const NumberStepperBlock: BlockComponent = ({ props, block }) => {
           {label}
         </span>
       ) : null}
-      <style>{STEPPER_TOUCH_CSS}</style>
+      <style>{PRESS_CSS + STEPPER_TOUCH_CSS}</style>
       <div
         role="group"
         aria-label={label || undefined}
@@ -185,7 +185,7 @@ export const NumberStepperBlock: BlockComponent = ({ props, block }) => {
           boxSizing: 'border-box',
         }}
       >
-        <button
+        <button data-pw-press=""
           type="button"
           aria-label={decreaseLabel}
           disabled={atMin}
@@ -237,7 +237,7 @@ export const NumberStepperBlock: BlockComponent = ({ props, block }) => {
             MozAppearance: 'textfield',
           }}
         />
-        <button
+        <button data-pw-press=""
           type="button"
           aria-label={increaseLabel}
           disabled={atMax}

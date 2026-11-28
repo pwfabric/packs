@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { safeRenderValue, safeHref, ICON_PATHS, listOf } from '../../../lib/_shared-utils.js'
+import { safeRenderValue, safeHref, ICON_PATHS, listOf, PRESS_CSS } from '../../../lib/_shared-utils.js'
 import {
   AccountAvatar,
   AccountControl,
@@ -163,6 +163,7 @@ export const BottomBarBlock: BlockComponent = ({ props, block, context }) => {
       data-block-type="bottom-bar"
       style={fixed ? { height: `calc(${height}px + env(safe-area-inset-bottom, 0px))`, flexShrink: 0 } : undefined}
     >
+      <style>{PRESS_CSS}</style>
       <nav style={barStyle} aria-label={safeRenderValue(props.ariaLabel) || messageOf(appWords, 'ui.nav.bottom', '')}>
         {items.map((item, i) => {
           const href = safeHref(item.href)
@@ -211,7 +212,7 @@ export const BottomBarBlock: BlockComponent = ({ props, block, context }) => {
             renderTrigger={({ ref, ...trigger }, state) => {
               const active = state.signedIn && sameRoute(state.account.profileHref, activeHref)
               return (
-                <button
+                <button data-pw-press=""
                   ref={ref}
                   {...trigger}
                   aria-current={active ? 'page' : undefined}

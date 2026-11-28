@@ -132,8 +132,10 @@ export const HeadingBlock: BlockComponent = ({ props, block, context }) => {
   // Inline sizes override a host reset stylesheet's `font-size: inherit; font-weight: inherit`
   // so h1–h6 always render with visible hierarchy regardless of global CSS reset.
   // fontWeight, lineHeight, and letterSpacing reference CSS vars from surface theme.
-  const PW_FONT_WEIGHT = 'var(--pw-font-weight-heading)' as React.CSSProperties['fontWeight']
-  const PW_LINE_HEIGHT = 'var(--pw-line-height-heading)'
+  // Weight and line height per level (typography headingWeightH1…H6, headingLineHeightH1…H6),
+  // each falling back to the heading weight / line height a theme sets for every level.
+  const PW_FONT_WEIGHT = `var(--pw-font-weight-${level}, var(--pw-font-weight-heading))` as React.CSSProperties['fontWeight']
+  const PW_LINE_HEIGHT = `var(--pw-line-height-${level}, var(--pw-line-height-heading))`
   const PW_LETTER_SPACING = 'var(--pw-letter-spacing-heading)'
   const headingSizeMap: Record<string, React.CSSProperties> = {
     // The type scale is tokenised — the fallbacks equal the OLD hardcoded
@@ -183,7 +185,7 @@ export const HeadingBlock: BlockComponent = ({ props, block, context }) => {
     // weight/lineHeight/letterSpacing referenced theme vars, so --pw-font-family-heading
     // was dead and headings fell back to the UA serif.
     fontFamily: 'var(--pw-font-family-heading)',
-    color: p.color ?? 'var(--pw-color-text)',
+    color: p.color ?? 'var(--pw-color-heading, var(--pw-color-text))',
     textAlign: p.textAlign,
     margin: 0,
     // A long single word must not push past the viewport: at the theme's 4xl

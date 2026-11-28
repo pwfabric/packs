@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { textOf } from '../../../lib/_shared-utils.js'
+import { textOf, PRESS_CSS } from '../../../lib/_shared-utils.js'
 import { messageOf, useAppMessages } from '@pwfabric/runtime'
 import { useClipboardCopy } from '../../../lib/_shared-copy.js'
 
@@ -105,7 +105,7 @@ export const CodeBlock: BlockComponent = ({ props, block }) => {
     ...(tokens as React.CSSProperties),
     backgroundColor: SURFACE,
     color: INK,
-    borderRadius: '8px',
+    borderRadius: 'var(--pw-border-radius-lg)',
     overflow: 'hidden',
     fontFamily: 'var(--pw-font-family-mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace)',
     fontSize: 'var(--pw-font-size-sm)',
@@ -158,12 +158,12 @@ export const CodeBlock: BlockComponent = ({ props, block }) => {
       data-language={language}
       data-tone={dark ? 'dark' : undefined}
     >
-      {copyButton ? <style>{CODE_COPY_CSS}</style> : null}
+      {copyButton ? <style>{PRESS_CSS + CODE_COPY_CSS}</style> : null}
       {(filename || (!filename && copyButton)) && (
         <div style={headerStyle}>
           <span style={filenameStyle}>{filename ?? language ?? ''}</span>
           {copyButton && (
-            <button
+            <button data-pw-press=""
               type="button"
               data-pw-code-copy=""
               style={{

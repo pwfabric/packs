@@ -10,6 +10,20 @@ import { HIT_AREA_CSS, ICON_PATHS, MOTION, inkOn, safeHref, safeRenderValue, tra
  */
 const BUTTON_TOUCH_CSS =
   '@media (max-width: 640px), (pointer: coarse) { [data-pw-btn-touch] { min-height: 44px; } }'
+
+/**
+ * A button answers the pointer and the keyboard. Hover and press lay a tint of
+ * the button's own ink over its fill (a background-image, so the variant's inline
+ * background-color stays and every variant and theme gets a fitting state: a
+ * dark fill lightens under white ink, an outline or ghost button gains a faint
+ * fill of its ink). A press also sinks by a pixel; keyboard focus draws the
+ * theme's focus ring. A disabled button does none of it.
+ */
+export const BUTTON_STATE_CSS =
+  '@media (hover: hover) { [data-pw-btn-touch]:not([disabled]):hover { background-image: linear-gradient(color-mix(in srgb, currentColor 12%, transparent) 0 0) !important; } }' +
+  ' [data-pw-btn-touch]:not([disabled]):active { background-image: linear-gradient(color-mix(in srgb, currentColor 20%, transparent) 0 0) !important; transform: translateY(1px); }' +
+  ' [data-pw-btn-touch]:focus-visible { outline: var(--pw-focus-ring-width, 2px) solid var(--pw-focus-ring-color, var(--pw-color-primary)); outline-offset: var(--pw-focus-ring-offset, 2px); }' +
+  ' @media (prefers-reduced-motion: reduce) { [data-pw-btn-touch]:active { transform: none; } }'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents } from '../../../lib/hooks.js'
 import { useSurfaceId } from '../../../lib/hooks.js'
@@ -248,7 +262,7 @@ export const ButtonBlock: BlockComponent = ({ props, block, context }) => {
   if (resolvedHref) {
     return (
       <>
-      <style>{HIT_AREA_CSS + BUTTON_TOUCH_CSS}</style>
+      <style>{HIT_AREA_CSS + BUTTON_TOUCH_CSS + BUTTON_STATE_CSS}</style>
       <a
         data-pw-hit=""
         data-pw-btn-touch=""
@@ -276,7 +290,7 @@ export const ButtonBlock: BlockComponent = ({ props, block, context }) => {
 
   return (
     <>
-    <style>{HIT_AREA_CSS + BUTTON_TOUCH_CSS}</style>
+    <style>{HIT_AREA_CSS + BUTTON_TOUCH_CSS + BUTTON_STATE_CSS}</style>
     <button
       data-pw-hit=""
       data-pw-btn-touch=""

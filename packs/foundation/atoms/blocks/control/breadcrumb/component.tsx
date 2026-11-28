@@ -125,7 +125,7 @@ export const BreadcrumbBlock: BlockComponent = ({ props, block, context }) => {
                   style={{
                     ...fit,
                     fontSize: 'var(--pw-font-size-sm)',
-                    color: isLast ? 'var(--pw-color-text)' : 'var(--pw-color-text-muted)',
+                    color: isLast ? 'var(--pw-breadcrumb-current-ink, var(--pw-color-text))' : 'var(--pw-color-text-muted)',
                     fontWeight: isLast ? 500 : 400,
                   }}
                 >
@@ -138,7 +138,8 @@ export const BreadcrumbBlock: BlockComponent = ({ props, block, context }) => {
                   data-pw-crumb=""
                   style={{
                     fontSize: 'var(--pw-font-size-sm)',
-                    color: 'var(--pw-color-primary-ink, #18181b)',
+                    // A token with today's ink as its fallback: a docs site draws the trail in its muted ink.
+                    color: 'var(--pw-breadcrumb-link-ink, var(--pw-color-primary-ink, #18181b))',
                     textDecoration: 'none',
                   }}
                 >

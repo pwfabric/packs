@@ -892,6 +892,26 @@ export const HIT_AREA_CSS =
   ' width: max(100%, 44px); height: max(100%, 44px); transform: translate(-50%, -50%); }' +
   ' }'
 
+/**
+ * Every control a visitor presses answers the pointer and the keyboard. An element
+ * marked `data-pw-press` gets, on hover, a faint tint of its own ink laid over its
+ * fill (a background-image, so the inline background-color stays and every fill,
+ * outline and bare icon button in every theme gets a fitting state), a stronger
+ * one while pressed, and the theme's focus ring on keyboard focus. An action button
+ * (`data-pw-press="sink"`: a submit, a call to action) also sinks a pixel while
+ * pressed, unless the visitor asked for reduced motion. A disabled control does
+ * none of it. A block that draws its own buttons renders `<style>{PRESS_CSS}</style>`
+ * (or adds it to its own style) and marks each one. The tint is `!important`
+ * because many buttons write the `background` shorthand inline (`'none'`,
+ * `'transparent'`), which also sets `background-image: none` and would beat it.
+ */
+export const PRESS_CSS =
+  '@media (hover: hover) { [data-pw-press]:not(:disabled):not([aria-disabled="true"]):hover { background-image: linear-gradient(color-mix(in srgb, currentColor 10%, transparent) 0 0) !important; cursor: pointer; } }' +
+  ' [data-pw-press]:not(:disabled):not([aria-disabled="true"]):active { background-image: linear-gradient(color-mix(in srgb, currentColor 18%, transparent) 0 0) !important; }' +
+  ' [data-pw-press="sink"]:not(:disabled):not([aria-disabled="true"]):active { transform: translateY(1px); }' +
+  ' [data-pw-press]:focus-visible { outline: var(--pw-focus-ring-width, 2px) solid var(--pw-focus-ring-color, var(--pw-color-primary)); outline-offset: var(--pw-focus-ring-offset, 2px); }' +
+  ' @media (prefers-reduced-motion: reduce) { [data-pw-press="sink"]:active { transform: none; } }'
+
 /** Whether a locale writes clock times on a 24-hour dial (en-GB, de-DE: yes; en-US: no). */
 export function localeUses24h(locale: string | undefined): boolean {
   try {

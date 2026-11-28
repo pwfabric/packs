@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { HIT_AREA_CSS, listOf, ON_OVERLAY_SCRIM, OVERLAY_SCRIM_STRONG, safeRenderValue } from '../../../lib/_kit.js'
+import { HIT_AREA_CSS, listOf, ON_OVERLAY_SCRIM, OVERLAY_SCRIM_STRONG, safeRenderValue, PRESS_CSS } from '../../../lib/_kit.js'
 import { messageOf, useAppMessages } from '@pwfabric/runtime'
 
 // Props — declared in manifest.json, applied by the runtime.
@@ -74,11 +74,12 @@ export const GalleryBlock: BlockComponent = ({ props, block }) => {
 
   return (
     <div className="pw-gallery" id={block.id} data-block-id={block.id} style={block.style as React.CSSProperties} data-block-type="gallery">
+      <style>{PRESS_CSS}</style>
       {title && <h3 style={{ margin: '0 0 10px', fontSize: 'var(--pw-font-size-lg, 18px)', fontWeight: 700, color: 'var(--pw-color-text, #09090b)' }}>{safeRenderValue(title)}</h3>}
       <div style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, 1fr)`, gap: 10 }}>
         {images.map((img, i) => (
           <figure key={`${img.src}-${i}`} style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
-          <button
+          <button data-pw-press=""
             type="button"
             ref={(el) => {
               thumbRefs.current[i] = el
@@ -91,7 +92,7 @@ export const GalleryBlock: BlockComponent = ({ props, block }) => {
               border: 'none',
               background: 'none',
               cursor: 'pointer',
-              borderRadius: 8,
+              borderRadius: 'var(--pw-border-radius-lg)',
               overflow: 'hidden',
               aspectRatio: '4/3',
             }}
@@ -136,8 +137,8 @@ export const GalleryBlock: BlockComponent = ({ props, block }) => {
             padding: 24,
           }}
         >
-          <style>{HIT_AREA_CSS}</style>
-          <button
+          <style>{PRESS_CSS + HIT_AREA_CSS}</style>
+          <button data-pw-press=""
             ref={closeRef}
             type="button"
             onClick={close}
@@ -164,7 +165,7 @@ export const GalleryBlock: BlockComponent = ({ props, block }) => {
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>
-          <img src={open.src} alt={open.alt ?? ''} onClick={close} style={{ maxWidth: '90vw', maxHeight: '80vh', borderRadius: 8 }} />
+          <img src={open.src} alt={open.alt ?? ''} onClick={close} style={{ maxWidth: '90vw', maxHeight: '80vh', borderRadius: 'var(--pw-border-radius-lg)' }} />
           {open.caption && <p style={{ color: ON_OVERLAY_SCRIM, fontSize: 'var(--pw-font-size-sm, 14px)' }}>{safeRenderValue(open.caption)}</p>}
         </div>
       )}

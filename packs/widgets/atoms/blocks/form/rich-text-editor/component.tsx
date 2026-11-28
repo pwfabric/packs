@@ -3,7 +3,7 @@ import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
-import { controlLabelStyle } from '../../../lib/_kit.js'
+import { controlLabelStyle, PRESS_CSS } from '../../../lib/_kit.js'
 
 // Props — declared in manifest.json, applied by the runtime.
 export interface RichTextEditorProps {
@@ -224,7 +224,7 @@ export const RichTextEditorBlock: BlockComponent = ({ props, context, block }) =
           FormData never saw the text although the manifest promised a FormData
           key. This input carries the sanitized HTML. */}
       {name ? <input type="hidden" name={name} value={html} /> : null}
-      <style>{RTE_TOUCH_CSS}</style>
+      <style>{PRESS_CSS + RTE_TOUCH_CSS}</style>
       <div
         role="toolbar"
         aria-label={label ? `${label} formatting` : 'Formatting'}
@@ -239,7 +239,7 @@ export const RichTextEditorBlock: BlockComponent = ({ props, context, block }) =
         }}
       >
         {TOOLBAR.map((tool) => (
-          <button
+          <button data-pw-press=""
             key={tool.command}
             type="button"
             aria-label={tool.aria}

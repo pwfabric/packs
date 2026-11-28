@@ -592,7 +592,7 @@ export const RepeaterBlock: BlockComponent = ({ props, block, children, context 
           title={errorMessage.trim() || undefined}
           style={{
             minHeight: 40,
-            borderRadius: 8,
+            borderRadius: 'var(--pw-border-radius-lg)',
             border: '2px dashed var(--pw-color-error, #dc2626)',
             background: 'color-mix(in srgb, var(--pw-color-error, #dc2626) 8%, transparent)',
           }}
@@ -607,7 +607,7 @@ export const RepeaterBlock: BlockComponent = ({ props, block, children, context 
     const bar = (w: string, h = 12): React.CSSProperties => ({
       width: w,
       height: h,
-      borderRadius: 6,
+      borderRadius: 'var(--pw-border-radius)',
       backgroundColor: 'color-mix(in srgb, var(--pw-color-text) 7%, transparent)',
       backgroundImage:
         'linear-gradient(90deg, transparent, color-mix(in srgb, var(--pw-color-text) 14%, transparent), transparent)',
@@ -635,7 +635,7 @@ export const RepeaterBlock: BlockComponent = ({ props, block, children, context 
             <div key={i} style={{ ...bar(`${56 + (i % 3) * 16}px`, 28), borderRadius: 'var(--pw-border-radius-full, 9999px)' }} />
           ) : layout === 'row' ? (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 4px' }}>
-              <div style={{ ...bar('36px', 36), borderRadius: 10, flexShrink: 0 }} />
+              <div style={{ ...bar('36px', 36), borderRadius: 'var(--pw-border-radius-xl)', flexShrink: 0 }} />
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
                 <div style={bar('45%')} />
                 <div style={bar('70%', 10)} />
@@ -646,7 +646,7 @@ export const RepeaterBlock: BlockComponent = ({ props, block, children, context 
               key={i}
               style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '18px 12px' }}
             >
-              <div style={{ ...bar('40px', 40), borderRadius: 12 }} />
+              <div style={{ ...bar('40px', 40), borderRadius: 'var(--pw-border-radius-xl)' }} />
               <div style={bar('60%')} />
             </div>
           )

@@ -15,6 +15,8 @@ export interface ThemeToggleProps {
   readonly showSystem: boolean
   /** Write each choice's word beside its icon. false: icons only, the words stay the accessible names. */
   readonly showLabels: boolean
+  /** segmented (default): the three choices side by side. select: the current choice with its icon, the others in a list — compact, for a sidebar foot or a dense bar. */
+  readonly variant?: 'segmented' | 'select'
 }
 
 // ============================================================
@@ -60,6 +62,11 @@ const VISUALLY_HIDDEN: React.CSSProperties = {
  * reader says "radio, 1 of 3"); each label is the visible segment. The focus
  * ring is drawn on the segment of the focused radio.
  */
+/** The select form: a focus ring on the list, a touch-sized target on a phone. */
+const SELECT_CSS =
+  '[data-pw-scheme-select] select:focus-visible { outline: var(--pw-focus-ring-width, 2px) solid var(--pw-focus-ring-color, var(--pw-color-primary, #18181b)); outline-offset: 2px; border-radius: 4px; }' +
+  '@media (max-width: 640px), (pointer: coarse) { [data-pw-scheme-select] select { min-height: 44px; } }'
+
 const TOGGLE_CSS =
   '[data-pw-scheme-option]:has(> input:focus-visible) { outline: var(--pw-focus-ring-width, 2px) solid var(--pw-focus-ring-color, var(--pw-color-primary, #18181b)); outline-offset: 1px; }' +
   '@media (max-width: 640px), (pointer: coarse) { [data-pw-scheme-option] { min-height: 44px; min-width: 44px; } }'
@@ -93,6 +100,42 @@ export const ThemeToggleBlock: BlockComponent = ({ props, block, context }) => {
     context?.setColorScheme?.(scheme)
   }
   const name = `${block.id}-scheme`
+  if (p.variant === 'select') {
+    const shown = options.find((o) => o.value === current) ?? options[0]
+    return (
+      <label
+        id={block.id}
+        data-block-id={block.id}
+        data-block-type="theme-toggle"
+        data-pw-scheme-select=""
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          color: 'var(--pw-color-text-on-card, var(--pw-color-text))',
+          fontSize: 'var(--pw-font-size-xs)',
+          fontWeight: 500,
+          ...block.style,
+        }}
+      >
+        <style>{SELECT_CSS}</style>
+        <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false" dangerouslySetInnerHTML={{ __html: (shown?.icon ?? CIRCLE).join('') }} />
+        <span style={VISUALLY_HIDDEN}>{groupWord}</span>
+        <select
+          name={name}
+          value={current}
+          onChange={(e) => choose(schemeOf(e.target.value))}
+          style={{ appearance: 'none', background: 'transparent', border: 'none', font: 'inherit', color: 'inherit', padding: '4px 2px', cursor: inert ? 'default' : 'pointer' }}
+        >
+          {options.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+      </label>
+    )
+  }
   return (
     <fieldset
       id={block.id}

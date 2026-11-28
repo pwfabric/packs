@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { HIT_AREA_CSS, ICON_PATHS, inkOn, listOf, safeHref, textOf } from '../../../lib/_shared-utils.js'
+import { HIT_AREA_CSS, ICON_PATHS, inkOn, listOf, safeHref, textOf, PRESS_CSS } from '../../../lib/_shared-utils.js'
 import { useAppMessage } from '@pwfabric/runtime'
 
 /** Stacked-card layout for a narrow table (see the render). */
@@ -667,7 +667,7 @@ export const TableBlock: BlockComponent = ({ props, block, context }) => {
         })
       }
       return (
-        <button
+        <button data-pw-press=""
           type="button"
           data-pw-hit=""
           onClick={handleClick}
@@ -785,7 +785,7 @@ export const TableBlock: BlockComponent = ({ props, block, context }) => {
           The box is a size container so the rule follows the table's real
           width (a narrow aside stacks too), not the viewport. Inline cell
           styles are overridden with !important on purpose. */}
-      <style>{TABLE_STACK_CSS + HIT_AREA_CSS}</style>
+      <style>{PRESS_CSS + TABLE_STACK_CSS + HIT_AREA_CSS}</style>
       {/* position: relative — the visually hidden caption and link helpers are
           absolutely positioned; without a positioned box here they were placed
           against the page, outside the scroller, and widened it sideways. */}
@@ -834,7 +834,7 @@ export const TableBlock: BlockComponent = ({ props, block, context }) => {
                 {sortable ? (
                   // A real button: a clickable <th> had no keyboard
                   // access and no role; the arrow is decoration only.
-                  <button
+                  <button data-pw-press=""
                     type="button"
                     onClick={() => cycleSort(col.key)}
                     style={{
@@ -924,7 +924,7 @@ export const TableBlock: BlockComponent = ({ props, block, context }) => {
                           verticalAlign: 'middle',
                           width: `${55 + ((i * 17) % 30)}%`,
                           height: 12,
-                          borderRadius: 6,
+                          borderRadius: 'var(--pw-border-radius)',
                           backgroundColor: 'color-mix(in srgb, var(--pw-color-text) 7%, transparent)',
                           backgroundImage:
                             'linear-gradient(90deg, transparent, color-mix(in srgb, var(--pw-color-text) 14%, transparent), transparent)',

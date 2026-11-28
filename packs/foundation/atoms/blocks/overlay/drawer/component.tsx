@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { OVERLAY_DISMISS_EVENT, OVERLAY_SCRIM, lockBodyScroll } from '../../../lib/_shared-utils.js'
+import { OVERLAY_DISMISS_EVENT, OVERLAY_SCRIM, lockBodyScroll, PRESS_CSS } from '../../../lib/_shared-utils.js'
 import { messageOf, useAppMessages } from '@pwfabric/runtime'
 
 // ============================================================
@@ -206,7 +206,7 @@ export const DrawerBlock: BlockComponent = ({ props, children, block, context })
             <span />
           )}
           {showCloseButton && (
-            <button
+            <button data-pw-press=""
               type="button"
               aria-label={messageOf(appWords, 'ui.close', '')}
               onClick={close}
@@ -234,9 +234,9 @@ export const DrawerBlock: BlockComponent = ({ props, children, block, context })
 
   return (
     <div id={block.id} data-block-id={block.id} data-block-type="drawer">
-      <style>{DRAWER_TOUCH_CSS}</style>
+      <style>{PRESS_CSS + DRAWER_TOUCH_CSS}</style>
       {triggerLabel ? (
-        <button
+        <button data-pw-press=""
           ref={triggerRef}
           type="button"
           style={triggerStyle}

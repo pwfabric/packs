@@ -75,14 +75,14 @@ export const EmbedBlock: BlockComponent = ({ props, block, context }) => {
     ? {
         width: '100%',
         height: cssUnit(p.height as CSSUnit) ?? '400px',
-        borderRadius: '4px',
+        borderRadius: 'var(--pw-border-radius-sm)',
         overflow: 'hidden',
       }
     : {
         position: 'relative',
         width: '100%',
         paddingBottom: aspectMap[aspectRatio] ?? '56.25%',
-        borderRadius: '4px',
+        borderRadius: 'var(--pw-border-radius-sm)',
         overflow: 'hidden',
       }
 

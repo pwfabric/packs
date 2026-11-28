@@ -3,7 +3,7 @@ import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
-import { safeRenderValue } from '../../../lib/_kit.js'
+import { safeRenderValue, PRESS_CSS } from '../../../lib/_kit.js'
 
 // ============================================================
 // PROPS — declared in manifest.json, applied by the runtime
@@ -183,9 +183,10 @@ export const RatingBlock: BlockComponent = ({ props, block, context }) => {
   const focusIndex = Math.max(0, Math.round(value) - 1)
   return (
     <div id={block.id} data-block-id={block.id} style={containerStyle} data-block-type="rating">
+      <style>{PRESS_CSS}</style>
       <div role="radiogroup" aria-label={label || undefined} onKeyDown={onKeyDown} style={{ display: 'inline-flex', gap: '2px' }}>
         {Array.from({ length: max }).map((_, i) => (
-          <button
+          <button data-pw-press=""
             key={i}
             type="button"
             role="radio"

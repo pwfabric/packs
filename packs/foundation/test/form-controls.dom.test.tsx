@@ -451,7 +451,11 @@ describe('navbar', () => {
     expect(bar.style.position).toBe('relative')
     expect(bar.style.top).toBe('')
     expect(bar.style.zIndex).toBe('')
-    expect(document.querySelector('#nav style')?.textContent).not.toContain('scroll-padding-top')
+    // No unconditional offset: the only scroll padding is the rule that needs a sticky wrapper or bar.
+    const css = document.querySelector('#nav style')?.textContent ?? ''
+    expect(css).not.toContain('html{scroll-padding-top')
+    expect(css.match(/scroll-padding-top/g)).toHaveLength(1)
+    expect(css).toContain(':root:has([data-pw-position] > [data-pw-navbar])')
   })
 
   it('one frame for every width: both forms are drawn, CSS picks one, viewport is not read', () => {

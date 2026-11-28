@@ -65,7 +65,7 @@
           "gap": 12,
           "align": "start",
           "padding": 16,
-          "borderRadius": 10,
+          "borderRadius": "var(--pw-border-radius-xl)",
           "backgroundColor": "color-mix(in srgb, var(--pw-color-primary) 8%, transparent)"
         },
         "children": [

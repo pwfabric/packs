@@ -1,7 +1,7 @@
 {
   "id": "text.prose",
   "kind": "block",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "category": "text",
   "name": "prose",
   "state": "stable",
@@ -32,7 +32,7 @@
       {
         "name": "content",
         "type": "string",
-        "description": "Markdown string (preferred) OR a raw HTML fragment. Markdown supports headings (#, each with an anchor id from its text, unique in the block), nested lists (indent an item under another), GitHub-style tables (| a | b | over |---|---:|, the colons aligning a column), **bold**, *italic*, `code`, fenced code with its language after the fence (```ts — its keywords, strings, numbers and comments coloured from the theme), > blockquote, links and images. A link to an app page (/setup) or an in-page anchor (#options) goes through the app's routing; an outside address is unchanged. HTML is sanitized to a conservative tag/attribute allowlist. Bindable to a data source.",
+        "description": "Markdown string (preferred) OR a raw HTML fragment — content that starts with a tag or closes one (</b>) outside code; anything else is Markdown, so a code span naming a tag (`pwf <command>`) or \"a <page> folder\" stays Markdown. Lines run together into one paragraph until a blank line. Markdown supports headings (#, each with an anchor id from its text (see anchors), unique in the block), nested lists (indent an item under another), GitHub-style tables (| a | b | over |---|---:|, the colons aligning a column), **bold**, *italic*, `code`, fenced code with its language after the fence (```ts — its keywords, strings, numbers and comments coloured from the theme), > blockquote, links and images. A link to an app page (/setup) or an in-page anchor (#options) goes through the app's routing; an outside address is unchanged. HTML is sanitized to a conservative tag/attribute allowlist. Bindable to a data source.",
         "jsonSchema": {
           "type": "string"
         },
@@ -80,6 +80,58 @@
           "type": "string"
         },
         "bindable": false
+      },
+      {
+        "name": "copyButtonReveal",
+        "type": "\"always\" | \"hover\"",
+        "description": "When the copy button shows: always (default), or only while the pointer is over the code block or the button has focus. On a touch screen it always shows.",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "always",
+            "hover"
+          ]
+        },
+        "bindable": false,
+        "default": "always"
+      },
+      {
+        "name": "headingLinks",
+        "type": "boolean",
+        "description": "A # link to itself after each h2–h4 heading, shown on hover, so a reader can copy a section's address. It is a pointer affordance: hidden from screen readers and the tab order (they list the headings already) and from llms-full.txt.",
+        "jsonSchema": {
+          "type": "boolean"
+        },
+        "bindable": false,
+        "default": false
+      },
+      {
+        "name": "anchors",
+        "type": "\"compact\" | \"github\"",
+        "description": "How a heading's anchor is written. compact (default): runs of other characters are one - and a repeat is -2 (\"Track A — run\" → track-a-run). github: as GitHub and most docs tools write it, so links made for them still land (\"Track A — run\" → track-a--run, \"Apache License 2.0\" → apache-license-20, a repeat -1); a non-ASCII letter is spelled in ASCII.",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "compact",
+            "github"
+          ]
+        },
+        "bindable": false,
+        "default": "compact"
+      },
+      {
+        "name": "tableWidth",
+        "type": "\"full\" | \"content\"",
+        "description": "How wide a table runs: full (default) the column's width, content as wide as its cells need (a wide one still scrolls inside its box).",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "full",
+            "content"
+          ]
+        },
+        "bindable": false,
+        "default": "full"
       }
     ],
     "defaultProps": {
@@ -98,6 +150,206 @@
         "id": "ui.copied",
         "prop": "copiedLabel",
         "when": "copyButton"
+      }
+    ],
+    "tokens": [
+      {
+        "name": "h1SpaceAbove",
+        "type": "length",
+        "default": "var(--pw-space-xl)",
+        "description": "Space above an h1."
+      },
+      {
+        "name": "h1SpaceBelow",
+        "type": "length",
+        "default": "var(--pw-space-md)",
+        "description": "Space below an h1."
+      },
+      {
+        "name": "h2SpaceAbove",
+        "type": "length",
+        "default": "var(--pw-space-xl)",
+        "description": "Space above an h2."
+      },
+      {
+        "name": "h2SpaceBelow",
+        "type": "length",
+        "default": "var(--pw-space-sm)",
+        "description": "Space below an h2."
+      },
+      {
+        "name": "h3SpaceAbove",
+        "type": "length",
+        "default": "var(--pw-space-lg)",
+        "description": "Space above an h3."
+      },
+      {
+        "name": "h3SpaceBelow",
+        "type": "length",
+        "default": "var(--pw-space-sm)",
+        "description": "Space below an h3."
+      },
+      {
+        "name": "h4SpaceAbove",
+        "type": "length",
+        "default": "var(--pw-space-lg)",
+        "description": "Space above an h4."
+      },
+      {
+        "name": "h4SpaceBelow",
+        "type": "length",
+        "default": "var(--pw-space-xs)",
+        "description": "Space below an h4."
+      },
+      {
+        "name": "h2RuleWidth",
+        "type": "length",
+        "default": "0px",
+        "description": "Thickness of a line under each h2; 0 draws none."
+      },
+      {
+        "name": "h2RuleColor",
+        "type": "color",
+        "default": "var(--pw-color-border)",
+        "description": "Colour of the line under each h2."
+      },
+      {
+        "name": "h2RuleGap",
+        "type": "length",
+        "default": "0px",
+        "description": "Space between an h2 and its line."
+      },
+      {
+        "name": "paragraphSpaceAbove",
+        "type": "length",
+        "default": "0px",
+        "description": "Space above a paragraph."
+      },
+      {
+        "name": "paragraphSpaceBelow",
+        "type": "length",
+        "default": "var(--pw-space-md)",
+        "description": "Space below a paragraph."
+      },
+      {
+        "name": "listSpaceAbove",
+        "type": "length",
+        "default": "0px",
+        "description": "Space above a list."
+      },
+      {
+        "name": "listSpaceBelow",
+        "type": "length",
+        "default": "var(--pw-space-md)",
+        "description": "Space below a list."
+      },
+      {
+        "name": "listIndent",
+        "type": "length",
+        "default": "var(--pw-space-xl)",
+        "description": "How far a list sits in from the text."
+      },
+      {
+        "name": "listItemSpaceAbove",
+        "type": "length",
+        "default": "0px",
+        "description": "Space above a list item."
+      },
+      {
+        "name": "listItemSpaceBelow",
+        "type": "length",
+        "default": "var(--pw-space-xs)",
+        "description": "Space below a list item."
+      },
+      {
+        "name": "listLineHeight",
+        "type": "lineHeight",
+        "default": "var(--pw-line-height-body)",
+        "description": "Line height in a list item."
+      },
+      {
+        "name": "inlineCodeSurface",
+        "type": "color",
+        "default": "var(--pw-color-code-surface, var(--pw-color-card))",
+        "description": "Fill behind inline code."
+      },
+      {
+        "name": "inlineCodeFontSize",
+        "type": "length",
+        "default": "var(--pw-font-size-sm)",
+        "description": "Size of inline code."
+      },
+      {
+        "name": "inlineCodePaddingBlock",
+        "type": "length",
+        "default": "0.15em",
+        "description": "Space above and below inline code, inside its box."
+      },
+      {
+        "name": "inlineCodePaddingInline",
+        "type": "length",
+        "default": "0.4em",
+        "description": "Space left and right of inline code, inside its box."
+      },
+      {
+        "name": "inlineCodeRadius",
+        "type": "length",
+        "default": "var(--pw-border-radius-sm)",
+        "description": "Corner radius of inline code."
+      },
+      {
+        "name": "inlineCodeBorderWidth",
+        "type": "length",
+        "default": "0px",
+        "description": "Border thickness of inline code; 0 draws none."
+      },
+      {
+        "name": "inlineCodeBorderColor",
+        "type": "color",
+        "default": "transparent",
+        "description": "Border colour of inline code."
+      },
+      {
+        "name": "codeBlockSpaceAbove",
+        "type": "length",
+        "default": "0px",
+        "description": "Space above a code block."
+      },
+      {
+        "name": "codeBlockSpaceBelow",
+        "type": "length",
+        "default": "var(--pw-space-md)",
+        "description": "Space below a code block."
+      },
+      {
+        "name": "codeBlockRadius",
+        "type": "length",
+        "default": "var(--pw-border-radius-lg)",
+        "description": "Corner radius of a code block."
+      },
+      {
+        "name": "codeBlockLineHeight",
+        "type": "lineHeight",
+        "default": "inherit",
+        "description": "Line height in a code block."
+      },
+      {
+        "name": "tableLineHeight",
+        "type": "lineHeight",
+        "default": "inherit",
+        "description": "Line height in a table."
+      },
+      {
+        "name": "tableCellPaddingBlock",
+        "type": "length",
+        "default": "var(--pw-space-xs)",
+        "description": "Space above and below a table cell’s text."
+      },
+      {
+        "name": "tableCellPaddingInline",
+        "type": "length",
+        "default": "var(--pw-space-sm)",
+        "description": "Space left and right of a table cell’s text."
       }
     ]
   },

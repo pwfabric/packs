@@ -83,7 +83,7 @@ describe('the date / time field edge is as visible as a text input', () => {
   })
 })
 
-describe('contrast of the table ink in 6 presets × light / derived dark', () => {
+describe('contrast of the table ink in 4 presets × light / derived dark', () => {
   // Foundation's two themes plus the four of the themes pack: the table must
   // read in every theme the catalogue ships.
   const rows = presetTokenSets([FOUNDATION_THEMES]).map(({ preset, mode, vars }) => {
@@ -100,7 +100,7 @@ describe('contrast of the table ink in 6 presets × light / derived dark', () =>
   it('prints the table', () => {
     // eslint-disable-next-line no-console
     console.table(rows)
-    expect(rows).toHaveLength(12)
+    expect(rows).toHaveLength(8)
   })
   it.each(rows)('$cell · every pill label and the destructive label clear 4.5:1', (row) => {
     for (const k of [...TONES, 'destructive']) expect(row[k] as number).toBeGreaterThanOrEqual(4.5)

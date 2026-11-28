@@ -1,0 +1,83 @@
+{
+  "id": "control.back-to-top",
+  "kind": "block",
+  "version": "1.0.0",
+  "category": "control",
+  "name": "back-to-top",
+  "state": "stable",
+  "knowledge": {
+    "purpose": "A \"back to top\" button that appears once the page has scrolled and takes the visitor to the top.",
+    "useCases": [
+      "Under a documentation page's table of contents",
+      "At the foot of a long article or a long list",
+      "Beside a page's footer links"
+    ],
+    "composesWith": [
+      "layout.table-of-contents",
+      "layout.container",
+      "text.prose"
+    ],
+    "antiPatterns": [
+      "A short page that never scrolls — it would never show",
+      "Navigation to a section — link to its anchor",
+      "A floating button over the content on a phone — place it in the page's own column"
+    ],
+    "implementation": "A <button> with the label prop, else the app word ui.backToTop, and a small up chevron. Hidden (opacity 0, aria-hidden, out of the tab order) until the page has scrolled past showAfter px (default 400); the first frame draws it hidden. A click scrolls to the top, smoothly unless the visitor prefers reduced motion. Its ink is --pw-back-to-top-ink (default the muted text), --pw-back-to-top-hover-ink on hover."
+  },
+  "definition": {
+    "props": [
+      {
+        "name": "label",
+        "type": "string",
+        "copy": true,
+        "description": "The button's word (\"Scroll to top\"). Unset: the app's ui.backToTop. Write it in the app's language.",
+        "jsonSchema": {
+          "type": "string"
+        },
+        "bindable": true
+      },
+      {
+        "name": "showAfter",
+        "type": "number",
+        "description": "Shown once the page has scrolled this many px.",
+        "jsonSchema": {
+          "type": "number",
+          "minimum": 0
+        },
+        "bindable": false,
+        "default": 400
+      }
+    ],
+    "defaultProps": {
+      "showAfter": 400
+    },
+    "canHaveChildren": false,
+    "icon": "↑",
+    "traits": [
+      "chrome"
+    ],
+    "messages": [
+      {
+        "id": "ui.backToTop",
+        "prop": "label"
+      }
+    ],
+    "tokens": [
+      {
+        "name": "ink",
+        "type": "color",
+        "default": "var(--pw-color-text-muted)",
+        "description": "Ink of the link."
+      },
+      {
+        "name": "hoverInk",
+        "type": "color",
+        "default": "var(--pw-color-text)",
+        "description": "Ink of the link under the pointer."
+      }
+    ]
+  },
+  "tags": [
+    "tier:widget"
+  ]
+}

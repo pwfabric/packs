@@ -45,7 +45,7 @@ describe('prose: GitHub-style tables', () => {
     ])
     expect(table.querySelector('tbody strong')?.textContent).toBe('29')
     expect([...table.querySelectorAll('thead th')].map((c) => c.getAttribute('data-align'))).toEqual(['left', 'right', 'center'])
-    expect(root().querySelector('table + p')?.textContent).toBe('After.')
+    expect(root().querySelector('[data-pw-prose-table] + p')?.textContent).toBe('After.')
   })
 
   it('a line of pipes with no separator under it stays a paragraph', () => {
@@ -89,7 +89,7 @@ describe('prose: fenced code', () => {
   })
 
   it('reads comments and strings as each language writes them', () => {
-    expect(highlightCode('# note\necho "hi"', 'bash')).toBe('<span data-tok="comment"># note</span>\n<span data-tok="keyword">echo</span> <span data-tok="string">"hi"</span>')
+    expect(highlightCode('# note\necho "hi"', 'bash')).toBe('<span data-tok="comment"># note</span>\n<span data-tok="function">echo</span> <span data-tok="string">"hi"</span>')
     expect(highlightCode('{"a": 1}', 'json')).toBe('{<span data-tok="string">"a"</span>: <span data-tok="number">1</span>}')
     // Unknown or no language: escaped text, no tokens.
     expect(highlightCode('<b>', undefined)).toBe('&lt;b&gt;')
@@ -167,7 +167,7 @@ describe('prose: the copy button on a code block', () => {
     host.remove()
   })
 
-  it('declares its words, read only while copyButton is on', () => {
+  it('declares its words, each read only while its prop is on', () => {
     const manifest = JSON.parse(readFileSync(join(HERE, '..', 'atoms', 'blocks', 'text', 'prose', 'manifest.json'), 'utf8'))
     expect(manifest.definition.messages).toEqual([
       { id: 'ui.copy', prop: 'copyLabel', when: 'copyButton' },

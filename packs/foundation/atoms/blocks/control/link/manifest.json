@@ -1,7 +1,7 @@
 {
   "id": "control.link",
   "kind": "block",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "category": "control",
   "name": "link",
   "state": "stable",
@@ -141,6 +141,20 @@
           "description": "This link names the page in view (a nav item): aria-current=\"page\", drawn semibold on a tint of its own ink. Bindable: \"{{item.active}}\"."
         },
         "bindable": true
+      },
+      {
+        "name": "display",
+        "type": "\"inline\" | \"block\"",
+        "description": "inline (default): the link sits in the line of text around it. block: the link is a line of its own, as tall as its own line height — a standalone link in a column (a table of contents, a footer list).",
+        "jsonSchema": {
+          "type": "string",
+          "enum": [
+            "inline",
+            "block"
+          ]
+        },
+        "bindable": false,
+        "default": "inline"
       }
     ],
     "defaultProps": {

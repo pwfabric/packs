@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { safeRenderValue } from '../../../lib/_kit.js'
+import { safeRenderValue, PRESS_CSS } from '../../../lib/_kit.js'
 import { SURFACE_EVENTS } from '@pwfabric/contracts'
 import { useSurfaceEvents, useSurfaceId } from '../../../lib/hooks.js'
 
@@ -81,7 +81,9 @@ export const LikeButtonBlock: BlockComponent = ({ props, context, block }) => {
   }
 
   return (
-    <button
+    <>
+    <style>{PRESS_CSS}</style>
+    <button data-pw-press=""
       type="button"
       className="pw-like-button"
       data-block-type="like-button"
@@ -96,7 +98,7 @@ export const LikeButtonBlock: BlockComponent = ({ props, context, block }) => {
         minHeight: 44,
         boxSizing: 'border-box',
         padding: '6px 14px',
-        borderRadius: 999,
+        borderRadius: 'var(--pw-border-radius-full)',
         border: `1px solid ${liked ? 'var(--pw-color-primary, #18181b)' : 'var(--pw-color-border, #e4e4e7)'}`,
         background: liked ? 'var(--pw-color-primary, #18181b)' : 'transparent',
         color: liked ? 'var(--pw-color-text-on-primary, #fafafa)' : 'var(--pw-color-text, #09090b)',
@@ -126,6 +128,7 @@ export const LikeButtonBlock: BlockComponent = ({ props, context, block }) => {
         </span>
       ) : null}
     </button>
+    </>
   )
 }
 

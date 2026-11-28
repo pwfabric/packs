@@ -61,6 +61,17 @@ describe('sidebar', () => {
     expect(sidebarTrail(DOCS, '/guides/deploy/cloudflare')).toEqual(['1', '1.1'])
   })
 
+  it('a group that matches by prefix still opens over the page in view', () => {
+    const tree = [
+      { label: 'Overview', href: '/' },
+      { label: 'Authoring', href: '/authoring', match: 'prefix', children: [{ label: 'defineBlock()', href: '/authoring/define-block' }] },
+    ]
+    expect(sidebarTrail(tree, '/authoring/define-block')).toEqual(['1'])
+    expect(sidebarTrail(tree, '/authoring')).toEqual([])
+    mount(SidebarBlock, 'sb', 'sidebar', { navLabel: 'Docs', items: tree, activeHref: '/authoring/define-block' })
+    expect(screen.getByRole('link', { name: 'defineBlock()' }).getAttribute('aria-current')).toBe('page')
+  })
+
   it('a group toggles with its button: aria-expanded, aria-controls, hidden entries', () => {
     mount(SidebarBlock, 'sb', 'sidebar', { navLabel: 'Docs', items: DOCS })
     const guides = screen.getByRole('button', { name: 'Guides' })

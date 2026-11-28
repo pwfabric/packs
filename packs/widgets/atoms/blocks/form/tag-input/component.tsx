@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { BlockDefinition } from '@pwfabric/core'
 import type { BlockComponent } from '../../../lib/component-types.js'
-import { HIT_AREA_CSS, controlLabelStyle, safeRenderValue } from '../../../lib/_kit.js'
+import { HIT_AREA_CSS, controlLabelStyle, safeRenderValue, PRESS_CSS } from '../../../lib/_kit.js'
 
 /**
  * At phone width or on a coarse pointer the remove × is a REAL 44×44 box (R3
@@ -170,7 +170,7 @@ export const TagInputBlock: BlockComponent = ({ props, block }) => {
     padding: '2px 8px',
     backgroundColor: 'color-mix(in srgb, var(--pw-color-primary) 14%, var(--pw-color-card))',
     color: 'color-mix(in srgb, var(--pw-color-primary) 45%, var(--pw-color-text-on-card, var(--pw-color-text)))',
-    borderRadius: '4px',
+    borderRadius: 'var(--pw-border-radius-sm)',
     fontSize: 'var(--pw-font-size-sm)',
     fontWeight: 500,
   }
@@ -197,13 +197,13 @@ export const TagInputBlock: BlockComponent = ({ props, block }) => {
       )}
       {name ? <input type="hidden" name={name} value={tags.join(',')} /> : null}
       {/* The remove × is a real 44px box on a phone or a touch screen. */}
-      <style>{HIT_AREA_CSS + TAG_TOUCH_CSS}</style>
+      <style>{PRESS_CSS + HIT_AREA_CSS + TAG_TOUCH_CSS}</style>
       <div style={fieldStyle} data-pw-tag-field="" onClick={() => textRef.current?.focus()}>
         {tags.map((tag, i) => (
           <span key={`${tag}-${i}`} style={tagStyle}>
             {tag}
             {!disabled && (
-              <button
+              <button data-pw-press=""
                 type="button"
                 aria-label={messageOf(messages, 'ui.remove', '', { name: tag })}
                 data-pw-hit=""
