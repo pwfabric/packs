@@ -9,20 +9,20 @@ importers:
   .:
     devDependencies:
       '@pwfabric/cli':
-        specifier: 3.7.0
-        version: 3.7.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: 3.8.0
+        version: 3.8.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@pwfabric/contracts':
-        specifier: 3.7.0
-        version: 3.7.0(zod@4.6.7)
+        specifier: 3.8.0
+        version: 3.8.0(zod@4.6.7)
       '@pwfabric/core':
-        specifier: 3.7.0
-        version: 3.7.0(zod@4.6.7)
+        specifier: 3.8.0
+        version: 3.8.0(zod@4.6.7)
       '@pwfabric/pack':
-        specifier: 3.7.0
-        version: 3.7.0(zod@4.6.7)
+        specifier: 3.8.0
+        version: 3.8.0(zod@4.6.7)
       '@pwfabric/runtime':
-        specifier: 3.7.0
-        version: 3.7.0(react@19.3.1)(zod@4.6.7)
+        specifier: 3.8.0
+        version: 3.8.0(react@19.3.1)(zod@4.6.7)
       '@testing-library/dom':
         specifier: ^10.4.2
         version: 10.4.2
@@ -293,8 +293,8 @@ packages:
   '@oxc-project/types@0.156.0':
     resolution: {integrity: sha512-1Duyg48TdJNdyhEB8Xn1L36bT9Pv6GUtlKjHxOys8xkaF/rQq3XJE+bAurSK/AgIz5mGFsb77cn9Pb20+WCScw==}
 
-  '@pwfabric/authoring@3.7.0':
-    resolution: {integrity: sha512-+qeSvsV6k0iTAXAKrrDu2H+9Trg5+mvPmY8ugTtTXT1yHi94QQNQMTOYxb2H/E1lhEvTXxiH+rBDAAZOByrPRQ==}
+  '@pwfabric/authoring@3.8.0':
+    resolution: {integrity: sha512-8UTkZJkDEkaClaFIDxEUL8AF0X9lJWazNWHb65BihJSKNLUTtPgyG1/hFei38frGzNQb3nZJBzHyeTLDsMmS0Q==}
     engines: {node: '>=22'}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
@@ -303,44 +303,44 @@ packages:
       zod:
         optional: true
 
-  '@pwfabric/cli@3.7.0':
-    resolution: {integrity: sha512-TzJbBQpMih/2ZGeX1q2G07z3bVPuRsuDZ3U3vQK5p5RuSFAPs3ly52K3zA1QflVuUgNP3t1/5197eo5WmaFm6w==}
+  '@pwfabric/cli@3.8.0':
+    resolution: {integrity: sha512-YlT3p3eNEEYXdWVvncLf1C1n66uG4zI2BCD1RGatOIdrU9oRdaCh4Hjva5YnzkTdxHaoF//+hYin5DQ5pkyJ7w==}
     engines: {node: '>=22'}
     hasBin: true
 
-  '@pwfabric/compiler@3.7.0':
-    resolution: {integrity: sha512-lullv31pr/lMylJ9DrAksONhglgfh7eKvISE9uWU1R4VDNKYxDNi6yKYl/cc4zuD1ZnQOSFIapqd7QNgxc1UGQ==}
+  '@pwfabric/compiler@3.8.0':
+    resolution: {integrity: sha512-oroEayFagZVqWlqTDrSyflJcammsvkXJ/KolFyP+n2LxhV2pcNot/hUIezxF4Ss2Ru/+4Nt/GtHVcn91YcKtrQ==}
     engines: {node: '>=22'}
 
-  '@pwfabric/contracts@3.7.0':
-    resolution: {integrity: sha512-ASeIM4MRFh1BotH022IWCfUHEmronYAonSb3+sahOEDn+LaClPZ3NK3PNA41Gz1ffiyQOGtqtYvBL6Dm/uXq8g==}
-    engines: {node: '>=22'}
-    peerDependencies:
-      zod: ^4.6.6
-
-  '@pwfabric/core@3.7.0':
-    resolution: {integrity: sha512-z6/ytXekL/PeRD940S6IOo/TNxTt31yj1X3eQ9YHG5FPeAI7SqSNfVULHf73KPmDGV8Q+nGNZcd3MJp/W95Jow==}
+  '@pwfabric/contracts@3.8.0':
+    resolution: {integrity: sha512-KpdnkuYFDu4stjb1UIBTZKMrLXaQJKeE1q5EChoxr3SgfmFEBjXVEkBaERgyRfeGNUmRxO3HpURhbpJ0rYNrrQ==}
     engines: {node: '>=22'}
     peerDependencies:
       zod: ^4.6.6
 
-  '@pwfabric/embed@3.7.0':
-    resolution: {integrity: sha512-S8K7zZXm9pDseO6vWzh5ma7Dvno7/CKJWKkEoGMoBCYjQPQlOeDRK9lQPAH0gyL4Gu+zfwd2jJzTkcnRU0GHvw==}
+  '@pwfabric/core@3.8.0':
+    resolution: {integrity: sha512-tGYwh5Mz6YOspvkPhV+DFOIA7S977DL2cO0ateAenChajBj0Uci6lWkNtE3Pzb3wmuMqOc2404+YfxBx5CS61w==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      zod: ^4.6.6
+
+  '@pwfabric/embed@3.8.0':
+    resolution: {integrity: sha512-3zrSzxcuQHTWobJv8GQ9VVFjMIXlznIqTucBF+jkcrUoRIJIpSbQ4Ifu5kp8WRkKOdL1k1/EHzqqDbPbBmHqLg==}
     engines: {node: '>=22'}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
 
-  '@pwfabric/pack@3.7.0':
-    resolution: {integrity: sha512-0rKUtBplf39tV4vHp1EhAe9gpIs7jL7jZR+YXNaVo+TAFEq5i0hLzyZXmf4O9Svl7l+Dn6WJgkaWY3uQIsOfhA==}
+  '@pwfabric/pack@3.8.0':
+    resolution: {integrity: sha512-AaEv9lyG9fw2dz+Eh2WqcXCKDJNqgJjgQs4on9ZpdckzulYLgy01885RYapDWvYBj7MlOqaIZEuMCyGgIUR+SA==}
     engines: {node: '>=22'}
 
-  '@pwfabric/runner@3.7.0':
-    resolution: {integrity: sha512-avG0CQAZE4fDHM2P9vWmWjL/7ULYeDuQKvnrFDDE8qo6QzYf9QN1TuthIw3RGgXBqUTO9Xh2ZfVB0/4ieRJBig==}
+  '@pwfabric/runner@3.8.0':
+    resolution: {integrity: sha512-iygQiWRHU20EgFLaXWarIwALM0gzBRa0BbYrFIPTtMzmaNls8xL8W3fpRqxHoEFjrl98530XEI8zsuNbThuPrQ==}
     engines: {node: '>=22'}
 
-  '@pwfabric/runtime@3.7.0':
-    resolution: {integrity: sha512-IwvNsZ+j7aEZsVBwfybkg3YzLZi6/udJeuO6ZUXAiXKeDKsSChbeBOJKALeNlmjp8fw55B08yrffyrrWm0Kzkw==}
+  '@pwfabric/runtime@3.8.0':
+    resolution: {integrity: sha512-vGaZIwT93jkjIzDLW+pn09PqnuLsL5dD5C0ahM5i+sBhUGsW+SyPQMkSlRuG50880iYueGW2yn+bmyzutVdaqw==}
     engines: {node: '>=22'}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
@@ -1491,25 +1491,25 @@ snapshots:
 
   '@oxc-project/types@0.156.0': {}
 
-  '@pwfabric/authoring@3.7.0(react@19.3.1)(zod@4.6.7)':
+  '@pwfabric/authoring@3.8.0(react@19.3.1)(zod@4.6.7)':
     dependencies:
-      '@pwfabric/contracts': 3.7.0(zod@4.6.7)
-      '@pwfabric/core': 3.7.0(zod@4.6.7)
-      '@pwfabric/runtime': 3.7.0(react@19.3.1)(zod@4.6.7)
+      '@pwfabric/contracts': 3.8.0(zod@4.6.7)
+      '@pwfabric/core': 3.8.0(zod@4.6.7)
+      '@pwfabric/runtime': 3.8.0(react@19.3.1)(zod@4.6.7)
       react: 19.3.1
     optionalDependencies:
       zod: 4.6.7
 
-  '@pwfabric/cli@3.7.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@pwfabric/cli@3.8.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.32.2(zod@4.6.7)
-      '@pwfabric/authoring': 3.7.0(react@19.3.1)(zod@4.6.7)
-      '@pwfabric/compiler': 3.7.0(zod@4.6.7)
-      '@pwfabric/contracts': 3.7.0(zod@4.6.7)
-      '@pwfabric/core': 3.7.0(zod@4.6.7)
-      '@pwfabric/embed': 3.7.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)
-      '@pwfabric/pack': 3.7.0(zod@4.6.7)
-      '@pwfabric/runner': 3.7.0(react@19.3.1)(zod@4.6.7)
+      '@pwfabric/authoring': 3.8.0(react@19.3.1)(zod@4.6.7)
+      '@pwfabric/compiler': 3.8.0(zod@4.6.7)
+      '@pwfabric/contracts': 3.8.0(zod@4.6.7)
+      '@pwfabric/core': 3.8.0(zod@4.6.7)
+      '@pwfabric/embed': 3.8.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)
+      '@pwfabric/pack': 3.8.0(zod@4.6.7)
+      '@pwfabric/runner': 3.8.0(react@19.3.1)(zod@4.6.7)
       esbuild: 0.28.2
       zod: 4.6.7
     transitivePeerDependencies:
@@ -1518,50 +1518,50 @@ snapshots:
       - react-dom
       - supports-color
 
-  '@pwfabric/compiler@3.7.0(zod@4.6.7)':
+  '@pwfabric/compiler@3.8.0(zod@4.6.7)':
     dependencies:
-      '@pwfabric/contracts': 3.7.0(zod@4.6.7)
-      '@pwfabric/core': 3.7.0(zod@4.6.7)
+      '@pwfabric/contracts': 3.8.0(zod@4.6.7)
+      '@pwfabric/core': 3.8.0(zod@4.6.7)
       esbuild: 0.28.2
     transitivePeerDependencies:
       - zod
 
-  '@pwfabric/contracts@3.7.0(zod@4.6.7)':
+  '@pwfabric/contracts@3.8.0(zod@4.6.7)':
     dependencies:
       zod: 4.6.7
 
-  '@pwfabric/core@3.7.0(zod@4.6.7)':
+  '@pwfabric/core@3.8.0(zod@4.6.7)':
     dependencies:
-      '@pwfabric/contracts': 3.7.0(zod@4.6.7)
+      '@pwfabric/contracts': 3.8.0(zod@4.6.7)
       zod: 4.6.7
 
-  '@pwfabric/embed@3.7.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)':
+  '@pwfabric/embed@3.8.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)':
     dependencies:
-      '@pwfabric/contracts': 3.7.0(zod@4.6.7)
-      '@pwfabric/runtime': 3.7.0(react@19.3.1)(zod@4.6.7)
+      '@pwfabric/contracts': 3.8.0(zod@4.6.7)
+      '@pwfabric/runtime': 3.8.0(react@19.3.1)(zod@4.6.7)
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
     transitivePeerDependencies:
       - zod
 
-  '@pwfabric/pack@3.7.0(zod@4.6.7)':
+  '@pwfabric/pack@3.8.0(zod@4.6.7)':
     dependencies:
-      '@pwfabric/contracts': 3.7.0(zod@4.6.7)
+      '@pwfabric/contracts': 3.8.0(zod@4.6.7)
     transitivePeerDependencies:
       - zod
 
-  '@pwfabric/runner@3.7.0(react@19.3.1)(zod@4.6.7)':
+  '@pwfabric/runner@3.8.0(react@19.3.1)(zod@4.6.7)':
     dependencies:
-      '@pwfabric/contracts': 3.7.0(zod@4.6.7)
-      '@pwfabric/runtime': 3.7.0(react@19.3.1)(zod@4.6.7)
+      '@pwfabric/contracts': 3.8.0(zod@4.6.7)
+      '@pwfabric/runtime': 3.8.0(react@19.3.1)(zod@4.6.7)
     transitivePeerDependencies:
       - react
       - zod
 
-  '@pwfabric/runtime@3.7.0(react@19.3.1)(zod@4.6.7)':
+  '@pwfabric/runtime@3.8.0(react@19.3.1)(zod@4.6.7)':
     dependencies:
-      '@pwfabric/contracts': 3.7.0(zod@4.6.7)
-      '@pwfabric/core': 3.7.0(zod@4.6.7)
+      '@pwfabric/contracts': 3.8.0(zod@4.6.7)
+      '@pwfabric/core': 3.8.0(zod@4.6.7)
       react: 19.3.1
       zod: 4.6.7
 

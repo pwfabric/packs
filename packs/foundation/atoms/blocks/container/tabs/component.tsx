@@ -150,7 +150,7 @@ export const TabsBlock: BlockComponent = ({ props, children, block, context }) =
         borderLeft: isActive ? '2px solid var(--pw-color-primary)' : '2px solid transparent',
         backgroundColor: isActive ? 'color-mix(in srgb, var(--pw-color-primary) 10%, transparent)' : 'transparent',
         color: isActive ? 'var(--pw-color-primary-ink, #18181b)' : 'var(--pw-color-text-muted)',
-        borderRadius: '0 var(--pw-border-radius-sm) var(--pw-border-radius-sm) 0',
+        borderRadius: '0 var(--pw-tabs-vertical-radius, var(--pw-border-radius-sm)) var(--pw-tabs-vertical-radius, var(--pw-border-radius-sm)) 0',
       }
     }
 
@@ -166,7 +166,7 @@ export const TabsBlock: BlockComponent = ({ props, children, block, context }) =
     if (variant === 'pills') {
       return {
         ...base,
-        borderRadius: 'var(--pw-border-radius)',
+        borderRadius: 'var(--pw-tabs-radius, var(--pw-border-radius))',
         backgroundColor: isActive ? 'var(--pw-color-primary)' : 'var(--pw-color-card)',
         color: isActive ? 'var(--pw-color-text-on-primary)' : 'var(--pw-color-text-muted)',
       }
